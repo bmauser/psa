@@ -159,9 +159,9 @@ class Psa_Router extends Psa_Model{
 			$url_arr = $this->explode_url($request_uri);
 
 		// controller name
-		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : $this->psa_registry->PSA_CFG['mvc']['default_controller_name']) . '_Controller';
+		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : $this->psa_registry->PSA_CFG['mvc']['default_controller_name']) . $this->psa_registry->PSA_CFG['mvc']['default_controller_suffix'];
 		// action name
-		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : $this->psa_registry->PSA_CFG['mvc']['default_action_name']) . '_action';
+		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : $this->psa_registry->PSA_CFG['mvc']['default_action_name']) . $this->psa_registry->PSA_CFG['mvc']['default_action_suffix'];
 		// action arguments
 		$return['arguments'] = isset($url_arr[2]) ? array_slice($url_arr, 2) : array();
 

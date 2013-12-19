@@ -221,10 +221,11 @@ $PSA_CFG['database']['table']['user_in_group'] = 'psa_user_in_group';
 /**
  * Default controller and action names.
  * These values are used by Psa_Router::get_dispatch_data() method.
- * _Controller and _action sufix will be added to these values (Default_Controller, default_action)
  */
 $PSA_CFG['mvc']['default_controller_name'] = 'Default';
 $PSA_CFG['mvc']['default_action_name'] = 'default';
+$PSA_CFG['mvc']['default_controller_suffix'] = '_Controller';
+$PSA_CFG['mvc']['default_action_suffix'] = '_action';
 
 
 /**
