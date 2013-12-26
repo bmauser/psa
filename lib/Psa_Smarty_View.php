@@ -32,10 +32,10 @@
 /**
  * Class for views that use {@link http://www.smarty.net Smarty} template engine.
  *
- * Classes that extends {@link Psa_Dully_View} or {@link Psa_Smarty_View} class are place for for methods that will
- * print results from your application. This can be HTML, XML or something else like plain text.
+ * Classes that extend {@link Psa_Dully_View} or {@link Psa_Smarty_View} class are the place for methods that will
+ * print results from your application. This can be HTML, XML or something else like a plain text.
  * View methods, like model methods, are called from controller. All application logic should
- * be in model and in view you should put only part for displaying results (presentational logic) like
+ * be in model and in view you should put only part of the logic for displaying results (presentation logic) like
  * template rendering code.
  *
  * You can write <i>Psa_Smarty_View</i> views by extending this class. Here is an example:

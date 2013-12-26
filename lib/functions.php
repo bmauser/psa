@@ -154,10 +154,9 @@ function psa_del_user_group($id, $user_or_group){
  * psa_delete_user(array(1, 3, 5, 'my_user'))
  * </code>
  *
- * @param int|array|string $user ID or username of the user or array with user
- * ids or usernames. <kbd>all</kbd> to delete all users.
- * @return int 0 for failure, 1 for success, -1 user (or more users) not exists
- * {@internal @see psa_del_user_group()}}
+ * @param int|array|string $user ID or username or array with user
+ * IDs or usernames. "<kbd>all</kbd>" to delete all users.
+ * @return int 0 for failure, 1 for success, -1 if an user (or more users) don't exist
  */
 function psa_delete_user($user){
 	return psa_del_user_group($user, 1);
@@ -180,10 +179,9 @@ function psa_delete_user($user){
  * psa_delete_group(array(1, 3, 5, 'my_group'))
  * </code>
  *
- * @param int|array|string $group ID or name of the group or array with group ids or group names.
- * <kbd>all</kbd> to delete all groups.
- * @return int 0 for failure, 1 for success, -1 group (or more groups) not exists
- * {@internal @see psa_del_user_group()}}
+ * @param int|array|string $group ID or group name or array with group IDs or group names.
+ * "<kbd>all</kbd>" to delete all groups.
+ * @return int 0 for failure, 1 for success, -1 if a group (or more groups) don't exist
  */
 function psa_delete_group($group){
 	return psa_del_user_group($group, 2);
@@ -194,11 +192,11 @@ function psa_delete_group($group){
  * Executes (runs) hooks.
  *
  * This function is used for calling hooks.
- * It includes hooks files, makes a new instances of hook objects named like hook class
- * and calls member methods. It can call class methods in two different ways depending on second argument.
+ * It includes hooks files, makes new instances of hook objects and calls member methods.
+ * It can call class methods in two different ways depending on the second argument.
  *
- * If the second argument is true hooks are called <i>by type</i> (hook type is the name of the class it extends)
- * and in this case first argument should be an array with elements like in example below:
+ * If the second argument is true, hooks are called <i>by type</i>. Hook type is the name of the class it extends.
+ * In this case the first argument should be an array with elements like in example below:
  * <code>
  * // $run is array that will be argument for psa_run_hooks() function
  * // Structure should be: $run['hook_type']['hook_method'] = array('method_argument1','method_argument2',...);
@@ -208,8 +206,8 @@ function psa_delete_group($group){
  * This example calls method <kbd>psa_main</kbd> with one argument (177) from all registered
  * <kbd>Psa_Hook_Before_User_Delete</kbd> hooks.
  *
- * If the second argument is false (default) hooks are called <i>by name</i> (hook name is same
- * as it's class name) and in this case first argument should be array with elements
+ * If the second argument is false (default) hooks are called <i>by name</i> (hook name is the same
+ * as its class name) and in this case first argument should be an array with elements
  * like in this example:
  * <code>
  * // $run is array that will be argument for psa_run_hooks() function
@@ -224,12 +222,11 @@ function psa_delete_group($group){
  * This function will throw {@link Psa_Exception} on error.
  *
  * @param array $run_data Array with data what to run.
- * @param bool $by_type If true hooks will be called <i>by type</i> otherwise will be called <i>by name</i>.
- * @param bool $disable_unregistered_exception Exception that hook is not registered will not be thrown.
- * This parameter can be set to true when hook doesn't have to be registered like
- * {@link Psa_Hook_After_User_Create}.
- * @return int 1:success all hooks executed, -1:success, but not with all hooks because some are
- * probably not registered. -1 can be returned only when third argument is set to true otherwise
+ * @param bool $by_type If true, hooks will be called <i>by type</i>, otherwise they'll be called <i>by name</i>.
+ * @param bool $disable_unregistered_exception Exception that hook is not registered won't be thrown.
+ * This parameter can be set to true when hook doesn't have to exist.
+ * @return int 1 for success (all hooks are executed), -1 for success, but not with all hooks because some are
+ * probably not registered or don't exist. -1 can be returned only when third argument is set to true, otherwise
  * exception will be thrown.
  * @see Psa_Files::register()
  * @throws Psa_Exception
@@ -330,17 +327,17 @@ function psa_run_hooks($run_data, $by_type = false, $disable_unregistered_except
 
 
 /**
- * This function is registered with PHP <kbd>spl_autoload_register()</kbd> function as <kbd>__autoload()</kbd> implementation
- * used to auto include files.
+ * This function is registered with the PHP <kbd>spl_autoload_register()</kbd> function as <kbd>__autoload()</kbd> implementation
+ * used to auto include .php files.
  *
- * Thus if you want to extend some class you don't have to include its file, it will be included automatically.
+ * Thus, if you want to extend some class you don't have to include its file, it will be included automatically.
  *
  * <b>Note:</b> Class autoloading will be working only in folders specified with
  * <var>$PSA_CFG['folders']['autoload'][]</var> and <var>$PSA_CFG['folders']['hook_autoload'][]</var> configuration
- * options. Also file registration must be invoked before to generate <kbd>autoload_data.php</kbd> file. There is CLI
- * <kbd>register_files.php</kbd> script for that.
+ * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array 
+ * with all classes and their paths. There is a command line helper script <kbd>register_files.php</kbd> for that.
  *
- * For example, you can just extends Psa_Mode class without including it's file:
+ * For example, you can just extend <i>Psa_Model</i> class without including its .php file:
  * <code>
  * <?php
  * class My_Model extends Psa_Model{
@@ -372,7 +369,7 @@ function psa_autoload($class_name){
 
 
 /**
- * You can use this function instead of <kbd>echo</kbd> or <kbd>print_r</kbd> functions during development.
+ * You can use this function instead of <kbd>echo</kbd> or <kbd>print_r</kbd> functions.
  *
  * <b>Example:</b>
  *
@@ -407,9 +404,9 @@ function prs($str, $return_only = false){
  * 	echo 'User with ID 2 is in the group with ID 55';
  * </code>
  *
- * @param int $user user id
- * @param int $group group id
- * @return int 1 if user is a member of the group, otherwise 0
+ * @param int $user user ID
+ * @param int $group group ID
+ * @return bool 1 if user is a member of the group, otherwise 0
  */
 function psa_is_user_in_group($user, $group){
 
@@ -433,7 +430,7 @@ function psa_is_user_in_group($user, $group){
 
 
 /**
- * Adds given path to PHP <var>include_path</var> configuration directive.
+ * Adds a given path to the PHP <var>include_path</var> configuration directive.
  *
  * It can be useful when you work with some externals libraries.
  *
@@ -443,7 +440,7 @@ function psa_is_user_in_group($user, $group){
  * psa_add_include_path('/usr/share/somefolder');
  * </code>
  *
- * @param string $path path to add to include path
+ * @param string $path path to add to <var>include_path</var>
  * @return string|bool returns the old include_path on success or FALSE on failure.
  * @see http://www.php.net/manual/en/ini.core.php#ini.include-path
  */

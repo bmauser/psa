@@ -32,14 +32,14 @@
 /**
  * This class handles logging.
  *
- * Logs are by default written to database into <i>psa_log</i> table but can be also
- * written to a file depending on settings in {@link config.php} file.
+ * Logs are by default written to database into <i>psa_log</i> table, but can be also
+ * written to a file depending on the settings in {@link config.php} file.
  *
  * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern singleton pattern}
  * to ensure that there is only one instance of the {@link Psa_Logger} object and
  * to allow that this single instance is easily accessible from any scope.
- * You should not make instance of {@link Psa_Logger} object with the <kbd>new</kbd> operator
- * instead call static method {@link get_instance()}.
+ * You cannot not make an instance of {@link Psa_Logger} object with the <kbd>new</kbd> operator,
+ * call static method {@link get_instance()} instead.
  *
  * <br><b>Examples:</b>
  *
@@ -59,7 +59,7 @@
  *       return parent::get_instance(__CLASS__);
  *    }
  *
- *    // your method for generate database query
+ *    // your method for database query
  *    function format_database_log_query($log_storage){
  *    		//...
  *    }
@@ -96,10 +96,10 @@ class Psa_Logger extends Psa_Singleton{
 
 
 	/**
-	 * Returns instance of the {@link Psa_Logger} object.
+	 * Returns the instance of the {@link Psa_Logger} object.
 	 *
-	 * You should statically call this method with scope resolution operator (::) which gives you
-	 * access to the logging object from anywhere in your application, whether it is from a function,
+	 * You should statically call this method with the scope resolution operator (::) which gives you
+	 * the access to the logging object from anywhere in your application, whether it is from a function,
 	 * a method, or the global scope.
 	 * Example:
 	 * <code>
@@ -120,21 +120,21 @@ class Psa_Logger extends Psa_Singleton{
 	/**
 	 * Writes logs.
 	 *
-	 * Writes a log record to database or file. This depends on settings (<var>$PSA_CFG['logging']</var>)
-	 * in {@link config.php}. First argument can be array or string. If is a string it is written to the log.
-	 * If it is array some other values in log record can be set. Here is example array with all
-	 * available elements and example values that can be used as first argument for this method.
+	 * Writes a log record to the database or a file. This depends on the settings (<var>$PSA_CFG['logging']</var>)
+	 * in {@link config.php}. First argument can be an array or a string. If it's a string, it is written to the log.
+	 * If it's an array, some other values in the log record can be set. Here is an example array with all
+	 * the available elements and values that can be used as the first argument to this method.
 	 * <pre>
 	 * Array
 	 * (
-	 *     [user_id] => 5                // id of user
+	 *     [user_id] => 5                // user ID
 	 *     [username] => john            // username
-	 *     [group_id] => 3               // id of group
+	 *     [group_id] => 3               // group ID
 	 *     [groupname] => test           // group name
 	 *     [message] => new user created // log message
-	 *     [function] => Psa_User::save  // method or function name that created log
+	 *     [function] => Psa_User::save  // method or function name that created the log record
 	 *     [level] => 2                  // Log level, default 1. Integer. If greater than <var>$PSA_CFG['logging']['level']</var> log will not be saved.
-	 *     [type] => general             // Log message type. For exceptions this is exception class name. Custom string value.
+	 *     [type] => general             // Log message type. Class name for exceptions or custom string value.
 	 * )
 	 * </pre>
 	 * All array elements are optional.
@@ -158,11 +158,10 @@ class Psa_Logger extends Psa_Singleton{
 	 * ?>
 	 * </code>
 	 *
-	 * @param array|string $log_data array with data to be logged or log message only. If is a string, that string
-	 * is used as message to be logged.
-	 * @param int|string $log_storage storage for the log. This is index of <var>$PSA_CFG['logging']['storage']</var>
+	 * @param array|string $log_data Array with data to be logged or log message only.
+	 * @param int|string $log_storage Storage for the log. This is the index of <var>$PSA_CFG['logging']['storage']</var>
 	 * array in {@link config.php}. Default is 'psa_default'.
-	 * @return int 0 for failure, 1 for success, -1 logging is disabled or the log level for message is set too low
+	 * @return int 0 for failure, 1 for success, -1 logging is disabled or the log level for the message is set too low
 	 * (bigger number than <var>$PSA_CFG['logging']['max_log_level'] </var>).
 	 * @see get_instance()
 	 * @see format_file_log()
@@ -273,11 +272,11 @@ class Psa_Logger extends Psa_Singleton{
 
 
 	/**
-	 * Returns SQL insert query that inserts row to <i>psa_log</i> database table.
+	 * Returns SQL insert query that inserts row to the <i>psa_log</i> database table.
 	 *
-	 * Override this method if you want to change log format in the database. You will have
-	 * to manually alter log database table if you wish to add some new columns into it.
-	 * This method has to have matching {@link format_database_log_query_params()} method.
+	 * Override this method if you want to change the log format in the database. You will have
+	 * to manually alter the log database table if you wish to add some new columns into it.
+	 * This method has to have the matching {@link format_database_log_query_params()} method.
 	 *
 	 * @param int $log_storage see {@link log()} method
 	 * @see format_database_log_query_params()
@@ -320,12 +319,11 @@ class Psa_Logger extends Psa_Singleton{
 
 
 	/**
-	 * Formats log message that will be written into the log file.
+	 * Formats a log message that will be written into the log file.
 	 *
-	 * Override this method if you want to change log format.
+	 * Override this method if you want to change the log format.
 	 *
 	 * @param array $log_data see {@link log()} method
-	 * @param int $log_storage see {@link log()} method
 	 * @see format_database_log()
 	 * @see log()
 	 * @return string

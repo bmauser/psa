@@ -37,17 +37,18 @@
  *
  * <br><b>1)</b> Create a new user group:
  * <code>
- * // if you want to create a new user group use 'new' as argument to constructor
+ * // if you want to create a new user group use 'new' as argument to the constructor
  * $group = new Psa_Group('new');
  *
- * // set name
+ * // set name of the new grop
  * $group->name = 'my_new_user_group';
  *
  * // save the group to the database and get ID of the newly created group
  * $new_group_id = $group->save();
  * </code>
  *
- * <br><b>2)</b> Extend <kbd>Psa_Group</kbd> class if you add more columns to <i>psa_group</i> database table:
+ * <br><b>2)</b> 
+ * If you want to add more columns to <i>psa_group</i> database table, extend <kbd>Psa_Group</kbd> class:
  * <code>
  * class MyGroup extends Psa_Group{
  *
@@ -66,7 +67,7 @@
  *
  * Because this class extends {@link Psa_Active_Record} you can save data in the database table
  * by setting corresponding object member variables and call {@link save()} method. After calling
- * {@link restore()} method corresponding object member variables will have values fetched from the
+ * {@link restore()} method, corresponding object member variables will have values fetched from the
  * database.
  *
  *
@@ -89,7 +90,7 @@ class Psa_Group extends Psa_Active_Record{
 	/**
 	 * Name of the group.
 	 * There cannot be two groups with the same name.
-	 * You will need to set this value when creating a new group or renaming group.
+	 * You will need to set this value when creating a new group or renaming a group.
 	 *
 	 * @var string
 	 */
@@ -101,13 +102,13 @@ class Psa_Group extends Psa_Active_Record{
 	/**
 	 * Constructor.
 	 *
-	 * Must be called with the group id or group name as argument.
+	 * Must be called with the group ID or group name as argument.
 	 * Pass <kbd>'new'</kbd> as argument if you want to create a new group.
 	 * See examples in {@link Psa_Group} class description.
 	 *
-	 * @param int|string $group_id_or_name Group ID or group name or 'new' if new group should be created.
+	 * @param int|string $group_id_or_name Group ID or group name or 'new' if a new group should be created.
 	 * @param array $table_columns Columns in the <i>psa_group</i> database table. If you add more
-	 * columns to the database table pass column names with this argument.
+	 * columns to the database table, pass column names with this argument.
 	 * @see save()
 	 */
 	public function __construct($group_id_or_name, array $table_columns = array('id', 'name')){
@@ -140,14 +141,14 @@ class Psa_Group extends Psa_Active_Record{
 	/**
 	 * Restores member variables from the database previously saved with {@link save()} method.
 	 *
-	 * Reads values from the database and populates corresponding object member variables. For example
-	 * if you have added to <i>psa_group</i> table column named <kbd>access_level</kbd> and you passed
-	 * the name of the column to constructor with <kbd>$table_columns</kbd> parameter, then when
-	 * this method is called, member variable with name <kbd>access_level</kbd> will be populated with
-	 * value from the database.
+	 * Reads values from the database and populates corresponding object member variables. For example,
+	 * if you have added to <i>psa_group</i> table column named <kbd>access_level</kbd>, and you passed
+	 * the name of the column to the constructor with <var>$table_columns</var> parameter. Then, when
+	 * this method is called, member variable named <kbd>access_level</kbd> will be populated with
+	 * a value from the database.
 	 *
-	 * @param array $only_columns Array with column names to restore from the database. If not set
-	 * all columns which names are passed to constructor are restored.
+	 * @param array $only_columns Array with column names to restore from the database. If not set,
+	 * all columns which names are passed to the constructor are restored.
 	 * @see save()
 	 * @throws Psa_Group_Exception
 	 */
@@ -168,14 +169,14 @@ class Psa_Group extends Psa_Active_Record{
 
 
 	/**
-	 * Saves values from member variables to the database.
+	 * Saves values from the member variables to the database.
 	 *
 	 * It also sets {@link $id} member variable if a new group is created.
 	 * See examples in {@link Psa_Group} class description. This method will throw
 	 * {@link Psa_Group_Exception} on error.
 	 *
 	 * @param array $only_columns
-	 * @return int ID of saved group for success.
+	 * @return int ID of the saved group for success.
 	 * @throws Psa_Group_Exception
 	 */
 	public function save(array $only_columns = array()){
@@ -205,11 +206,11 @@ class Psa_Group extends Psa_Active_Record{
 
 
 	/**
-	 * Puts user in the group or more users if the <var>$user_id</var> argument is array.
+	 * Puts an user or more users in the group if the <var>$user_id</var> argument is an array.
 	 *
-	 * Group membership changes are immediately stored in the database and you don't have to
+	 * Group membership changes are immediately stored in the database, and you don't have to
 	 * call {@link save()} method after.
-	 * If you creating a new group this method must be called after {@link save()} method.
+	 * If you are creating a new group, this method must be called after {@link save()} method.
 	 * Throws {@link Psa_Group_Exception} on error.
 	 *
 	 * Example:
@@ -221,8 +222,8 @@ class Psa_Group extends Psa_Active_Record{
 	 * </code>
 	 *
 	 * @param int|array $user_id ID of the user. Or array with user IDs.
-	 * @return int 1 for success, -1 user already was in the group (or more groups)
-	 * or user does not exists
+	 * @return int 1 for success, -1 user was already in the group (or more groups)
+	 * or user doesn't exist
 	 * @see remove_user()
 	 * @throws Psa_Group_Exception
 	 */
@@ -232,11 +233,11 @@ class Psa_Group extends Psa_Active_Record{
 
 
 	/**
-	 * Removes user from the group or more users if the <var>$user_id</var> argument is array.
+	 * Removes user from the group or removes more users if the <var>$user_id</var> argument is an array.
 	 *
 	 * Group membership changes are immediately stored in the database and you don't have to
 	 * call {@link save()} method after.
-	 * If you creating a new group this method must be called after {@link save()} method.
+	 * If you are creating a new group, this method must be called after {@link save()} method.
 	 * Throws {@link Psa_Group_Exception} on error.
 	 *
 	 * Example:
@@ -248,8 +249,8 @@ class Psa_Group extends Psa_Active_Record{
 	 * </code>
 	 *
 	 * @param int|array $user_id ID of the user. Or array with user IDs.
-	 * @return int 1 for success, -1 user was not member of the group (or more groups)
-	 * or user does not exists
+	 * @return int 1 for success, -1 user was not a member of the group (or more groups)
+	 * or user doesn't exist
 	 * @see remove_user()
 	 * @throws Psa_Group_Exception
 	 */
