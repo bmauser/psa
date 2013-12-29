@@ -54,13 +54,13 @@
  * ?>
  * </code>
  *
- * When this example hook is registered every new created user will have property called
+ * When this example hook is registered, every new user will have property called
  * <kbd>favorite_background_color</kbd> with value '<kbd>white</kbd>'.
  *
- * <b>Note:</b> this hook is called before the new user is created and saved to database. Because of that
- * this hook will be called even if the user is not created due to some error like user with the same userneme
- * already exists in the database. If you set some property to user like <i>favorite_background_color</i> in
- * example above and user is successfully created this property will be saved to the database and you don't have to call
+ * <b>Note:</b> this hook is called before the new user is created and saved to the database. Because of that,
+ * this hook will be called even if the user is not created due to some error, ex. user with the same userneme
+ * already exists in the database. If you set some property to the user like <i>favorite_background_color</i> in
+ * the example above and the user is successfully created, this property will be saved to the database and you don't have to call
  * {@link Psa_User::save()} method later to store it. That is unlike {@link Psa_Hook_After_User_Create} hook.
  * Also, a user ID is unknown when this hook is called and is set after the user is created.
  *

@@ -55,10 +55,10 @@
  * ?>
  * </code>
  *
- * When this example hook is registered, before every user deletion with {@link psa_delete_user()} function
+ * When this example hook is registered, before user deletion with {@link psa_delete_user()} function,
  * folder associated with user will be deleted.
  *
- * <b>Note:</b> argument passed to the <kbd>psa_main()</kbd> method can be integer (user ID) or string (username) this depends on
+ * <b>Note:</b> argument passed to the <kbd>psa_main()</kbd> method can be an integer (user ID) or a string (username). It depends on
  * what you pass to {@link psa_delete_user()} function.
  *
  * @see Psa_User

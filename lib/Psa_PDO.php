@@ -30,7 +30,7 @@
 
 
 /**
- * Simple database connection class and database access wrapper class.
+ * It's a simple database connection class and database access wrapper class.
  *
  * Handles database connection and executes queries against the database.
  * PSA uses {@link http://www.php.net/pdo PHP Data Objects (PDO)} extension for
@@ -40,8 +40,7 @@
  * same database connection that can be accessed through <var>$this->psa_database->pdo</var>
  * which is PDO object.
  *
- * See in examples below how you can access Psa_PDO object or PDO connection object
- * in model methods.
+ * See in examples how to interact with database in model methods.
  *
  * <br><b>Examples:</b>
  *
@@ -62,7 +61,7 @@
  *     }
  *
  *
- *     // returns one row from a table
+ *     // returns one row from the table
  *     function get_one_row(){
  *         return $this->psa_database->fetch_row("SELECT * FROM table WHERE id = 123");
  *     }
@@ -239,10 +238,10 @@ class Psa_PDO{
 	/**
 	 * Connects to the database.
 	 *
-	 * If called without arguments it first uses connection parameters from object properties ({@link $dsn},
+	 * If called without arguments, it first uses connection parameters from object properties ({@link $dsn},
 	 * {@link $username}, {@link $password}, {@link $driver_options}) and if
-	 * {@link $dsn} value is not set takes connection parameters from <var>$PSA_CFG</var> config array
-	 * from {@link config.php}.
+	 * {@link $dsn} value is not set, it takes connection parameters from <var>$PSA_CFG</var> config array
+	 * (set in {@link config.php} or config_override.php).
 	 * Throws a {@link Psa_Db_Exception} if the attempt to connect to the requested database fails.
 	 *
 	 * @param string $dsn PDO data source name.
@@ -342,7 +341,7 @@ class Psa_PDO{
 
 
 	/**
-	 * Returns only one column from a result as one dimensional array.
+	 * Returns only one column from the result as one dimensional array.
 	 *
 	 * @param int $column Column index. 0 for the first column.
 	 * @param string $sql Database query.

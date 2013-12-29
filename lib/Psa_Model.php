@@ -30,19 +30,18 @@
 
 
 /**
- * Models are place for all the domain business logic of your application.
+ * Models are the place for all business logic of your application.
  *
- * In the model you do all calculations, get and store data to the database and all other business logic
- * of your application. When you extend this class just some object properties will be set, it has only
- * simple constructor method.
+ * You can put all your calculations, database interaction and all other business 
+ * logic in the model methods. 
  *
- * Your model classes will contain methods that are called from the controller. You should organize your model methods
- * into more model classes to be logically grouped. You can also put classes for each group of operations into
- * different subfolder.
+ * Your model classes will contain methods that are called from the controller.
  *
- * You can put results from the model into {@link Psa_Result} object because it is accessible from templates
- * and view objects (see {@link Psa_Dully_View} or {@link Psa_Smarty_View}). But it is better and cleaner to make
- * all your models to return values and then in the controller action method pass results from model to view method.
+ * You can put results from the model into the {@link Psa_Result} object because
+ * it is accessible from templates and view objects (see {@link Psa_Dully_View} or 
+ * {@link Psa_Smarty_View}). But, it is better and cleaner to make all your model 
+ * methods to return values and then, in the controller action method you can pass 
+ * results from the model to the view method as arguments.
  *
  * You can write your models by extending this class. Here is an example:
  *
@@ -57,8 +56,8 @@
  * </code>
  *
  * <br>By extending <i>Psa_Model</i> class only {@link $psa_result}, {@link $psa_registry} and {@link $psa_database} properties
- * are set. So if you do not need any of them in your model methods your model class don't need to extend <i>Psa_Model</i>.
- * For example this is also a valid model class:
+ * are set. So, if you do not need any of them in your model methods, your model class doesn't need to extend <i>Psa_Model</i>.
+ * For example, this is also a valid model class:
  *
  * <code>
  * <?php
@@ -99,7 +98,7 @@ class Psa_Model{
 
 
 	/**
-	 * Reference to database connect object
+	 * Reference to database object
 	 * @var Psa_PDO
 	 */
 	protected $psa_database;

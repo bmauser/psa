@@ -33,7 +33,7 @@
  * Abstract class for <i>Psa_Hook_Before_Group_Create</i> hooks.
  *
  * You can write <i>Psa_Hook_Before_Group_Create</i> hooks by extending this class.
- * You start a new group creation process by passing '<kbd>new</kbd>' to {@link Psa_Group} class constructor. See
+ * You can create a new group by passing '<kbd>new</kbd>' to {@link Psa_Group} class constructor. See
  * {@link Psa_Group::__construct()} method of {@link Psa_Group} class.
  *
  * Before a new group is successfully created with {@link Psa_Group::save()} method,
@@ -54,15 +54,15 @@
  * ?>
  * </code>
  *
- * When this example hook is registered every new created group will have property called
+ * When this example hook is registered, every new created group will have a property called
  * <kbd>good_students</kbd> with value '<kbd>yes</kbd>'.
  *
- * <b>Note:</b> this hook is called before a new group is created and saved to database. Because of that
- * this hook will be called even if the group is not created due to some error like group with same name
- * already exists in the database. If you set some property to the group like <i>good_students</i> in
- * example above and the group is successfully created this property will be saved to the database and you don't have to call
+ * <b>Note:</b> this hook is called before a new group is created and saved to the database. Because of that,
+ * this hook will be called even if the group is not created due to some error, ex. group with the same name
+ * already exists in the database. If you set some property to the group like <i>good_students</i> in the
+ * example above and the group is successfully created, this property will be saved to the database and you don't have to call
  * {@link Psa_Group::save()} method later to store it. That is unlike {@link Psa_Hook_After_Group_Create} hook.
- * Also, a group ID is unknown when this hook is called and is is set after the group is created.
+ * Also, a group ID is unknown when this hook is called and it is set after the group is created.
  *
  * @see Psa_Group::save()
  * @see Psa_Hook_Before_User_Create
@@ -70,7 +70,7 @@
 abstract class Psa_Hook_Before_Group_Create extends Psa_Model{
 
 	/**
-	 * This method will be called after a new group is successfully
+	 * This method will be called before a new group is 
 	 * created with {@link Psa_Group::save()} method.
 	 *
 	 * @param Psa_Group $group_object Reference to the {@link Psa_Group} object whose {@link Psa_Group::save()} method is invoked.

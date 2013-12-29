@@ -55,10 +55,10 @@
  * ?>
  * </code>
  *
- * When this example hook is registered, before every group deletion with {@link psa_delete_group()} function
- * folder associated with group will be deleted.
+ * When this example hook is registered, before group deletion with {@link psa_delete_group()} function,
+ * folder associated with the group will be deleted.
  *
- * <b>Note:</b> argument passed to the <kbd>psa_main()</kbd> method can be integer (group ID) or string (group name) this depends on
+ * <b>Note:</b> argument passed to the <kbd>psa_main()</kbd> method can be an integer (group ID) or a string (group name) this depends on
  * what you pass to {@link psa_delete_group()} function.
  *
  * @see Psa_Group
@@ -69,7 +69,7 @@ abstract class Psa_Hook_Before_Group_Delete extends Psa_Model{
 
 	/**
 	 * This method will be called before the group is deleted from
-	 * database with {@link psa_delete_group()} function.
+	 * the database with {@link psa_delete_group()} function.
 	 *
 	 * @param int|string $group ID or name of the group to be deleted.
 	 * Same as passed to {@link psa_delete_group()} function.

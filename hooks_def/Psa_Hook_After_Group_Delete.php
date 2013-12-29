@@ -51,15 +51,15 @@
  * ?>
  * </code>
  *
- * When this example hook is registered, after every group deletion with {@link psa_delete_group()} function
- * folder associated with group will be deleted.
+ * When this example hook is registered, after group deletion with {@link psa_delete_group()} function,
+ * folder associated with the group will be deleted.
  *
- * <b>Note:</b> the record about the group in the database will be deleted before calling <kbd>psa_main()</kbd> method.
- * So you cannot read other information about the group from the database because database record doesn't
- * exists any more and all information you have is group ID or name passed as argument to <kbd>psa_main()</kbd> method.
+ * <b>Note:</b> the row in the database will be deleted before calling hook's <kbd>psa_main()</kbd> method.
+ * So, you cannot read other information about the group from the database because database record doesn't
+ * exist any more and all information you have is group ID or name passed as argument to <kbd>psa_main()</kbd> method.
  *
- * <b>Note:</b> the argument passed to the <kbd>psa_main()</kbd> method can be integer (group ID) or string (group name)
- * this depends on what you pass to {@link psa_delete_group()} function.
+ * <b>Note:</b> the argument passed to the <kbd>psa_main()</kbd> method can be integer (group ID) or string (group name).
+ * This depends on what you pass to {@link psa_delete_group()} function.
  *
  *
  * @see Psa_Group
@@ -69,9 +69,9 @@ abstract class Psa_Hook_After_Group_Delete extends Psa_Model{
 
 
 	/**
-	 * This method will be called after the group is successfully deleted from database with {@link psa_delete_group()} function.
+	 * This method will be called after the group is successfully deleted from the database with {@link psa_delete_group()} function.
 	 *
-	 * @param int|string $group ID or name of the deleted group. Same as passed to {@link psa_delete_group()} function.
+	 * @param int|string $group ID or name of the deleted group as passed to {@link psa_delete_group()} function.
 	 * @see psa_delete_group()
 	 */
 	abstract protected function psa_main($group);

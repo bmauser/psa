@@ -32,8 +32,8 @@
 /**
  * Abstract class for <i>Psa_Hook_After_Group_Create</i> hook.
  *
- * You make <i>Psa_Hook_After_Group_Create</i> hooks by extending this class.
- * You can crate a new group by passing '<kbd>new</kbd>' to {@link Psa_Group} class constructor. See
+ * You can make <i>Psa_Hook_After_Group_Create</i> hooks by extending this class.
+ * You can create a new group by passing '<kbd>new</kbd>' to {@link Psa_Group} class constructor. See
  * {@link Psa_Group::__construct()} method.
  *
  * After a new group is successfully created with {@link Psa_Group::save()} method,
@@ -54,10 +54,10 @@
  * ?>
  * </code>
  *
- * When this example hook is registered every new created group will have property called
+ * When this example hook is registered, every new created group will have a property called
  * <kbd>students</kbd> with value '<kbd>yes</kbd>'.
  *
- * <b>Note:</b> if you set some property to the group like <i>students</i> in the example above
+ * <b>Note:</b> if you set some property to the group, like <i>students</i> in the example above,
  * it will not be saved until you call {@link Psa_Group::save()} method again.
  *
  *

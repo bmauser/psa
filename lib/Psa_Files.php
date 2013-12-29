@@ -32,12 +32,13 @@
 /**
  * Class that collects (registers) information about file paths in your application for autoloading.
  *
- * If <var>$PSA_CFG['develop_mode']</var> is on, file registration is done on every request
- * for convenience that you don't need manually register if you add some class to your project.
+ * If <var>$PSA_CFG['develop_mode']</var> is true and <var>$PSA_CFG['develop_mode_register_files']</var> 
+ * is true, file registration is done on every request for convenience that you don't need to manually 
+ * register files if you add some class to your project.
  *
  * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern singleton pattern}
- * so you can get reference to result object from any scope with
- * {@link get_instance()} method. You cannot make instance of Psa_Files object with
+ * so you can get reference to Psa_Files object from any scope with
+ * {@link get_instance()} method. You cannot make instance of Psa_Files object with the 
  * <var>new</var> operator.
  *
  * @see register_files.php
@@ -79,7 +80,7 @@ class Psa_Files extends Psa_Singleton{
 	 * fills {@link $files_data} member array.
 	 *
 	 * <b>Note:</b> you don't need to call this method if you called {@link save()} or {@link register()}
-	 * method before cause {@link register()} method will also fill {@link $files_data} array.
+	 * method before because {@link register()} method will also fill {@link $files_data} array.
 	 * This method only reads previously saved files data from the file.
 	 *
 	 * @see $files_data
@@ -322,7 +323,7 @@ class Psa_Files extends Psa_Singleton{
 	 *
 	 * By default the data is stored in <kbd>autoload_data.php</kbd> file. You can change that with
 	 * <var>$PSA_CFG['autoload_data_file']</var> config value.
-	 * If called without arguments it first calls {@link register()} method.
+	 * If called without arguments, it first calls {@link register()} method.
 	 * Throws {@link Psa_File_Exception} on error.
 	 *
 	 * @param array $files_data array returned from {@link register()} method

@@ -30,13 +30,11 @@
 
 
 /**
- * Class for object that can be used for storing results from model methods.
+ * Class for an object that can be used for storing results from model methods.
  *
- * Object instanced from this class can be used to collect results from models.
- * It's only purpose is to transfer results from model to view, but cleaner way
- * to do that is to make model methods to return the value and pass it to the view method
- * as argument in the controller action method.
- * This class implements singleton pattern and beside that is without any properties or methods.
+ * The only purpose of <kbd>Psa_Result</kbd> object is to transfer results from model to view, 
+ * but a nicer way to do that is to make model methods to return the value and pass it 
+ * to the view method as argument in the controller action method.
  * In <i>models</i> and <i>views</i> you can access <kbd>Psa_Result</kbd> object through
  * references in local scope.
  * For example, you can add property to <kbd>Psa_Result</kbd> object in your model
@@ -64,7 +62,7 @@
  *
  * 	function get_numbers(){
  *
- * 		// put some numbers in result object using reference in local scope
+ * 		// put some numbers in the result object using the reference in local scope
  * 		$this->psa_result->numbers = array(1,2,3);
  *
  * 		// or the same thing but using get_instance() method. This works from any scope.

@@ -32,7 +32,7 @@
 /**
  * Abstract class for <i>Psa_Hook_After_User_Delete</i> hooks.
  *
- * You write <i>Psa_Hook_After_User_Delete</i> hooks by extending this class.
+ * You can write <i>Psa_Hook_After_User_Delete</i> hooks by extending this class.
  * After the user is successfully deleted from the database with {@link psa_delete_user()} function,
  * <kbd>psa_main()</kbd> method of the hook object that extends this class will be called.
  * <br><br><b>Example:</b>
@@ -52,14 +52,14 @@
  * </code>
  *
  * When this example hook is registered, after every user deletion with {@link psa_delete_user()} function
- * folder associated with user will be deleted.
+ * folder associated with the user will be deleted.
  *
- * <b>Note:</b> the record about the user in the database will be deleted before calling hook's <kbd>psa_main()</kbd> method.
- * So you cannot read other information about the user from database (authorize user) because database record doesn't
- * exists and all information you have is user ID or username passed as argument to <kbd>psa_main()</kbd> method.
+ * <b>Note:</b> the row in the database will be deleted before calling hook's <kbd>psa_main()</kbd> method.
+ * So, you cannot read other information about the user from the database because database record doesn't
+ * exist and all information you have is user ID or username passed as argument to <kbd>psa_main()</kbd> method.
  *
- * <b>Note:</b> the argument passed to the <kbd>psa_main()</kbd> method can be integer (user ID) or string (username) this depends on
- * what you pass to {@link psa_delete_user()} function.
+ * <b>Note:</b> the argument passed to the <kbd>psa_main()</kbd> method can be integer (user ID) or string (username)
+ * this depends on what you pass to {@link psa_delete_user()} function.
  *
  *
  * @see Psa_User
@@ -69,8 +69,8 @@ abstract class Psa_Hook_After_User_Delete extends Psa_Model{
 
 
 	/**
-	 * This method will be called after the user is successfully deleted from database with {@link psa_delete_user()} function.
-	 * @param int|string $user ID or username name of the deleted user. Same as passed to {@link psa_delete_user()} function.
+	 * This method will be called after the user is successfully deleted from the database with {@link psa_delete_user()} function.
+	 * @param int|string $user ID or username name of the deleted user as passed to {@link psa_delete_user()} function.
 	 * @see psa_delete_user()
 	 */
 	abstract protected function psa_main($user);

@@ -33,8 +33,6 @@ include_once 'Psa_Exception.php';
 
 
 /**
- * Psa_Db_Exception class.
- *
  * This exception will be raised by some methods from the {@link Psa_PDO} class.
  */
 class Psa_Db_Exception extends Psa_Exception{

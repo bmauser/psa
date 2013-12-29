@@ -33,8 +33,6 @@ include_once 'Psa_Exception.php';
 
 
 /**
- * Psa_Active_Record_Exception class.
- *
  * This exception will be raised by some methods from the {@link Psa_Active_Record} class.
  */
 class Psa_Active_Record_Exception extends Psa_Exception{

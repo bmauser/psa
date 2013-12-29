@@ -33,11 +33,8 @@ include_once 'Psa_Exception.php';
 
 
 /**
- * Psa_Fatal_Error_Exception class.
- *
  * If you raise <kbd>Psa_Fatal_Error_Exception</kbd> exception anywhere in your application,
- * execution of the script will be terminated and message you provide as first argument
- * to constructor will be logged.
+ * execution of the script will be terminated.
  *
  * <b>Example:</b>
  * <code>
@@ -60,9 +57,9 @@ class Psa_Fatal_Error_Exception extends Psa_Exception{
 	 * Constructor
 	 *
 	 * @param string $log_message message to be logged
-	 * @param string $echo_message message to be sent to output
+	 * @param string $echo_message message to be sent to the output
 	 * @param string $code user defined exception code
-	 * @param bool $write_log set to false if you don't want to write exception to log
+	 * @param bool $write_log set to false if you don't want to log the exception
 	 */
 	public function __construct($log_message, $echo_message = null, $code = 0, $write_log = true){
 

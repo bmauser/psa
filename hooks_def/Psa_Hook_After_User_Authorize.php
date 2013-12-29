@@ -53,7 +53,7 @@
  * ?>
  * </code>
  *
- * When this example hook is registered every authorized user will have property called
+ * When this example hook is registered, every authorized user will have a property called
  * <kbd>favorite_background_color</kbd> with value '<kbd>white</kbd>'.
  *
  * @see Psa_User

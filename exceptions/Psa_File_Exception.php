@@ -33,9 +33,7 @@ include_once 'Psa_Exception.php';
 
 
 /**
- * Psa_File_Exception class.
- *
- * This exception will be raised by some of methods from the {@link Psa_Files} class.
+ * This exception will be raised by some methods from the {@link Psa_Files} class.
  */
 class Psa_File_Exception extends Psa_Exception{
 

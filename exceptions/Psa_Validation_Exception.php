@@ -33,8 +33,6 @@ include_once 'Psa_Exception.php';
 
 
 /**
- * Data validation exception.
- *
  * This exception will be raised by some methods from the {@link Psa_Validator} class.
  */
 class Psa_Validation_Exception extends Psa_Exception{

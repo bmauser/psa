@@ -56,10 +56,10 @@
  * ?>
  * </code>
  *
- * When this example hook is registered every new created user will have property called
+ * When this example hook is registered, every new created user will have a property called
  * <kbd>favorite_background_color</kbd> with value '<kbd>white</kbd>'.
  *
- * <b>Note:</b> if you set some property to the user like <i>favorite_background_color</i> in example above
+ * <b>Note:</b> if you set some property to the user like <i>favorite_background_color</i> in example above,
  * it will not be saved if you don't call {@link Psa_User::save()} method later.
  *
  *

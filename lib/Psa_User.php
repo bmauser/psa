@@ -68,7 +68,7 @@
  * }
  * </code>
  *
- * Code in some model method:
+ * Code in a model method:
  * <code>
  * // create a new user
  * $user = new MyUser('new');
@@ -133,15 +133,15 @@ class Psa_User extends Psa_Active_Record{
 	/**
 	 * Constructor method.
 	 *
-	 * - If called with '<kbd>new</kbd>' as the first argument new user will be created when {@link save()}
+	 * - If called with '<kbd>new</kbd>' as the first argument, new user will be created when {@link save()}
 	 *   method is called.
-	 * - If called with user ID as the first argument, {@link $id} value is set. In this case
+	 * - If called with user ID as the first argument, {@link $id} value is set. In this case, the
 	 *   first argument must be an integer value.
-	 * - If first parameter is a string (different from '<kbd>new</kbd>'), the {@link $username} value is set.
+	 * - If the first parameter is a string (different from '<kbd>new</kbd>'), the {@link $username} value is set.
 	 *
-	 * @param int|string $user_id_or_username '<kbd>new</kbd>' if new user should be created or ID or username of the user.
+	 * @param int|string $user_id_or_username '<kbd>new</kbd>' if new user should be created, or ID or username of the existing user.
 	 * @param array $table_columns Array with column names in <i>psa_user</i> database table. See example 3
-	 * above how to extend this class and add more columns to the database table.
+	 * above on how to extend this class and add more columns to the database table.
 	 * @see restore()
 	 */
 	public function __construct($user_id_or_username, array $table_columns = array('id', 'username')){
@@ -174,18 +174,18 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Does the same as {@link restore()} method, but also writes log message, calls hooks and calls
+	 * Does the same as {@link restore()} method, but also writes a log message, calls hooks and calls
 	 * {@link session_save()} method.
 	 *
 	 * See examples in {@link Psa_User} class description.
 	 *
-	 * This function calls {@link restore()} method with <kbd>'username_password'</kbd> as first argument,
-	 * writes log message that user is authorized and runs {@link Psa_Hook_After_User_Authorize} hooks.
+	 * This function calls {@link restore()} method with <kbd>'username_password'</kbd> as the first argument,
+	 * writes a log message that user is authorized and runs {@link Psa_Hook_After_User_Authorize} hooks.
 	 *
 	 * @param string $password User password.
-	 * @param bool $run_hooks If false {@link Psa_Hook_After_User_Authorize} hooks will not be invoked.
-	 * @param bool $write_success_login_logs If false log message about successful authorization will not be written.
-	 * @param bool $save_to_session If true {@link session_save()} will be called to write user ID and username to
+	 * @param bool $run_hooks If false, {@link Psa_Hook_After_User_Authorize} hooks will not be invoked.
+	 * @param bool $write_success_login_logs If false, log message about successful authorization will not be written.
+	 * @param bool $save_to_session If true, {@link session_save()} will be called to write user ID and username to
 	 * the session if session is started before.
 	 * @return int 1 for success.
 	 * @see restore()
@@ -219,10 +219,10 @@ class Psa_User extends Psa_Active_Record{
 	/**
 	 * Restores member variables from the database previously saved with {@link save()} method.
 	 *
-	 * Reads values from the database and populates corresponding object member variables. For example
+	 * Reads values from the database and populates corresponding object member variables. For example,
 	 * if you have added to <i>psa_user</i> table column named <kbd>access_level</kbd> and you passed
-	 * the name of the column to constructor with <var>$table_columns</var> parameter, then when
-	 * this method is called member variable with name <kbd>access_level</kbd> will be
+	 * the name of the column to the constructor with <var>$table_columns</var> parameter, then when
+	 * this method is called, member variable with name <kbd>access_level</kbd> will be
 	 * populated with the value from the database.
 	 *
 	 * @see authorize()
@@ -251,19 +251,18 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Saves values from member variables to the database.
+	 * Saves values from the member variables to the database.
 	 *
-	 * This method saves values from objet's member variables to the database. There must be column in
-	 * the database named like the member variable. It works only for variables mentioned in
-	 * <var>$table_columns</var> argument to constructor or by <var>$only_columns</var> argument to
-	 * this method.
+	 * There must be a column in the database named the same as the member variable. It works only for 
+	 * variables mentioned in <var>$table_columns</var> argument to the constructor or by <var>$only_columns</var> 
+	 * argument to this method.
 	 * All saved values will be restored when the {@link authorize()} or {@link restore()}
 	 * methods are called.
 	 * See examples in {@link Psa_User} class description.
 	 *
 	 * @see authorize()
 	 * @param array $only_columns Array with column names in <i>psa_user</i> database table to work with.
-	 * If not set column names set by constructor are used.
+	 * If not set, column names set by the constructor are used.
 	 * @return int 1 for success
 	 * @throws Psa_User_Exception
 	 */
@@ -301,13 +300,13 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Puts user in a group or more groups if the <var>$group_id</var> argument is an array.
+	 * Puts the user in a group or more groups if the <var>$group_id</var> argument is an array.
 	 *
 	 * Group membership changes are immediately stored in the database and you don't have to
 	 * call {@link save()} method after.
-	 * If you creating a new user this method must be called after {@link save()} method.
+	 * If you are creating a new user, this method must be called after {@link save()} method.
 	 * {@link $id} member variable must be set before calling this method. If you pass username
-	 * to constructor, call {@link restore()} or {@link authorize()} method before to get the
+	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
 	 * user ID from the database.
 	 * Throws {@link Psa_User_Exception} on error.
 	 *
@@ -319,7 +318,7 @@ class Psa_User extends Psa_Active_Record{
 	 *
 	 * @param int|array $group_id ID or array with groups IDs.
 	 * @return int 1 for success, -1 user already was in the group (or more groups)
-	 * or group does not exists.
+	 * or group does not exist.
 	 * @see remove_group()
 	 * @throws Psa_User_Exception
 	 */
@@ -329,12 +328,12 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Remove user from a group or more groups if $group_id argument is an array.
+	 * Remove the user from a group or more groups if $group_id argument is an array.
 	 *
 	 * Group membership changes are immediately stored in the database and you don't have to
 	 * call {@link save()} method after.
 	 * {@link $id} member variable must be set before calling this method. If you pass username
-	 * to constructor, call {@link restore()} or {@link authorize()} method before to get the
+	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
 	 * user ID from the database.
 	 * Throws {@link Psa_User_Exception} on error.
 	 *
@@ -346,9 +345,9 @@ class Psa_User extends Psa_Active_Record{
 	 * </code>
 	 *
 	 * @param int|array|string $group_id ID or array with group IDs. '<kbd>all</kbd>'
-	 * for remove user from all groups.
+	 * to remove user from all groups.
 	 * @return int 1 for success, -1 user was not in the group (or more groups).
-	 * or group does not exists.
+	 * or group does not exist.
 	 * @see add_group()
 	 * @throws Psa_User_Exception
 	 */
@@ -437,7 +436,7 @@ class Psa_User extends Psa_Active_Record{
 	 * Changes user password.
 	 *
 	 * New password will be hashed with {@link password_hash()} method and stored in the database.
-	 * You need to call it only when you want to change password for existing user.
+	 * You need to call this method only when you want to change the password for the existing user.
 	 * Throws {@link Psa_User_Exception} on error.
 	 *
 	 * @param string $new_password New password.
@@ -484,7 +483,7 @@ class Psa_User extends Psa_Active_Record{
 	/**
 	 * Verifies user password.
 	 *
-	 * Checks if given string is user's password. This method can be used in process of changing user password to
+	 * Checks if given string is the user's password. This method can be used in process of changing user password to
 	 * verify the old password.
 	 *
 	 * @param string $password Password to check.
@@ -571,7 +570,7 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Returns array with all groups user is in.
+	 * Returns an array with all user's groups.
 	 *
 	 * Example of returning array:
 	 * <pre>
@@ -584,7 +583,7 @@ class Psa_User extends Psa_Active_Record{
 	 * </pre>
 	 *
 	 * {@link $id} member variable must be set before calling this method. If you pass username
-	 * to constructor, call {@link restore()} or {@link authorize()} method before to get the
+	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
 	 * user ID from the database.
 	 *
 	 * @return array
@@ -615,9 +614,9 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Saves current timestamp to the database into <kbd>last_login</kbd> column.
+	 * Saves current timestamp to the database into the <kbd>last_login</kbd> column of the <kbd>psa_user</kbd> table.
 	 *
-	 * You can call this method when you want to set last login time for the user. It
+	 * You can call this method when you want to set the last login time for the user. It
 	 * will also set value of the {@link $last_login} member variable.
 	 * Throws {@link Psa_User_Exception} on error.
 	 *
@@ -637,11 +636,11 @@ class Psa_User extends Psa_Active_Record{
 	/**
 	 * Stores user ID and username into the session.
 	 *
-	 * It will store array named <kbd>psa_current_user_data</kbd> with user ID and username into session.
+	 * It will store an array named <kbd>psa_current_user_data</kbd> with user ID and username into the session.
 	 * All log messages will contain user ID and username from this session
 	 * variable if not explicitly set otherwise. See {@link Psa_Logger::log()} method for details.
 	 *
-	 * @param bool $throw_exception If true Psa_User_Exception will be thrown if PHP session is not started.
+	 * @param bool $throw_exception If true, Psa_User_Exception will be thrown if PHP session is not started.
 	 * @throws Psa_User_Exception
 	 */
 	protected function session_save($throw_exception = true){

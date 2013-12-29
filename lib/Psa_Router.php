@@ -30,23 +30,14 @@
 
 
 /**
- * Class with methods for parsing the request URL into controller, action, and parameters
- * and invoking action methods.
+ * Class with methods for parsing the requested URL into controller, action, and parameters
+ * and for invoking action methods.
  *
- * Router should be used to decide which controller to call. This class has methods for that task.
- * That decision can be made from given URL path if your web server is set to use rewrite rules,
- * which is common practice, but can also be made from get or post values.
+ * Router's task is to decide which controller and action method to call.
+ * That decision can be made from the given URL if your web server is set to use rewrite rules,
+ * which is a common practice.
  *
- * If you want to use rewrite rules you must set up your web server for this, with Apache web server
- * you can do it by enabling {@link http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html mod_rewrite}
- * by adding line like this into the configuration file:
- *
- * <kbd>LoadModule rewrite_module modules/mod_rewrite.so</kbd>
- *
- * Make sure that you can override (AllowOverride directive) rewrite settings with .htaccess file.
- * Edit .htaccess file to match your configuration.
- *
- * You can write your Router by extending this class. Here is an example:
+ * Example:
  *
  * <code>
  * <?php
@@ -76,15 +67,15 @@
  * </code>
  *
  * <br><b>Note:</b> PSA will firstly try to call <kbd>psa_main()</kbd> method from the <i>Main</i> class. You can make
- * your main class extends Psa_Router class. <i>Main</i> class should be defined in Main.php file placed
- * in the first autoload directory (see settings in {@link config.php}). So you can use Main.php file as bootstrap
+ * your <i>Main</i> class to extend <i>Psa_Router</i> class. <i>Main</i> class should be defined in the Main.php file, which is placed
+ * in the first autoload directory (set by <var>$PSA_CFG['folders']['autoload']</var> in {@link config.php}). Use Main.php file as bootstrap
  * file for your application.
  */
 class Psa_Router extends Psa_Model{
 
 
 	/**
-	 * Returns array of URL path parts after application base directory exploded by '/'.
+	 * Returns an array of URL elements after application base directory exploded by '/'.
 	 *
 	 * For example, for URL <kbd>http://server/mycontroller/mymethod/abc/123</kbd> returning array
 	 * is:
@@ -99,7 +90,7 @@ class Psa_Router extends Psa_Model{
 	 * )
 	 * </pre>
 	 *
-	 * @param string $request_uri $_SERVER["REQUEST_URI"] by default
+	 * @param string $request_uri <kbd>$_SERVER["REQUEST_URI"]</kbd> by default
 	 * @return array
 	 */
 	public function explode_url($request_uri = null){
@@ -129,7 +120,7 @@ class Psa_Router extends Psa_Model{
 
 
 	/**
-	 * Returns array with the names of the controller and action and array of arguments for
+	 * Returns an array with the names of the controller and the action and array of arguments for
 	 * action method.
 	 *
 	 * For example, for URL <kbd>http://server/mycontroller/mymethod/abc/123</kbd> returning array
@@ -148,7 +139,7 @@ class Psa_Router extends Psa_Model{
 	 * )
 	 * </pre>
 	 *
-	 * @param string|array $request_uri $_SERVER["REQUEST_URI"] by default
+	 * @param string|array $request_uri <kbd>$_SERVER["REQUEST_URI"]</kbd> by default
 	 * @return array
 	 */
 	public function get_dispatch_data($request_uri = null){
@@ -172,16 +163,16 @@ class Psa_Router extends Psa_Model{
 	/**
 	 * Invokes method in a class with arguments.
 	 *
-	 * This method is intended to be used to call controller method with arguments.
-	 * If you call it without parameters it will try to get controller name, method and
-	 * parameters from URL. In that case it actually calls {@link get_dispatch_data()}
+	 * This method is intended to be used to call the controller method with arguments.
+	 * If you call it without parameters, it will try to get controller name, method and
+	 * parameters from the URL. In that case, it actually calls {@link get_dispatch_data()}
 	 * method to get data for dispatch.
 	 *
 	 * @param string $class_name Class name.
 	 * @param string $method_name Method to invoke.
 	 * @param array $method_arguments Arguments for invoking method.
 	 * @throws Psa_Router_Exception
-	 * @return mixed Returns the calling method result.
+	 * @return mixed Returns result from the called method.
 	 */
 	public function dispach($class_name = null, $method_name = null, array $method_arguments = array()){
 

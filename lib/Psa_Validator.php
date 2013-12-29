@@ -33,7 +33,7 @@
  * Class for input data validation.
  *
  * You should validate all input data from users.
- * Validation should occur in the model method, not in controller (in some action method).
+ * Validation should occur in the model method, not in the controller (in some action method).
  * That makes your models more independent and more reusable and testing is easier.
  *
  * <br><b>Usage example</b>
@@ -63,11 +63,11 @@
  *
  * <br><b>All validation actions</b>
  *
- * Two main methods in this class are {@link required()} and {@link optional()}. They behave the same except that
+ * Two main methods in this class are {@link required()} and {@link optional()}. They behave the same way except that
  * {@link optional()} will not raise exception if value is empty or <kbd>null</kbd>.
- * Like in the example above, first argument is the value that should be validated, second is the validation action
- * name. See {@link required()} method documentation for all action names.
- * Some validation actions expect more parameters. Examples:
+ * Like in the example above, first argument is the value that should be validated and second is the name of the 
+ * validation action. See {@link required()} method documentation for all action names.
+ * Some validation actions require more parameters. Examples:
  *
  * <code>
  *
@@ -82,10 +82,10 @@
  * // Finds whether the given $value is in array passed as third argument.
  * $val->required($value, 'invalues', array(1, 2, 3, 4));
  *
- * // Checks is the given $value an integer.
+ * // Checks if the given $value is an integer.
  * $val->required($value, 'int');
  *
- * // Finds whether the given $value is integer bigger than 0.
+ * // Finds whether the given $value is an integer bigger than 0.
  * $val->required($value, 'id');
  *
  * // Checks date if matches given format and validity of the date.
@@ -95,10 +95,10 @@
  * //  Finds whether the given $value has valid email format.
  * $val->required($value, 'email');
  *
- * // Checks is the given $value valid IPv4 address.
+ * // Checks is the given $value a valid IPv4 address.
  * $val->required($value, 'ip4');
  *
- * // Checks is the given $value valid floating point number.
+ * // Checks is the given $value a valid floating point number.
  * $val->required($value, 'float');
  *
  * // Checks whether the given $value is a valid string.
@@ -141,7 +141,7 @@
  *
  * <br><b>Validating array of values</b>
  *
- * If you want to validate array of values, suffix <b><kbd>_array</kbd></b> can be added to any of
+ * If you want to validate an array of values, suffix <b><kbd>_array</kbd></b> can be added to any of
  * validation actions to validate each element of array. For example, this is useful
  * when validating input from HTML drop-down menu with multiple selections.
  *
@@ -159,10 +159,10 @@
  *
  * <br><b>Custom error message per validation</b>
  *
- * If validation fails, by default exception will be raized. Each action has it's own default
+ * If validation fails, by default exception will be raized. Each action has its own default
  * error message, but you can change that message by passing one more argument to {@link required()}
- * or {@link optional()} method. This can be usefull for example if you log exeptions and want
- * more descriptive error message or message will be shown to the user.
+ * or {@link optional()} method. This can be usefull if you want more descriptive error message
+ * or message will be shown to the user.
  *
  * <code>
  *
@@ -174,11 +174,11 @@
  *
  * <br><b>Adding custom validation</b>
  *
- * You can extend this class and add your validation function (action). In the next example '<kbd>5to9</kbd>'
+ * You can extend this class and add your custom validation function (action). In the next example '<kbd>5to9</kbd>'
  * action is added. Note that validation method named <var>check_5to9()</var> and error message named
  * <var>$msg_check_5to9</var> are added in the child class. Validation method should return <kbd>true</kbd> or
  * <kbd>false</kbd>. When you add validation action like this you can use it with <kbd>_array</kbd> suffilx like
- * any other builtin action. See the source code of this class for more examples.
+ * any other built-in action. See the source code of this class for more examples.
  *
  * <code>
  * class MyValidator extends Psa_validator{
@@ -339,7 +339,7 @@ class Psa_Validator{
 	 * <kbd>equal</kbd>, <kbd>identical</kbd>, <kbd>hostname</kbd>, <kbd>callback</kbd><br>
 	 *
 	 * If <var>$value</var> is an array, suffix <b><kbd>_array</kbd></b> can be added to any of these
-	 * types to validate each element of array <var>$value</var>. For example, this is useful
+	 * types to validate each element of the array. For example, this is useful
 	 * when validating input from HTML drop-down menu with multiple selections.
 	 *
 	 * @param mixed $p,... Unlimited optional number of additional parameters that will be passed as
@@ -357,7 +357,7 @@ class Psa_Validator{
 	/**
 	 * Validates an optional value.
 	 *
-	 * This method does the same as {@link required()} method, only difference is that
+	 * This method does the same as {@link required()} method, the only difference is that
 	 * evaluated value can be empty string or null.
 	 * For example this can be useful for values from optional HTML form elements.
 	 * See example in {@link Psa_Validator class description} and for description of parameters
@@ -377,7 +377,7 @@ class Psa_Validator{
 
 
 	/**
-	 * Returns array with validation errors (messages).
+	 * Returns an array with validation errors (messages).
 	 *
 	 * It will return 0 if there is no validation error messages.
 	 *

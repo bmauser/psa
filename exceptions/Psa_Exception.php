@@ -30,10 +30,8 @@
 
 
 /**
- * Psa_Exception class.
- *
  * This class extends PHP Exception and adds {@link log()} method
- * for writing PSA log. Other PSA exception classes extend this class.
+ * for logging. Other PSA exception classes extend this class.
  * You can also extend this class for your custom exceptions. If logs are enabled
  * in {@link config.php} file every exception message will be logged.
  */
