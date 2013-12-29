@@ -32,24 +32,24 @@
 /**
  * Simple template engine class.
  *
- * I called this class Dully to be opposite to {@link http://www.smarty.net Smarty}.
+ * I named this class Dully as opposite to {@link http://www.smarty.net Smarty}.
  * It has few methods that are similar to those in Smarty template engine.
  *
- * All that Dully does is to put values from associative array into the local namespace and
+ * All that Dully does is putting values from an associative array into the local namespace and
  * includes .php (template) file. There are no special template tags, just use PHP code
  * blocks to echo values. Templates are ordinary PHP files and you can write them
- * as any other .php script, but keep in mind that the point of template engine
- * should be to separate business logic from presentation.
- * So you should not put any logic (calculations, getting data from a database ...)
- * into templates. With {@link http://www.smarty.net Smarty} that is easier to achieve
+ * as any other .php script, but keep in mind that point of the template engine
+ * is separating business logic from presentation.
+ * So, you should not put any logic (calculations, getting data from a database ...)
+ * into the templates. With {@link http://www.smarty.net Smarty} that is easier to achieve,
  * and it has many advanced features so I suggest that you use Smarty as a template engine.
- * If you need simple and fast template engine or don't want to learn Smarty's tags you can
+ * If you need a simple and fast template engine or don't want to learn Smarty's tags, you can
  * use Dully.
  * Dully class doesn't include anything from PSA so you can use this class as template engine
  * in any PHP application.
  *
- * This class is inspired from {@link http://www.massassi.com/php/articles/template_engines/ here} and there are
- * some interesting thoughts about template engines.
+ * This class is inspired from {@link http://www.massassi.com/php/articles/template_engines/ here}
+ * and there are some interesting thoughts about template engines.
  *
  * <br><b>Usage examples:</b>
  *
@@ -57,7 +57,7 @@
  *
  * Template file <samp>template.tpl</samp>:
  * <code>
- * This is text from template file template.php<br/>
+ * This is a text from template file template.php<br/>
  * My car is <?php echo $my_car_color ?>.<br/>
  * Something else: <?php echo $some_name ?>
  * </code>
@@ -81,7 +81,7 @@
  *
  * The printout of the above .php script will be:
  * <pre>
- * This is text from template file template.php
+ * This is a text from template file template.php
  * My car is Black.
  * Something else: bla bla bla
  * </pre>
@@ -94,14 +94,14 @@
  *
  * template file <samp>template1.tpl</samp>:
  * <code>
- * This is text from template1.php<br/>
+ * This is a text from template1.php<br/>
  * <?php echo $var1 ?><br/>
  * <?php echo $var2 ?>
  * </code>
  *
  * template file <samp>template2.tpl</samp>:
  * <code>
- * This is text from template2.php
+ * This is a text from template2.php
  * </code>
  *
  * .php file:
@@ -126,8 +126,8 @@
  *
  * The above example will output:
  * <pre>
- * This is text from template1.php
- * This is text from template2.php
+ * This is a text from template1.php
+ * This is a text from template2.php
  * bla bla bla
  * </pre>
  *
@@ -197,10 +197,10 @@ class Psa_Dully{
 
 
 	/**
-	 * Returns the fetched template as string.
+	 * Returns the fetched template as a string.
 	 * See examples in {@link Psa_Dully} class description.
 	 *
-	 * @param string $template_file Template file name or relative path from path passed to constructor.
+	 * @param string $template_file Template file name or relative path from the path passed to the constructor.
 	 * @return string Fetched (rendered) template.
 	 * @see display()
 	 */
@@ -228,7 +228,7 @@ class Psa_Dully{
 	 *
 	 * Just prints output from {@link fetch()} method.
 	 *
-	 * @param string $template_file Template file name or relative path from path passed to constructor.
+	 * @param string $template_file Template file name or relative path from path passed to the constructor.
 	 * @see fetch()
 	 */
 	function display($template_file){

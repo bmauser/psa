@@ -30,7 +30,7 @@
 
 
 /**
- * Implements simple {@link https://en.wikipedia.org/wiki/Active_record_pattern Active Record} pattern.
+ * Implements a simple {@link https://en.wikipedia.org/wiki/Active_record_pattern Active Record} pattern.
  *
  * Active record is an approach to accessing data in a database. An object instance
  * is tied to a single row in the database table. After creation of an object, a new
@@ -39,8 +39,8 @@
  *
  * By extending this class you can make an object which has member variables that correspond
  * to the fields in the database table. When you call {@link save_to_database()} method, values assigned
- * to instance variables will be saved to database. When you call {@link restore_from_database()} method
- * member variables named like the database columns will be populated with values from the
+ * to instance variables will be saved to the database. When you call {@link restore_from_database()} method
+ * member variables named the same as database columns will be populated with values from the
  * database.
  *
  * <b>Example:</b>
@@ -67,7 +67,7 @@
  *
  * </code>
  *
- * <br>For example of usage check source code of {@link Psa_Group} and {@link Psa_User} which extend this class.
+ * <br>For example of usage, check source code of {@link Psa_Group} and {@link Psa_User} classes which extend this class.
  */
 class Psa_Active_Record{
 
@@ -140,12 +140,12 @@ class Psa_Active_Record{
 	 *
 	 * @param string $table_name Name of the database table.
 	 * @param string $primary_key_field_name Name of the primary key field in the database table.
-	 * @param string $primary_key_value Value of the primary key field. If not set, new row
+	 * @param string $primary_key_value Value of the primary key field. If not set, a new row
 	 * to the table will be added when {@link save_to_database()} method is called.
 	 * @param array $column_names Array with column names from the database table to work with.
-	 * Not all columns needs to be included. If you skip to set this argument column names will be
+	 * Not all columns need to be included. If you skip to set this argument, column names will be
 	 * set automatically. That is one query more to the database on the object initialization to get
-	 * table shema, so it's better to provide column names by setting this argument.
+	 * a table schema, so it's better to provide column names by setting this argument.
 	 * @param string $primary_key_sequence_name Name of the primary key field sequence.
 	 * @param Psa_PDO $database_connection Database connection to use.
 	 */
@@ -182,8 +182,8 @@ class Psa_Active_Record{
 	 * Fetches data from the database and populates objects member variables that correspond to columns
 	 * in the database table.
 	 *
-	 * @param array $only_columns Array with column names to restore from the database. If not set
-	 * column names set by constructor are used.
+	 * @param array $only_columns Array with column names to restore from the database. If not set,
+	 * column names set by the constructor are used.
 	 * @param string $custom_query Query to fetch data from the database. '<kbd><COLUMNS></kbd>' will
 	 * be replaced with comma delimited column names.
 	 * @param array $custom_query_params Array with query parameters for <var>$custom_query</var> argument.
@@ -246,12 +246,12 @@ class Psa_Active_Record{
 
 
 	/**
-	 * Saves values from object's member variables to the database.
+	 * Saves values from the object's member variables to the database.
 	 *
-	 * @param array $only_columns Array with column names to save to the database. If not set
-	 * column names set by constructor are used.
-	 * @param array $and_columns Array with column names to be saved also with default columns set
-	 * by constructor or <var>$only_columns</var> argument.
+	 * @param array $only_columns Array with column names to save to the database. If not set,
+	 * column names set by the constructor are used.
+	 * @param array $and_columns Array with column names to be saved together with default columns set
+	 * by the constructor or <var>$only_columns</var> argument.
 	 * @throws Psa_Active_Record_Exception
 	 * @return int Returns the value of the primary key column.
 	 */
