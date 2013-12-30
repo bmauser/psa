@@ -32,13 +32,13 @@
 /**
  * Class that collects (registers) information about file paths in your application for autoloading.
  *
- * If <var>$PSA_CFG['develop_mode']</var> is true and <var>$PSA_CFG['develop_mode_register_files']</var> 
- * is true, file registration is done on every request for convenience that you don't need to manually 
+ * If <var>$PSA_CFG['develop_mode']</var> is true and <var>$PSA_CFG['develop_mode_register_files']</var>
+ * is true, file registration is done on every request for convenience that you don't need to manually
  * register files if you add some class to your project.
  *
  * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern singleton pattern}
  * so you can get reference to Psa_Files object from any scope with
- * {@link get_instance()} method. You cannot make instance of Psa_Files object with the 
+ * {@link get_instance()} method. You cannot make instance of Psa_Files object with the
  * <var>new</var> operator.
  *
  * @see register_files.php
@@ -99,9 +99,11 @@ class Psa_Files extends Psa_Singleton{
 				return 1;
 			}
 
+			include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
 			throw new Psa_File_Exception("No autoload data in file {$PSA_CFG['autoload_data_file']}. Try to register files.", 501);
 		}
 
+		include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
 		throw new Psa_File_Exception("Cannot open file {$PSA_CFG['autoload_data_file']}. Try to register files to create it.", 502);
 	}
 
