@@ -206,8 +206,8 @@ class Psa_User extends Psa_Active_Record{
 			$this->log('User authorized', __METHOD__, 2);
 
 		// run Psa_Hook_After_User_Authorize hooks
-		if($run_hooks)
-			psa_run_hooks(array('Psa_Hook_After_User_Authorize' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
+		//if($run_hooks)
+		//	psa_run_hooks(array('Psa_Hook_After_User_Authorize' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
 
 		if($save_to_session)
 			$this->session_save(false);
@@ -281,12 +281,12 @@ class Psa_User extends Psa_Active_Record{
 			$this->password = $this->password_hash($this->password);
 
 			// run Psa_Hook_Before_User_Create hooks
-			psa_run_hooks(array('Psa_Hook_Before_User_Create' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
+			//psa_run_hooks(array('Psa_Hook_Before_User_Create' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
 
 			parent::save_to_database($only_columns, array('password'));
 
 			// run Psa_Hook_After_User_Create hooks
-			psa_run_hooks(array('Psa_Hook_After_User_Create' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
+			//psa_run_hooks(array('Psa_Hook_After_User_Create' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
 
 			// write log
 			$this->log('New user created', __METHOD__, 2);

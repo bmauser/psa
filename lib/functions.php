@@ -62,15 +62,15 @@ function psa_del_user_group($id, $user_or_group){
 		if($user_or_group == 1){
 			$table = $PSA_CFG['database']['table']['user'];
 			$name_column = 'username';
-			$hook_to_run_before = 'Psa_Hook_Before_User_Delete';
-			$hook_to_run_after = 'Psa_Hook_After_User_Delete';
+			//$hook_to_run_before = 'Psa_Hook_Before_User_Delete';
+			//$hook_to_run_after = 'Psa_Hook_After_User_Delete';
 		}
 		// work with groups
 		else if($user_or_group == 2){
 			$table = $PSA_CFG['database']['table']['group'];
 			$name_column = 'name';
-			$hook_to_run_before = 'Psa_Hook_Before_Group_Delete';
-			$hook_to_run_after = 'Psa_Hook_After_Group_Delete';
+			//$hook_to_run_before = 'Psa_Hook_Before_Group_Delete';
+			//$hook_to_run_after = 'Psa_Hook_After_Group_Delete';
 		}
 
 		// delete users or groups
@@ -89,7 +89,7 @@ function psa_del_user_group($id, $user_or_group){
 			}
 
 			// run Psa_Hook_Before_[user/group]_Delete hooks
-			psa_run_hooks(array($hook_to_run_before => array('psa_main' => array($id_value))),'by_type','no_unregistered_warning');
+			//psa_run_hooks(array($hook_to_run_before => array('psa_main' => array($id_value))),'by_type','no_unregistered_warning');
 
 			// run query against the database
 			$psa_database->query($sql);
@@ -101,7 +101,7 @@ function psa_del_user_group($id, $user_or_group){
 			}
 			// run Psa_Hook_After_[user/group]_Delete hooks
 			else{
-				psa_run_hooks(array($hook_to_run_after => array('psa_main' => array($id_value))),'by_type','no_unregistered_warning');
+				//psa_run_hooks(array($hook_to_run_after => array('psa_main' => array($id_value))),'by_type','no_unregistered_warning');
 				$log_data['message']  = (($user_or_group == 1) ? 'User' : 'Group') . ' deleted';
 			}
 
@@ -191,7 +191,6 @@ function psa_delete_group($group){
 /**
  * Executes (runs) hooks.
  *
- * This function is used for calling hooks.
  * It includes hooks files, makes new instances of hook objects and calls member methods.
  * It can call class methods in two different ways depending on the second argument.
  *

@@ -184,12 +184,12 @@ class Psa_Group extends Psa_Active_Record{
 		if($this->psa_new_record && $this->name){
 
 			// run Psa_Hook_After_Group_Create hooks
-			psa_run_hooks(array('Psa_Hook_Before_Group_Create' => array('psa_main' => array($this))), 'by_type', 'no_unregistered_warning');
+			//psa_run_hooks(array('Psa_Hook_Before_Group_Create' => array('psa_main' => array($this))), 'by_type', 'no_unregistered_warning');
 
 			$this->save_to_database($only_columns);
 
 			// run Psa_Hook_After_Group_Create hooks
-			psa_run_hooks(array('Psa_Hook_After_Group_Create' => array('psa_main' => array($this))), 'by_type', 'no_unregistered_warning');
+			//psa_run_hooks(array('Psa_Hook_After_Group_Create' => array('psa_main' => array($this))), 'by_type', 'no_unregistered_warning');
 
 			$log_message = "New group created";
 		}
