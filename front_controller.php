@@ -60,29 +60,12 @@ include PSA_BASE_DIR . '/lib/Psa_PDO.php';
 include PSA_BASE_DIR . '/lib/Psa_Logger.php';
 include PSA_BASE_DIR . '/lib/Psa_Files.php';
 include PSA_BASE_DIR . '/lib/Psa_Registry.php';
-include PSA_BASE_DIR . '/lib/Psa_Model.php';
-//include PSA_BASE_DIR . '/lib/Psa_Router.php';
-
-
-// register psa_autoload() function as __autoload() implementation
-spl_autoload_register('psa_autoload');
 
 
 // registry object
 $psa_registry = Psa_Registry::get_instance();
 
-
-// database connection wrapper object
-$psa_registry->psa_database = new Psa_PDO();
-
-
-// profile log object. If profile log is enabled
-if($PSA_CFG['profile_log']){
-	include PSA_BASE_DIR . '/lib/Psa_Profile_Logger.php';
-}
-
-
-// put PSA config array to the registry
+// put $PSA_CFG config array to the registry
 $psa_registry->PSA_CFG = $PSA_CFG;
 
 
@@ -92,9 +75,17 @@ if($PSA_CFG['develop_mode'] && $PSA_CFG['develop_mode_register_files']){
 }
 
 
-// if web mode
+// register psa_autoload() function as __autoload() implementation
+spl_autoload_register('psa_autoload');
+
+// database connection wrapper object
+$psa_registry->psa_database = new Psa_PDO();
+
+
+
+// if in web mode
 if(isset($_SERVER['REQUEST_URI'])){
-	// get application base url
+	// get application base URL
 	if(isset($PSA_CFG['folders']['basedir_web']))
 		$psa_registry->basedir_web = $PSA_CFG['folders']['basedir_web'];
 	else

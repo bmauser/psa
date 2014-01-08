@@ -151,25 +151,29 @@ class Psa_Files extends Psa_Singleton{
 	function register($additional_autoload_folders = array(), $additional_hook_autoload_folders = array()){
 
 		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
+		
+		$all_hook_types = array();
 
 		// find all available hook types from file names in each $PSA_CFG['folders']['hooks_def'] dir
-		foreach ($PSA_CFG['folders']['hooks_def'] as $hooks_folder) {
-
-			$hook_folder_path = PSA_BASE_DIR . '/' . $hooks_folder;
-
-			if ($handle = @opendir($hook_folder_path)) {
-				while (false !== ($file = readdir($handle))) {
-
-					if(substr($file, -4, 4) == '.php'){
-						// get the part of the filename to the first dot. This is the name of the hook class.
-						$psa_hook_class_name = str_replace(strstr($file, '.'), '', $file);
-						$all_hook_types[$psa_hook_class_name] = $hook_folder_path . '/' . $file;
+		if(isset($PSA_CFG['folders']['hooks_def']) && $PSA_CFG['folders']['hooks_def']){
+			foreach ($PSA_CFG['folders']['hooks_def'] as $hooks_folder) {
+	
+				$hook_folder_path = PSA_BASE_DIR . '/' . $hooks_folder;
+	
+				if ($handle = @opendir($hook_folder_path)) {
+					while (false !== ($file = readdir($handle))) {
+	
+						if(substr($file, -4, 4) == '.php'){
+							// get the part of the filename to the first dot. This is the name of the hook class.
+							$psa_hook_class_name = str_replace(strstr($file, '.'), '', $file);
+							$all_hook_types[$psa_hook_class_name] = $hook_folder_path . '/' . $file;
+						}
 					}
+					closedir($handle);
 				}
-				closedir($handle);
-			}
-			else{
-				throw new Psa_File_Exception("files register: unable to open dir with hooks: $hook_folder_path", 503);
+				else{
+					throw new Psa_File_Exception("files register: unable to open dir with hooks: $hook_folder_path", 503);
+				}
 			}
 		}
 
@@ -195,7 +199,7 @@ class Psa_Files extends Psa_Singleton{
 		if($additional_hook_autoload_folders){
 			$folders_hook_autoload = array_merge($folders_hook_autoload, $additional_hook_autoload_folders);
 		}
-		if(is_array($folders_hook_autoload)){
+		if(is_array($folders_hook_autoload) && $all_hook_types){
 			foreach ($folders_hook_autoload as $folder_path){
 				$this->check_files(PSA_BASE_DIR . "/$folder_path", $all_hook_types, $return);
 			}
@@ -205,7 +209,8 @@ class Psa_Files extends Psa_Singleton{
 			$return['class_paths'] = array();
 
 		// put also hooks into return array which will be used for class autoloading
-		$return['class_paths'] = array_merge($return['class_paths'], $all_hook_types);
+		if($all_hook_types)
+			$return['class_paths'] = array_merge($return['class_paths'], $all_hook_types);
 
 		return $this->files_data = $return;
 	}
