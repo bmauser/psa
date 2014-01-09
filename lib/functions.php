@@ -62,15 +62,11 @@ function psa_del_user_group($id, $user_or_group){
 		if($user_or_group == 1){
 			$table = $PSA_CFG['database']['table']['user'];
 			$name_column = 'username';
-			//$hook_to_run_before = 'Psa_Hook_Before_User_Delete';
-			//$hook_to_run_after = 'Psa_Hook_After_User_Delete';
 		}
 		// work with groups
 		else if($user_or_group == 2){
 			$table = $PSA_CFG['database']['table']['group'];
 			$name_column = 'name';
-			//$hook_to_run_before = 'Psa_Hook_Before_Group_Delete';
-			//$hook_to_run_after = 'Psa_Hook_After_Group_Delete';
 		}
 
 		// delete users or groups
@@ -88,9 +84,6 @@ function psa_del_user_group($id, $user_or_group){
 				$sql = "DELETE FROM {$table} WHERE $name_column = " . $psa_database->escape($id_value);
 			}
 
-			// run Psa_Hook_Before_[user/group]_Delete hooks
-			//psa_run_hooks(array($hook_to_run_before => array('psa_main' => array($id_value))),'by_type','no_unregistered_warning');
-
 			// run query against the database
 			$psa_database->query($sql);
 
@@ -99,9 +92,7 @@ function psa_del_user_group($id, $user_or_group){
 				$failed = 1;
 				$log_data['message']  = 'Unable to delete ' . (($user_or_group == 1) ? 'user' : 'group') . ". Maybe does not exists.";
 			}
-			// run Psa_Hook_After_[user/group]_Delete hooks
 			else{
-				//psa_run_hooks(array($hook_to_run_after => array('psa_main' => array($id_value))),'by_type','no_unregistered_warning');
 				$log_data['message']  = (($user_or_group == 1) ? 'User' : 'Group') . ' deleted';
 			}
 
@@ -191,127 +182,111 @@ function psa_delete_group($group){
 /**
  * Executes (runs) hooks.
  *
- * It includes hooks files, makes new instances of hook objects and calls member methods.
- * It can call class methods in two different ways depending on the second argument.
+ * It includes hooks files, makes new instances of hook classes and calls member methods.
  *
- * If the second argument is true, hooks are called <i>by type</i>. Hook type is the name of the class it extends.
- * In this case the first argument should be an array with elements like in example below:
+ * Hooks are called <i>by type</i>. Hook type is the name of the class it extends.
+ * First argument should be an array with elements like in the example below:
  * <code>
  * // $run is array that will be argument for psa_run_hooks() function
  * // Structure should be: $run['hook_type']['hook_method'] = array('method_argument1','method_argument2',...);
- * $run['Psa_Hook_Before_User_Delete']['psa_main'] = array(177);
- * psa_run_hooks($run, 'by_type');
+ * $run['After_User_Delete']['psa_main'] = array(177);
+ * psa_run_hooks($run);
+ *
+ * // or the same in one line
+ * psa_run_hooks(array('After_User_Delete' => array('psa_main' => array(177))));
  * </code>
  * This example calls method <kbd>psa_main</kbd> with one argument (177) from all registered
- * <kbd>Psa_Hook_Before_User_Delete</kbd> hooks.
+ * <kbd>After_User_Delete</kbd> hooks.
  *
- * If the second argument is false (default) hooks are called <i>by name</i> (hook name is the same
- * as its class name) and in this case first argument should be an array with elements
- * like in this example:
+ * <br><b>How to make hooks</b>
+ *
+ * <b>1)</b> Put the file with the hook definition class into the folder listed in
+ * <var>$PSA_CFG['folders']['hook_def'][]</var>.
+ * You can make it abstract class to force method implementation in child classes like this:
  * <code>
- * // $run is array that will be argument for psa_run_hooks() function
- * // Structure should be: $run['class_name']['hook_method'] = array('method_argument1','method_argument2',...);
- * $run['Article']['load'] = array(14);
- * $run['News']['open'] = array();
- * psa_run_hooks($run);
- * </code>
- * This example calls method <kbd>load</kbd> with one argument (14) from the <kbd>Article</kbd> class
- * and method <kbd>open</kbd> with no arguments from the <kbd>News</kbd> class.
+ * <?php
  *
- * This function will throw {@link Psa_Exception} on error.
+ * abstract class After_User_Delete extends Psa_Model{
+ *
+ *     abstract function main($user_id); // ypu can call this method as you like
+ * }
+ *
+ * ?>
+ * </code>
+ *
+ * <b>2)</b> Put the file with the hook class into the folder listed in <var>$PSA_CFG['folders']['hook_autoload'][]</var>.
+ * <code>
+ * <?php
+ *
+ * class MyHook extends After_User_Delete{
+ *
+ *     function main($user_id){
+ *
+ *         // Do something here. For example, delete users home folder.
+ *     }
+ * }
+ *
+ * ?>
+ * </code>
+ *
+ * <b>3)</b> Put call to <kbd>psa_run_hooks()</kbd> function somewhere in your code where is needed.
+ * <code>
+ * // invoke main() methods in all hooks that extend After_User_Delete class
+ * psa_run_hooks(array('After_User_Delete' => array('main' => array($user_id))));
+ *
+ * </code>
+ *
+ * <br><b>Note:</b> Hooks are called in no special order if there are more hooks of the same type.
+ *
+ * <br><b>Note:</b> You have to register files when a new hook or a hook definition class i added.
  *
  * @param array $run_data Array with data what to run.
- * @param bool $by_type If true, hooks will be called <i>by type</i>, otherwise they'll be called <i>by name</i>.
- * @param bool $disable_unregistered_exception Exception that hook is not registered won't be thrown.
- * This parameter can be set to true when hook doesn't have to exist.
- * @return int 1 for success (all hooks are executed), -1 for success, but not with all hooks because some are
- * probably not registered or don't exist. -1 can be returned only when third argument is set to true, otherwise
- * exception will be thrown.
+ * @param bool $disable_unregistered_exception if true, exception that hook is not registered (
+ * or doesn't exists) won't be thrown.
+ * @return int 1 for success (all hooks are executed), 0 can be returned when the second
+ * argument is set to false and there is no hooks registered.
  * @see Psa_Files::register()
  * @throws Psa_Exception
  */
-function psa_run_hooks($run_data, $by_type = false, $disable_unregistered_exception = false){
+function psa_run_hooks($run_data, $disable_unregistered_exception = true){
 
-	// Disable hooks globally. I use this while testing.
+	// return if hooks are disabled
 	$psa_registry = Psa_Registry::get_instance();
 	if(isset($psa_registry->psa_disable_hooks) && $psa_registry->psa_disable_hooks)
 		return;
-
-	// files object
-	$psa_files = Psa_Files::get_instance();
-
-
-	// die if files are not registered or not retrieved from session or database
-	if(!$psa_files->files_data or !is_array($psa_files->files_data['class_paths'])){
-		$msg = 'No files to run. Files are not registered or data not retrieved from session or database';
-		throw new Psa_Fatal_Error_Exception($msg, $msg, 16);
-	}
-
 
 	// exit if $run_data is not array
 	if(!is_array($run_data)){
 		throw new Psa_Exception('Invalid first argument for psa_run_hooks() function. Not an array.', 11);
 	}
 
+	$hook_type = key($run_data);
 
-	// call hooks
-	if($by_type){
+	$psa_files = Psa_Files::get_instance();
 
-		$file_type = key($run_data);
-
-		// if file is registered
-		if(isset($psa_files->files_data['hooks'][$file_type]))
-			$files_data = &$psa_files->files_data['hooks'][$file_type];
-		else{
-			if(!$disable_unregistered_exception){
-				throw new Psa_Exception("Trying to run unregistered hook $file_type. Try to register files and delete session (cookies) if you store registered files data in session.", 12);
-			}
-			else
-				return 0;
-		}
-	}
-	// call hooks by name (hook class name)
+	// if file is registered
+	if(isset($psa_files->files_data['hooks'][$hook_type]))
+		$files_data = $psa_files->files_data['hooks'][$hook_type];
 	else{
-		$files_data = &$run_data;
+		if(!$disable_unregistered_exception){
+			throw new Psa_Exception("Trying to run unregistered hook $hook_type. Try to register files.", 12);
+		}
+		else
+			return 0;
 	}
 
 
 	// set default return value
 	$return = 1;
 
-
 	$router = new Psa_Router();
 
-
 	// $files_data is array with data used to instance classes and run methods (class name, method name, file name)
-	foreach ($files_data as $files_data_key => &$files_data_value){
+	foreach ($files_data as $files_data_key => $files_data_value){
 
-		// hooks
-		if($by_type){
-			$include_file = $files_data_value;
-			$file_class = $files_data_key;
-			$file_methods_data = &$run_data[$file_type]; // array of method names and arguments
-		}
-		// if we call files by name
-		else{
-
-			// if file is not registered
-			if(!isset($psa_files->files_data['class_paths'][$files_data_key])){
-
-				if(!$disable_unregistered_exception){
-					throw new Psa_Exception("Trying to run unregistered class $files_data_key. Try to register files and delete session (cookies) if you store registered file data in session.", 13);
-				}
-				else{
-					$return = -1;
-
-					continue;
-				}
-			}
-
-			$include_file = $psa_files->files_data['class_paths'][$files_data_key];
-			$file_class = $files_data_key;
-			$file_methods_data = &$files_data_value; // array of method names and arguments
-		}
+		$include_file = $files_data_value;
+		$file_class = $files_data_key;
+		$file_methods_data = &$run_data[$hook_type]; // array of method names and arguments
 
 		// call object methods
 		if(is_array($file_methods_data)){
@@ -333,7 +308,7 @@ function psa_run_hooks($run_data, $by_type = false, $disable_unregistered_except
  *
  * <b>Note:</b> Class autoloading will be working only in folders specified with
  * <var>$PSA_CFG['folders']['autoload'][]</var> and <var>$PSA_CFG['folders']['hook_autoload'][]</var> configuration
- * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array 
+ * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array
  * with all classes and their paths. There is a command line helper script <kbd>register_files.php</kbd> for that.
  *
  * For example, you can just extend <i>Psa_Model</i> class without including its .php file:
