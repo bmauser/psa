@@ -107,11 +107,11 @@ $PSA_CFG['folders']['autoload'][] = 'exceptions'; // psa/exceptions/
 
 /**
  * Hook definition classes location.
- * Folders in $PSA_CFG['folders']['hooks_def'] array will be checked for classes that define hooks.
+ * Folders in $PSA_CFG['folders']['hook_def'] array will be checked for classes that define hooks.
  * You can add more locations by adding elements to this array.
  * Paths in this array must be relative to PSA_BASE_DIR folder.
  */
-//$PSA_CFG['folders']['hooks_def'][] = 'hooks_def';
+//$PSA_CFG['folders']['hook_def'][] = 'hooks_def';
 
 
 /**

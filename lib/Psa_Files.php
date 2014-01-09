@@ -111,7 +111,7 @@ class Psa_Files extends Psa_Singleton{
 	/**
 	 * Registers files.
 	 *
-	 * It searches for .php files in folders defined by <var>$PSA_CFG['folders']['hooks_def']</var>,
+	 * It searches for .php files in folders defined by <var>$PSA_CFG['folders']['hook_def']</var>,
 	 * <var>$PSA_CFG['folders']['autoload']</var> and <var>$PSA_CFG['folders']['hook_autoload']</var> and
 	 * returns array with file names and corresponding paths.
 	 * It will search in content of .php files located in folders listed in <var>$PSA_CFG['folders']['hook_autoload']</var>
@@ -151,18 +151,18 @@ class Psa_Files extends Psa_Singleton{
 	function register($additional_autoload_folders = array(), $additional_hook_autoload_folders = array()){
 
 		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-		
+
 		$all_hook_types = array();
 
-		// find all available hook types from file names in each $PSA_CFG['folders']['hooks_def'] dir
-		if(isset($PSA_CFG['folders']['hooks_def']) && $PSA_CFG['folders']['hooks_def']){
-			foreach ($PSA_CFG['folders']['hooks_def'] as $hooks_folder) {
-	
+		// find all available hook types from file names in each $PSA_CFG['folders']['hook_def'] dir
+		if(isset($PSA_CFG['folders']['hook_def']) && $PSA_CFG['folders']['hook_def']){
+			foreach ($PSA_CFG['folders']['hook_def'] as $hooks_folder) {
+
 				$hook_folder_path = PSA_BASE_DIR . '/' . $hooks_folder;
-	
+
 				if ($handle = @opendir($hook_folder_path)) {
 					while (false !== ($file = readdir($handle))) {
-	
+
 						if(substr($file, -4, 4) == '.php'){
 							// get the part of the filename to the first dot. This is the name of the hook class.
 							$psa_hook_class_name = str_replace(strstr($file, '.'), '', $file);
@@ -209,8 +209,9 @@ class Psa_Files extends Psa_Singleton{
 			$return['class_paths'] = array();
 
 		// put also hooks into return array which will be used for class autoloading
-		if($all_hook_types)
+		if($all_hook_types){
 			$return['class_paths'] = array_merge($return['class_paths'], $all_hook_types);
+		}
 
 		return $this->files_data = $return;
 	}
