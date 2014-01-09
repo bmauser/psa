@@ -248,6 +248,9 @@ class Psa_Active_Record{
 	/**
 	 * Saves values from the object's member variables to the database.
 	 *
+	 * Unset member variables or those with NULL value will be excluded from saving. If you want to save
+	 * NULL value to the database, assign the string "<kbd>NULL</kbd>" to the member variable.
+	 *
 	 * @param array $only_columns Array with column names to save to the database. If not set,
 	 * column names set by the constructor are used.
 	 * @param array $and_columns Array with column names to be saved together with default columns set
@@ -270,15 +273,15 @@ class Psa_Active_Record{
 
 		foreach ($use_columns as $col_name){
 
-			if(isset($this->$col_name)){
+			if(isset($this->$col_name) && $this->$col_name !== null){
 
 				if($this->psa_new_record){
 					$col_names[] = $col_name;
-					$q_params[] = $this->$col_name;
+					$q_params[] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
 				}
 				else if($col_name != $this->psa_primary_key_field_name){
 					$col_names[] = $col_name . '=?';
-					$q_params[] = $this->$col_name;
+					$q_params[] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
 				}
 			}
 		}
