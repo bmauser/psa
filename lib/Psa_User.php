@@ -174,16 +174,15 @@ class Psa_User extends Psa_Active_Record{
 
 
 	/**
-	 * Does the same as {@link restore()} method, but also writes a log message, calls hooks and calls
+	 * Does the same as {@link restore()} method, but also writes a log message and calls
 	 * {@link session_save()} method.
 	 *
 	 * See examples in {@link Psa_User} class description.
 	 *
-	 * This function calls {@link restore()} method with <kbd>'username_password'</kbd> as the first argument,
-	 * writes a log message that user is authorized and runs {@link Psa_Hook_After_User_Authorize} hooks.
+	 * This function calls {@link restore()} method with <kbd>'username_password'</kbd> as the first argument
+	 * and writes a log message that user is authorized.
 	 *
 	 * @param string $password User password.
-	 * @param bool $run_hooks If false, {@link Psa_Hook_After_User_Authorize} hooks will not be invoked.
 	 * @param bool $write_success_login_logs If false, log message about successful authorization will not be written.
 	 * @param bool $save_to_session If true, {@link session_save()} will be called to write user ID and username to
 	 * the session if session is started before.
@@ -191,7 +190,7 @@ class Psa_User extends Psa_Active_Record{
 	 * @see restore()
 	 * @throws Psa_User_Exception
 	 */
-	public function authorize($password = null, $run_hooks = true, $write_success_login_logs = true, $save_to_session = true){
+	public function authorize($password = null, $write_success_login_logs = true, $save_to_session = true){
 
 		if($password){
 			$this->password = $this->password_hash($password);
@@ -204,10 +203,6 @@ class Psa_User extends Psa_Active_Record{
 		// write log
 		if($write_success_login_logs)
 			$this->log('User authorized', __METHOD__, 2);
-
-		// run Psa_Hook_After_User_Authorize hooks
-		//if($run_hooks)
-		//	psa_run_hooks(array('Psa_Hook_After_User_Authorize' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
 
 		if($save_to_session)
 			$this->session_save(false);
@@ -280,13 +275,7 @@ class Psa_User extends Psa_Active_Record{
 			// hash new password
 			$this->password = $this->password_hash($this->password);
 
-			// run Psa_Hook_Before_User_Create hooks
-			//psa_run_hooks(array('Psa_Hook_Before_User_Create' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
-
 			parent::save_to_database($only_columns, array('password'));
-
-			// run Psa_Hook_After_User_Create hooks
-			//psa_run_hooks(array('Psa_Hook_After_User_Create' => array('psa_main' => array($this))),'by_type','no_unregistered_warning');
 
 			// write log
 			$this->log('New user created', __METHOD__, 2);
