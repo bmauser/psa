@@ -356,7 +356,7 @@ function psa_autoload($class_name){
  * prs($array);
  * </code>
  *
- * @param mixed $value
+ * @param mixed $value The expression to be printed.
  * @param bool $return_only When this parameter is set to TRUE, function will return the 
  * information rather than print it just like print_r() function. 
  */
