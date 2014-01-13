@@ -343,8 +343,12 @@ function psa_autoload($class_name){
 
 
 /**
- * You can use this function instead of <kbd>echo</kbd> or <kbd>print_r</kbd> functions.
- *
+ * You can use this function instead of <kbd>echo</kbd> or <kbd>print_r</kbd> functions
+ * during development for debug output.
+ * 
+ * It will just return if <var>PSA_CFG['develop_mode']</var> is FALSE. This function is 
+ * wrapper for <kbd>print_r</kbd> function. 
+ * 
  * <b>Example:</b>
  *
  * <code>
@@ -353,9 +357,14 @@ function psa_autoload($class_name){
  * </code>
  *
  * @param mixed $str
- * @param bool $return_only
+ * @param bool $return_only When this parameter is set to TRUE, function will return the 
+ * information rather than print it just like print_r() function. 
  */
 function prs($str, $return_only = false){
+	
+	if(!Psa_Registry::get_instance()->PSA_CFG['develop_mode'])
+		return;
+	
 	$return = '<pre>' . htmlspecialchars (print_r($str, TRUE)) . '</pre>';
 
 	if($return_only)
