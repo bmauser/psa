@@ -353,7 +353,7 @@ class Psa_Files extends Psa_Singleton{
 		$file_content = "<?php\n\n\$autoload_data = " . var_export($files_data, 1) . ";\n";
 
 		// save file
-		if(0 && file_put_contents($PSA_CFG['autoload_data_file'], $file_content)){
+		if(file_put_contents($PSA_CFG['autoload_data_file'], $file_content)){
 			return 1;
 		}
 
