@@ -30,10 +30,10 @@
 
 
 /**
+ * Models can extend this class.
+ * 
  * Models are the place for calculations, database interaction, data manipulation and 
  * other business logic.
- * 
- * Model classes contain methods that are called from the controller.
  *
  * Model method should return a value which is passed to the view method in the
  * controller. You can also pass results from the model to the view method with

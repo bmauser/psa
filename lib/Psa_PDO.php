@@ -30,7 +30,7 @@
 
 
 /**
- * It's a simple database connection class and database access wrapper class.
+ * Simple database connection class and database access wrapper class.
  *
  * Handles database connection and executes queries against the database.
  * PSA uses {@link http://www.php.net/pdo PHP Data Objects (PDO)} extension for

@@ -35,6 +35,7 @@
 
 /**
  * This class handles profile logging.
+ * 
  * @ignore
  */
 class Psa_Profile_Logger extends Psa_Logger{

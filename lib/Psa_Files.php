@@ -30,7 +30,7 @@
 
 
 /**
- * Class that collects (registers) information about file paths in your application for autoloading.
+ * Class for collecting (registering) information about file paths in your application for autoloading.
  *
  * If <var>$PSA_CFG['develop_mode']</var> is true and <var>$PSA_CFG['develop_mode_register_files']</var>
  * is true, file registration is done on every request for convenience that you don't need to manually
