@@ -25,7 +25,7 @@
  * @link http://code.google.com/p/phpstartapp/
  * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA\exceptions
- * @version $Id: Psa_Fatal_Error_Exception.php 38 2011-10-18 00:18:43Z bmauser $
+ * @version $Id: Psa_User_Exception.php 38 2011-10-18 00:18:43Z bmauser $
  */
 
 
@@ -33,39 +33,9 @@ include_once 'Psa_Exception.php';
 
 
 /**
- * If you raise <kbd>Psa_Fatal_Error_Exception</kbd> exception anywhere in your application,
- * execution of the script will be terminated.
- *
- * <b>Example:</b>
- * <code>
- * class example_model extends Psa_Model {
- *
- *     function example_method(){
- *
- *         // some code here
- *
- *         // die and write message to log
- *         if($fatal_error)
- *             throw new Psa_Fatal_Error_Exception('This message will be in logs');
- * 	}
- * }
- * </code>
+ * This exception will be raised by some methods from the {@link Psa_Logger} class.
  */
-class Psa_Fatal_Error_Exception extends Psa_Exception{
+class Psa_Logger_Exception extends Psa_Exception{
 
-	/**
-	 * Constructor
-	 *
-	 * @param string $log_message message to be logged
-	 * @param string $echo_message message to be sent to the output
-	 * @param string $code user defined exception code
-	 * @param bool $write_log set to false if you don't want to log the exception
-	 */
-	public function __construct($log_message, $echo_message = null, $code = 0, $write_log = true){
-
-		// make sure everything is assigned properly
-		parent::__construct($log_message, $code, $write_log);
-
-		exit($echo_message);
-	}
 }
+

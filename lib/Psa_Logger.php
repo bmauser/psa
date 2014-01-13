@@ -258,9 +258,9 @@ class Psa_Logger extends Psa_Singleton{
 
 					// log message cannot be written into the database if there is problem with database connection
 					if($PSA_CFG['logging']['storage']['psa_default']['type'] == 'database')
-						throw new Psa_Fatal_Error_Exception($message, $message, $e->getCode(), false);
+						throw new Psa_Logger_Exception($message, $e->getCode(), false);
 					else
-						throw new Psa_Fatal_Error_Exception($message, $message, $e->getCode());
+						throw new Psa_Logger_Exception($message, $e->getCode());
 				}
 
 				return 1;
