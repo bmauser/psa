@@ -30,20 +30,17 @@
 
 
 /**
- * Models are the place for all business logic of your application.
+ * Models are the place for calculations, database interaction, data manipulation and 
+ * other business logic.
+ * 
+ * Model classes contain methods that are called from the controller.
  *
- * You can put all your calculations, database interaction and all other business 
- * logic in the model methods. 
+ * Model method should return a value which is passed to the view method in the
+ * controller. You can also pass results from the model to the view method with
+ * {@link Psa_Result} object because it is accessible from templates and view objects
+ * (see {@link Psa_Dully_View} or {@link Psa_Smarty_View}).
  *
- * Your model classes will contain methods that are called from the controller.
- *
- * You can put results from the model into the {@link Psa_Result} object because
- * it is accessible from templates and view objects (see {@link Psa_Dully_View} or 
- * {@link Psa_Smarty_View}). But, it is better and cleaner to make all your model 
- * methods to return values and then, in the controller action method you can pass 
- * results from the model to the view method as arguments.
- *
- * You can write your models by extending this class. Here is an example:
+ * Example:
  *
  * <code>
  * <?php
@@ -57,28 +54,6 @@
  *
  * <br>By extending <i>Psa_Model</i> class only {@link $psa_result}, {@link $psa_registry} and {@link $psa_database} properties
  * are set. So, if you do not need any of them in your model methods, your model class doesn't need to extend <i>Psa_Model</i>.
- * For example, this is also a valid model class:
- *
- * <code>
- * <?php
- * class my_model{
- *
- *     // Maximum number in result from functions below
- *     var $max_number = 150;
- *
- *     // Puts even numbers till $to_number in $psa_result object.
- *     function even_numbers($to_number){
- *
- *          for($i=0; $i <= $this->max_number; $i++){
- *               if($i % 2 == 0)
- *               $return[] = $i;
- *          }
- *
- *          return $return;
- *     }
- * }
- * ?>
- * </code>
  *
  */
 class Psa_Model{

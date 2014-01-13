@@ -31,8 +31,6 @@
 /**
  * User group class.
  *
- * Here are some examples of using <kbd>Psa_Group</kbd> object.
- *
  * <br><b>Examples:</b>
  *
  * <br><b>1)</b> Create a new user group:
@@ -69,10 +67,6 @@
  * by setting corresponding object member variables and call {@link save()} method. After calling
  * {@link restore()} method, corresponding object member variables will have values fetched from the
  * database.
- *
- *
- *
- *
  *
  * @see Psa_Active_Record
  */

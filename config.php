@@ -1,7 +1,8 @@
 <?php
 /**
  * PSA configuration file.
- * See comments in the file for detailed description of options.
+ * 
+ * See comments for detailed description of options.
  * You can make file named <kbd>config_override.php</kbd> in the same directory
  * and override values from this file. It is useful if you update your PSA directory
  * from Git repository.

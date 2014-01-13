@@ -32,8 +32,8 @@
 /**
  * Simple template engine class.
  *
- * I named this class Dully as opposite to {@link http://www.smarty.net Smarty}.
- * It has few methods that are similar to those in Smarty template engine.
+ * This class has few methods that are similar to those in {@link http://www.smarty.net Smarty}
+ * template engine.
  *
  * All that Dully does is putting values from an associative array into the local namespace and
  * includes .php (template) file. There are no special template tags, just use PHP code
@@ -48,7 +48,8 @@
  * Dully class doesn't include anything from PSA so you can use this class as template engine
  * in any PHP application.
  *
- * This class is inspired from {@link http://www.massassi.com/php/articles/template_engines/ here}
+ * I named this class Dully as opposite to Smarty. This class is inspired from 
+ * {@link http://www.massassi.com/php/articles/template_engines/ here}
  * and there are some interesting thoughts about template engines.
  *
  * <br><b>Usage examples:</b>

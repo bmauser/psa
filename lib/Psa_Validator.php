@@ -32,9 +32,8 @@
 /**
  * Class for input data validation.
  *
- * You should validate all input data from users.
- * Validation should occur in the model method, not in the controller (in some action method).
- * That makes your models more independent and more reusable and testing is easier.
+ * You should validate all input data from users. Make each model or view method to
+ * validate its parameters if they are input from a user.
  *
  * <br><b>Usage example</b>
  *

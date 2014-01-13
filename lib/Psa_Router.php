@@ -30,7 +30,7 @@
 
 
 /**
- * Class with methods for parsing the requested URL into controller, action, and parameters
+ * Class with methods for parsing the requested URL into controller, action and arguments,
  * and for invoking action methods.
  *
  * Router's task is to decide which controller and action method to call.

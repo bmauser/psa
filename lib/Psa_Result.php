@@ -34,7 +34,7 @@
  *
  * The only purpose of <kbd>Psa_Result</kbd> object is to transfer results from model to view, 
  * but a nicer way to do that is to make model methods to return the value and pass it 
- * to the view method as argument in the controller action method.
+ * to the view method as argument in the controller (in action method).
  * In <i>models</i> and <i>views</i> you can access <kbd>Psa_Result</kbd> object through
  * references in local scope.
  * For example, you can add property to <kbd>Psa_Result</kbd> object in your model

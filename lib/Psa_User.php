@@ -32,9 +32,7 @@
 /**
  * User object class.
  *
- * Here are some examples of using <kbd>Psa_User</kbd> object.
- *
- * <br><b>Usage examples:</b>
+ * <br><b>Examples:</b>
  *
  * <br><b>1)</b> Create a new user:
  * <code>

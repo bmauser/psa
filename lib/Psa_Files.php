@@ -172,7 +172,8 @@ class Psa_Files extends Psa_Singleton{
 					closedir($handle);
 				}
 				else{
-					throw new Psa_File_Exception("files register: unable to open dir with hooks: $hook_folder_path", 503);
+					include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+					throw new Psa_File_Exception("Unable to open dir with hooks: $hook_folder_path", 503);
 				}
 			}
 		}
@@ -223,7 +224,7 @@ class Psa_Files extends Psa_Singleton{
 	 * This is helper method for register().
 	 *
 	 * @see register()
-	 * @return int 1-sucess, 0-if cannot open <kbd>$dir</kbd> or array with files data
+	 * @return int 1-sucess, 0-if cannot open <kbd>$dir</kbd>
 	 * @ignore
 	 */
 	protected function check_files($dir, $all_hook_types = null, &$return, $recursion = false, $recursion_depth = 0){
@@ -249,9 +250,9 @@ class Psa_Files extends Psa_Singleton{
 		}
 
 
-		if ($handle){
+		if($handle){
 
-			while (($file = readdir($handle)) !== false){
+			while(($file = readdir($handle)) !== false){
 
 				if ($file=='.' or $file=='..'  or strcasecmp($file,'.svn')==0 or strcasecmp($file,'.cvs')==0 or strcasecmp($file,'.git')==0){
 					continue;
@@ -260,7 +261,7 @@ class Psa_Files extends Psa_Singleton{
 				// full filesystem path
 				$filepath = $dir . '/' . $file;
 
-				if ($recursion && is_dir($filepath)){
+				if($recursion && is_dir($filepath)){
 					// call self for this directory
 					$this->check_files($filepath, $all_hook_types, $return, $recursion, $recursion_depth+1);
 				}
@@ -352,10 +353,11 @@ class Psa_Files extends Psa_Singleton{
 		$file_content = "<?php\n\n\$autoload_data = " . var_export($files_data, 1) . ";\n";
 
 		// save file
-		if(file_put_contents($PSA_CFG['autoload_data_file'], $file_content)){
+		if(0 && file_put_contents($PSA_CFG['autoload_data_file'], $file_content)){
 			return 1;
 		}
 
-		throw new Psa_File_Exception('Error saving data about registered files to file ' . $PSA_CFG['autoload_data_file'], 504);
+		include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+		throw new Psa_File_Exception('Error saving data about registered files. Maybe file ' . $PSA_CFG['autoload_data_file'] . ' is not writeable.', 504);
 	}
 }

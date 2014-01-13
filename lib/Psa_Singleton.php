@@ -35,6 +35,7 @@
 
 /**
  * Singleton class.
+ * 
  * Classes that needs to implement singleton pattern can extend this class.
  *
  * @see http://en.wikipedia.org/wiki/Singleton_pattern
