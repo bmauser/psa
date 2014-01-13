@@ -356,16 +356,16 @@ function psa_autoload($class_name){
  * prs($array);
  * </code>
  *
- * @param mixed $str
+ * @param mixed $value
  * @param bool $return_only When this parameter is set to TRUE, function will return the 
  * information rather than print it just like print_r() function. 
  */
-function prs($str, $return_only = false){
+function prs($value, $return_only = false){
 	
 	if(!Psa_Registry::get_instance()->PSA_CFG['develop_mode'])
 		return;
 	
-	$return = '<pre>' . htmlspecialchars (print_r($str, TRUE)) . '</pre>';
+	$return = '<pre>' . htmlspecialchars (print_r($value, TRUE)) . '</pre>';
 
 	if($return_only)
 		return $return;
