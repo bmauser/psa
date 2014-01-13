@@ -229,16 +229,16 @@ function psa_delete_group($group){
  * ?>
  * </code>
  *
- * <b>3)</b> Put call to <kbd>psa_run_hooks()</kbd> function somewhere in your code where is needed.
+ * <b>3)</b> Put call to <kbd>psa_run_hooks()</kbd> function in your code where is needed.
  * <code>
  * // invoke main() methods in all hooks that extend After_User_Delete class
  * psa_run_hooks(array('After_User_Delete' => array('main' => array($user_id))));
  *
  * </code>
  *
- * <br><b>Note:</b> Hooks are called in no special order if there are more hooks of the same type.
+ * <br><b>Note:</b> If there are more hooks of the same type, they are called in no special order. 
  *
- * <br><b>Note:</b> You have to register files when a new hook or a hook definition class i added.
+ * <br><b>Note:</b> When a new hook or a hook definition class is added, you have to register files for autoloading.
  *
  * @param array $run_data Array with data what to run.
  * @param bool $disable_unregistered_exception if true, exception that hook is not registered (

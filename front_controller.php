@@ -1,9 +1,10 @@
 <?php
 /**
  * Front controller script.
- * Your site bootstrap file (usually index.php) shoud only include this file, so all requests
+ * 
+ * Your site index.php shoud only include this file, so all requests
  * will go through this script. It includes main PSA files, instances some objects and
- * calls psa_main method of the Main class.
+ * calls psa_main() method of the Main class.
  *
  *
  * The MIT License (MIT)
