@@ -64,7 +64,7 @@
  *
  * Two main methods in this class are {@link required()} and {@link optional()}. They behave the same way except that
  * {@link optional()} will not raise exception if value is empty or <kbd>null</kbd>.
- * Like in the example above, first argument is the value that should be validated and second is the name of the 
+ * Like in the example above, first argument is the value that should be validated and second is the name of the
  * validation action. See {@link required()} method documentation for all action names.
  * Some validation actions require more parameters. Examples:
  *
@@ -797,7 +797,7 @@ class Psa_Validator{
 	 */
 	public function check_string($value){
 
-		if(is_array($value) or is_object($value) or $value === '')
+		if(is_array($value) or is_object($value))
 			return false;
 
 		if(strval($value) == $value){
