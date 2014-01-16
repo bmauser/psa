@@ -246,8 +246,8 @@ class Psa_User extends Psa_Active_Record{
 	/**
 	 * Saves values from the member variables to the database.
 	 *
-	 * There must be a column in the database named the same as the member variable. It works only for 
-	 * variables mentioned in <var>$table_columns</var> argument to the constructor or by <var>$only_columns</var> 
+	 * There must be a column in the database named the same as the member variable. It works only for
+	 * variables mentioned in <var>$table_columns</var> argument to the constructor or by <var>$only_columns</var>
 	 * argument to this method.
 	 * All saved values will be restored when the {@link authorize()} or {@link restore()}
 	 * methods are called.
@@ -591,8 +591,6 @@ class Psa_User extends Psa_Active_Record{
 
 		// for each fetched row
 		while($row = $this->psa_database->fetch_row()){
-
-			// set array ith all user groups
 			$groups[$row['group_id']] = $row['name'];
 		}
 
