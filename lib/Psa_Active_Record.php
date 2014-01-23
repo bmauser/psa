@@ -200,7 +200,7 @@ class Psa_Active_Record{
 			$use_columns = $this->psa_column_names;
 
 		if(!$use_columns){
-			throw new Psa_Active_Record_Exception("Table column names not set", 701);
+			throw new Psa_Active_Record_Exception('Table column names not set', 701);
 		}
 
 		if($custom_query){
