@@ -289,7 +289,7 @@ class Psa_Validator{
 	/**
 	 * @ignore
 	 */
-	protected $msg_check_identical  = "%v is not identical(===) %p1";
+	protected $msg_check_identical  = "%v is not identical (===) %p1";
 	/**
 	 * @ignore
 	 */
