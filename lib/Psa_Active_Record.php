@@ -192,15 +192,13 @@ class Psa_Active_Record{
 	 */
 	protected function restore_from_database(array $only_columns = array(), $custom_query = null, $custom_query_params = array()){
 
-		$col_names = array();
-
 		if($only_columns)
 			$use_columns = $only_columns;
 		else
 			$use_columns = $this->psa_column_names;
 
 		if(!$use_columns){
-			throw new Psa_Active_Record_Exception('Table column names not set', 701);
+			throw new Psa_Active_Record_Exception("Table column names not set", 701);
 		}
 
 		if($custom_query){
@@ -260,7 +258,113 @@ class Psa_Active_Record{
 	 */
 	protected function save_to_database(array $only_columns = array(), array $and_columns = array()){
 
-		$col_names = array();
+		$columns = $this->columns_for_save($only_columns, $and_columns);
+
+		if($this->psa_new_record){
+
+			$col_count = count($columns);
+
+			$col_names = implode(', ', array_keys($columns));
+			$t = array_fill(0, $col_count, '?');
+			$marks = implode(',', $t);
+
+			$sql = 'INSERT INTO ' . $this->psa_table_name . ' (' . $col_names . ') VALUES (' . $marks . ')';
+			$this->psa_database->execute(array_values($columns), $this->psa_database->prepare($sql));
+
+			$this->psa_new_record = 0;
+
+			// get the last insert id
+			return $this->{$this->psa_primary_key_field_name} = (int) $this->psa_database->last_insert_id($this->psa_sequence_name);
+		}
+		else{
+			// remove  primary key field from $columns
+			if(array_key_exists($this->psa_primary_key_field_name, $columns))
+				unset($columns[$this->psa_primary_key_field_name]);
+
+			$col_names = implode('=?, ', array_keys($columns)) . '=?';
+
+			// put primary key field in the last place
+			$columns[] = $this->{$this->psa_primary_key_field_name};
+
+			$sql = 'UPDATE ' . $this->psa_table_name . ' SET ' . $col_names . ' WHERE ' . $this->psa_primary_key_field_name . '=?';
+			$this->psa_database->execute(array_values($columns), $this->psa_database->prepare($sql));
+
+			return $this->{$this->psa_primary_key_field_name};
+		}
+	}
+
+
+	/**
+	 * Saves values from the object's member variables to the session.
+	 *
+	 * @see restore_from_session()
+	 * @throws Psa_Active_Record_Exception
+	 * @return array
+	 */
+	protected function save_to_session(){
+
+		// check if session is started
+		if(!session_id())
+			throw new Psa_Active_Record_Exception('Session is not started. Cannot save data into the session.', 705);
+
+		// if no value for primary key
+		if(!isset($this->{$this->psa_primary_key_field_name}) or !$this->{$this->psa_primary_key_field_name})
+			throw new Psa_Active_Record_Exception("Value for primary key not set.", 706);
+
+		return $_SESSION['psa_active_record_data'][$this->psa_table_name][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save();
+	}
+
+
+	/**
+	 * Restores data from the session saved with {@link save_to_session()} method and populates
+	 * objects member variables.
+	 *
+	 * @see restore_from_session()
+	 * @throws Psa_Active_Record_Exception
+	 * @return array
+	 */
+	protected function restore_from_session(){
+
+		// check if session is started
+		if(!session_id())
+			throw new Psa_Active_Record_Exception('Session is not started. Cannot restore data from the session.', 707);
+
+		// if no value for primary key
+		if(!isset($this->{$this->psa_primary_key_field_name}) or !$this->{$this->psa_primary_key_field_name})
+			throw new Psa_Active_Record_Exception('Value for primary key not set.', 708);
+
+		// get data from session
+		if(isset($_SESSION['psa_active_record_data'][$this->psa_table_name][$this->{$this->psa_primary_key_field_name}])){
+
+			$data = $_SESSION['psa_active_record_data'][$this->psa_table_name][$this->{$this->psa_primary_key_field_name}];
+
+			if(is_array($data)){
+				foreach ($data as $key => $value) {
+					$this->$key = $value;
+				}
+
+				return $data;
+			}
+		}
+
+		throw new Psa_Active_Record_Exception('No data in session', 709);
+	}
+
+
+	/**
+	 * Returns names and values for data to save.
+	 *
+	 * See {@link save_to_database()} method for description of arguments and NULL values.
+	 *
+	 * @param array $only_columns
+	 * @param array $and_columns
+	 * @return array Associative array with names and values.
+	 * @see save_to_database()
+	 * @ignore
+	 */
+	protected function columns_for_save(array $only_columns = array(), array $and_columns = array()){
+
+		$return = array();
 
 		if($only_columns)
 			$use_columns = $only_columns;
@@ -270,47 +374,16 @@ class Psa_Active_Record{
 		if($and_columns)
 			$use_columns = array_merge($use_columns, $and_columns);
 
+		if($use_columns){
+			foreach ($use_columns as $col_name){
 
-		foreach ($use_columns as $col_name){
+				if(isset($this->$col_name) && $this->$col_name !== null){
 
-			if(isset($this->$col_name) && $this->$col_name !== null){
-
-				if($this->psa_new_record){
-					$col_names[] = $col_name;
-					$q_params[] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
-				}
-				else if($col_name != $this->psa_primary_key_field_name){
-					$col_names[] = $col_name . '=?';
-					$q_params[] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
+					$return[$col_name] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
 				}
 			}
-		}
 
-		$col_count = count($col_names);
-
-		if($col_count){
-			if($this->psa_new_record){
-
-				$col_names = implode(', ', $col_names);
-				$t = array_fill(0, $col_count, '?');
-				$marks = implode(',', $t);
-
-				$sql = 'INSERT INTO ' . $this->psa_table_name . ' (' . $col_names . ') VALUES (' . $marks . ')';
-				$this->psa_database->execute($q_params, $this->psa_database->prepare($sql));
-
-				$this->psa_new_record = 0;
-
-				// get the last insert id
-				return $this->{$this->psa_primary_key_field_name} = (int) $this->psa_database->last_insert_id($this->psa_sequence_name);
-			}
-			else{
-				$col_names = implode(', ', $col_names);
-				$q_params[] = $this->{$this->psa_primary_key_field_name};
-				$sql = 'UPDATE ' . $this->psa_table_name . ' SET ' . $col_names . ' WHERE ' . $this->psa_primary_key_field_name . '=?';
-				$this->psa_database->execute($q_params, $this->psa_database->prepare($sql));
-
-				return $this->{$this->psa_primary_key_field_name};
-			}
+			return $return;
 		}
 
 		throw new Psa_Active_Record_Exception('No values set to save.', 704);
