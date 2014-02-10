@@ -797,7 +797,7 @@ class Psa_Validator{
 	 */
 	public function check_string($value){
 
-		if(is_array($value) or is_object($value))
+		if(is_array($value) or is_object($value) or $value === '')
 			return false;
 
 		if(strval($value) == $value){
