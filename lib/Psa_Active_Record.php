@@ -297,11 +297,19 @@ class Psa_Active_Record{
 	/**
 	 * Saves values from the object's member variables to the session.
 	 *
+	 * This method will save values from object's member variables mentioned in <var>$column_names</var>
+	 * parameter in constructor method to session.
+	 *
+	 * @param array $only_columns Array with column names to save to the database. If not set,
+	 * column names set by the constructor are used.
+	 * @param array $and_columns Array with column names to be saved together with default columns set
+	 * by the constructor or <var>$only_columns</var> argument.
+	 * @param string $save_key Database table name will be used by default.
 	 * @see restore_from_session()
 	 * @throws Psa_Active_Record_Exception
 	 * @return array
 	 */
-	protected function save_to_session(){
+	protected function save_to_session(array $only_columns = array(), array $and_columns = array(), $save_key = null){
 
 		// check if session is started
 		if(!session_id())
@@ -311,19 +319,23 @@ class Psa_Active_Record{
 		if(!isset($this->{$this->psa_primary_key_field_name}) or !$this->{$this->psa_primary_key_field_name})
 			throw new Psa_Active_Record_Exception("Value for primary key not set.", 706);
 
-		return $_SESSION['psa_active_record_data'][$this->psa_table_name][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save();
+		if(!$save_key)
+			$save_key = $this->psa_table_name;
+
+		return $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save($only_columns, $and_columns);
 	}
 
 
 	/**
-	 * Restores data from the session saved with {@link save_to_session()} method and populates
+	 * Restores data from the session saved with the {@link save_to_session()} method and populates
 	 * objects member variables.
 	 *
+	 * @param string $save_key Database table name will be used by default.
 	 * @see restore_from_session()
 	 * @throws Psa_Active_Record_Exception
 	 * @return array
 	 */
-	protected function restore_from_session(){
+	protected function restore_from_session($save_key = null){
 
 		// check if session is started
 		if(!session_id())
@@ -333,10 +345,13 @@ class Psa_Active_Record{
 		if(!isset($this->{$this->psa_primary_key_field_name}) or !$this->{$this->psa_primary_key_field_name})
 			throw new Psa_Active_Record_Exception('Value for primary key not set.', 708);
 
-		// get data from session
-		if(isset($_SESSION['psa_active_record_data'][$this->psa_table_name][$this->{$this->psa_primary_key_field_name}])){
+		if(!$save_key)
+			$save_key = $this->psa_table_name;
 
-			$data = $_SESSION['psa_active_record_data'][$this->psa_table_name][$this->{$this->psa_primary_key_field_name}];
+		// get data from session
+		if(isset($_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}])){
+
+			$data = $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}];
 
 			if(is_array($data)){
 				foreach ($data as $key => $value) {
