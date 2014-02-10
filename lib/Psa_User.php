@@ -195,7 +195,7 @@ class Psa_User extends Psa_Active_Record{
 			$return = $this->restore('username_password');
 		}
 		else{
-			$return = $this->restore();
+			$return = $this->restore(null, 'try_from_session');
 		}
 
 		// write log
@@ -221,7 +221,7 @@ class Psa_User extends Psa_Active_Record{
 	 * @see authorize()
 	 * @throws Psa_User_Exception
 	 */
-	public function restore($restore_by = null){
+	public function restore($restore_by = null, $try_from_session = false){
 
 		try{
 			if($restore_by == 'username_password'){
@@ -232,8 +232,19 @@ class Psa_User extends Psa_Active_Record{
 				$q_params = array($this->username, $this->password);
 				$this->restore_from_database(array(), $sql, $q_params);
 			}
-			else if($this->id or $this->username)
-				$this->restore_from_database();
+			else if($this->id or $this->username){
+
+				if($try_from_session){
+					try{
+						$this->restore_from_session();
+					}
+					catch (Psa_Active_Record_Exception $e){
+						$this->restore_from_database();
+					}
+				}
+				else
+					$this->restore_from_database();
+			}
 			else
 				throw new Psa_User_Exception('Cannot restore user data. User id or username not set', 204);
 		}
@@ -643,6 +654,8 @@ class Psa_User extends Psa_Active_Record{
 
 		if($this->username)
 			$_SESSION['psa_current_user_data']['username'] = $this->username;
+
+		$this->save_to_session();
 
 		return true;
 	}
