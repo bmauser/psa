@@ -298,7 +298,7 @@ class Psa_Active_Record{
 	 * Saves values from the object's member variables to the session.
 	 *
 	 * This method will save values from object's member variables mentioned in <var>$column_names</var>
-	 * parameter in constructor method to session.
+	 * parameter in the constructor method to the session.
 	 *
 	 * @param array $only_columns Array with column names to save to the database. If not set,
 	 * column names set by the constructor are used.
