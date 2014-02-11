@@ -195,7 +195,7 @@ class Psa_User extends Psa_Active_Record{
 			$return = $this->restore('username_password');
 		}
 		else{
-			$return = $this->restore(null, 'try_from_session');
+			$return = $this->restore();
 		}
 
 		// write log
