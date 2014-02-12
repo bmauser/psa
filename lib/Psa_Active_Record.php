@@ -338,7 +338,7 @@ class Psa_Active_Record{
 		if(!$save_key)
 			$save_key = $this->psa_table_name;
 
-		return $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save($only_columns, $and_columns, 'before_save_to_session');
+		return $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save($only_columns, $and_columns);
 	}
 
 
@@ -369,16 +369,9 @@ class Psa_Active_Record{
 
 			$data = $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}];
 
-			// $modifier_count = $this->count_modifiers('after_restore_from_session');
-
 			if(is_array($data)){
-				foreach ($data as $key => $value) {
-
-					// call modifier
-					if($modifier_count)
-						$this->$key = $this->call_modifier('after_restore_from_session', $key, $value);
-					else
-						$this->$key = $value;
+				foreach($data as $key => $value){
+					$this->$key = $value;
 				}
 
 				return $data;
@@ -438,13 +431,39 @@ class Psa_Active_Record{
 
 
 	/**
-	 * Registers modifier action.
+	 * Registers data modifier.
 	 *
-	 * @param string $modifier_type
-	 * @param string $function
-	 * @param string|function $function
+	 * This method is useful when data stored in the database needs to be formatted.
+	 * For example an array can be serialized before saving it to the database and unserialized
+	 * when is restored from the database.
+	 *
+	 * <b>Example:</b>
+	 *
+	 * <code>
+	 * <?php
+	 *
+	 * class MyClass extends Psa_Active_Record{
+	 *
+	 *     public function __construct($record_id){
+	 *
+	 *         // call parent constructor
+	 *         parent::__construct('my_table', 'id', $record_id, array('column1', 'column2', 'column3'));
+	 *
+	 *         // register modifier for column1
+	 *         $this->register_data_modifier('before_save_to_database', 'column1',  function($value){
+	 *             return serialize($value);
+	 *         });
+	 *
+	 *         $this->register_data_modifier('after_restore_from_database', 'column1',  function($value){
+	 *             return unserialize($value);
+	 *         });
+	 * }
+	 * </code>
+	 *
+	 * @param string $modifier_type <kbd>before_save_to_database</kbd> or <kbd>after_restore_from_database</kbd>
+	 * @param string $property_name Name of the property on which modifier is bound.
+	 * @param function $function Callback function.
 	 * @throws Psa_Active_Record_Exception
-	 * @return multitype:NULL
 	 */
 	protected function register_data_modifier($modifier_type, $property_name, $function){
 
