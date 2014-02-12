@@ -136,6 +136,15 @@ class Psa_Active_Record{
 
 
 	/**
+	 * Array for modifier definitions.
+	 *
+	 * @var array
+	 * @ignore
+	 */
+	protected $psa_modifiers = array();
+
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $table_name Name of the database table.
@@ -217,9 +226,16 @@ class Psa_Active_Record{
 			throw new Psa_Active_Record_Exception("No data for {$this->psa_primary_key_field_name} with value '{$this->{$this->psa_primary_key_field_name}}' in table {$this->psa_table_name}", 702);
 		}
 
+		$modifier_count = $this->count_modifiers('after_restore_from_database');
+
 		// set local member variables
 		foreach ($data as $key => $value) {
-			$this->$key = $value;
+
+			// call modifier
+			if($modifier_count)
+				$this->$key = $this->call_modifier('after_restore_from_database', $key, $value);
+			else
+				$this->$key = $value;
 		}
 
 		return $data;
@@ -258,7 +274,7 @@ class Psa_Active_Record{
 	 */
 	protected function save_to_database(array $only_columns = array(), array $and_columns = array()){
 
-		$columns = $this->columns_for_save($only_columns, $and_columns);
+		$columns = $this->columns_for_save($only_columns, $and_columns, 'before_save_to_database');
 
 		if($this->psa_new_record){
 
@@ -322,7 +338,7 @@ class Psa_Active_Record{
 		if(!$save_key)
 			$save_key = $this->psa_table_name;
 
-		return $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save($only_columns, $and_columns);
+		return $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}] = $this->columns_for_save($only_columns, $and_columns, 'before_save_to_session');
 	}
 
 
@@ -353,9 +369,16 @@ class Psa_Active_Record{
 
 			$data = $_SESSION['psa_active_record_data'][$save_key][$this->{$this->psa_primary_key_field_name}];
 
+			// $modifier_count = $this->count_modifiers('after_restore_from_session');
+
 			if(is_array($data)){
 				foreach ($data as $key => $value) {
-					$this->$key = $value;
+
+					// call modifier
+					if($modifier_count)
+						$this->$key = $this->call_modifier('after_restore_from_session', $key, $value);
+					else
+						$this->$key = $value;
 				}
 
 				return $data;
@@ -373,13 +396,15 @@ class Psa_Active_Record{
 	 *
 	 * @param array $only_columns
 	 * @param array $and_columns
+	 * @param string $call_modifier
 	 * @return array Associative array with names and values.
 	 * @see save_to_database()
 	 * @ignore
 	 */
-	protected function columns_for_save(array $only_columns = array(), array $and_columns = array()){
+	protected function columns_for_save(array $only_columns = array(), array $and_columns = array(), $call_modifier = null){
 
 		$return = array();
+		$modifier_count = 0;
 
 		if($only_columns)
 			$use_columns = $only_columns;
@@ -389,12 +414,19 @@ class Psa_Active_Record{
 		if($and_columns)
 			$use_columns = array_merge($use_columns, $and_columns);
 
+		if($call_modifier)
+			$modifier_count = $this->count_modifiers($call_modifier);
+
 		if($use_columns){
 			foreach ($use_columns as $col_name){
 
 				if(isset($this->$col_name) && $this->$col_name !== null){
 
 					$return[$col_name] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
+
+					// call modifier
+					if($modifier_count)
+						$return[$col_name] = $this->call_modifier($call_modifier, $col_name);
 				}
 			}
 
@@ -402,5 +434,71 @@ class Psa_Active_Record{
 		}
 
 		throw new Psa_Active_Record_Exception('No values set to save.', 704);
+	}
+
+
+	/**
+	 * Registers modifier action.
+	 *
+	 * @param string $modifier_type
+	 * @param string $function
+	 * @param string|function $function
+	 * @throws Psa_Active_Record_Exception
+	 * @return multitype:NULL
+	 */
+	protected function register_data_modifier($modifier_type, $property_name, $function){
+
+		$types = array(
+				'before_save_to_database',
+				//'before_save_to_session',
+				'after_restore_from_database',
+				//'after_restore_from_session',
+				);
+
+		if(!in_array($modifier_type, $types))
+			throw new Psa_Active_Record_Exception("Invalid modifier type: $modifier_type", 710);
+
+		$this->psa_modifiers[$modifier_type][$property_name] = $function;
+	}
+
+
+	/**
+	 * Registers modifier action.
+	 *
+	 * @param string $modifier_type
+	 * @param string $function
+	 * @param string|function $function
+	 * @throws Psa_Active_Record_Exception
+	 * @return multitype
+	 * @ignore
+	 */
+	protected function call_modifier($modifier_type, $property_name, $value = null){
+
+		if($value === null && isset($this->$property_name))
+			$value = $this->$property_name;
+
+		if(isset($this->psa_modifiers[$modifier_type][$property_name]) && is_callable($this->psa_modifiers[$modifier_type][$property_name])){
+
+			// invoke modifier
+			return $this->psa_modifiers[$modifier_type][$property_name]($value);
+		}
+
+		return $value;
+	}
+
+
+	/**
+	 * Counts elements in $psa_modifiers member array;
+	 *
+	 * @param string $modifier_type
+	 * @ignore
+	 */
+	protected function count_modifiers($modifier_type){
+
+		if($modifier_type && isset($this->psa_modifiers[$modifier_type])){
+			return count($this->psa_modifiers[$modifier_type]);
+		}
+
+		return 0;
 	}
 }
