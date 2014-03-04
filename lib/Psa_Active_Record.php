@@ -328,7 +328,7 @@ class Psa_Active_Record{
 	protected function save_to_session(array $only_columns = array(), array $and_columns = array(), $save_key = null){
 
 		// check if session is started
-		if(!session_id())
+		if(!session_id() && !defined('PSA_TEST'))
 			throw new Psa_Active_Record_Exception('Session is not started. Cannot save data into the session.', 705);
 
 		// if no value for primary key
@@ -354,7 +354,7 @@ class Psa_Active_Record{
 	protected function restore_from_session($save_key = null){
 
 		// check if session is started
-		if(!session_id())
+		if(!session_id() && !defined('PSA_TEST'))
 			throw new Psa_Active_Record_Exception('Session is not started. Cannot restore data from the session.', 707);
 
 		// if no value for primary key
