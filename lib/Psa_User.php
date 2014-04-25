@@ -184,7 +184,7 @@ class Psa_User extends Psa_Active_Record{
 	 * @param bool $write_success_login_logs If false, log message about successful authorization will not be written.
 	 * @param bool $save_to_session If true, {@link session_save()} will be called to write user ID and username to
 	 * the session if session is started before.
-	 * @return int 1 for success.
+	 * @return array User data restored from the database.
 	 * @see restore()
 	 * @throws Psa_User_Exception
 	 */
@@ -218,6 +218,7 @@ class Psa_User extends Psa_Active_Record{
 	 * this method is called, member variable with name <kbd>access_level</kbd> will be
 	 * populated with the value from the database.
 	 *
+	 * @return array Restored user data.
 	 * @see authorize()
 	 * @throws Psa_User_Exception
 	 */
@@ -230,20 +231,20 @@ class Psa_User extends Psa_Active_Record{
 
 				$sql = "SELECT <COLUMNS> FROM {$this->psa_registry->PSA_CFG['database']['table']['user']} WHERE username=? AND password=?";
 				$q_params = array($this->username, $this->password);
-				$this->restore_from_database(array(), $sql, $q_params);
+				return $this->restore_from_database(array(), $sql, $q_params);
 			}
 			else if($this->id or $this->username){
 
 				if($try_from_session){
 					try{
-						$this->restore_from_session();
+						return $this->restore_from_session();
 					}
 					catch (Psa_Active_Record_Exception $e){
-						$this->restore_from_database();
+						return $this->restore_from_database();
 					}
 				}
 				else
-					$this->restore_from_database();
+					return $this->restore_from_database();
 			}
 			else
 				throw new Psa_User_Exception('Cannot restore user data. User id or username not set', 204);
@@ -267,7 +268,7 @@ class Psa_User extends Psa_Active_Record{
 	 * @see authorize()
 	 * @param array $only_columns Array with column names in <i>psa_user</i> database table to work with.
 	 * If not set, column names set by the constructor are used.
-	 * @return int 1 for success
+	 * @return int User ID.
 	 * @throws Psa_User_Exception
 	 */
 	public function save(array $only_columns = array()){
