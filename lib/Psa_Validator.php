@@ -136,6 +136,10 @@
  * // Validates an IPv6 address.
  * $val->required($value, 'ip6');
  *
+ * // Checks with instanceof operator
+ * $val->required($value, 'instanceof', 'stdClass');
+ * $val->required($value, 'instanceof', new stdClass();
+ *
  * </code>
  *
  * <br><b>Validating array of values</b>
@@ -301,7 +305,7 @@ class Psa_Validator{
 	/**
 	 * @ignore
 	 */
-	protected $msg_required          = "%t value is required. "; // Custom message can be concatenated
+	protected $msg_required          = "Value for %t is required. "; // Custom message can be concatenated
 
 
 	/**
