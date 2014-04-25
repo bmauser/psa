@@ -108,7 +108,7 @@ class Psa_Router extends Psa_Model{
 		// If application root folder is in subfolder from server root like: www.example.com/my/application/
 		// remove unnecessary part of the path. In case of url above that would be '/my/application'.
 		if($this->psa_registry->basedir_web)
-			$request_uri_arr[0] = str_replace($this->psa_registry->basedir_web, '', $request_uri_arr[0]);
+			$request_uri_arr[0] = implode('', explode($this->psa_registry->basedir_web, $request_uri_arr[0], 2));
 
 		$request_uri_arr[0] = trim($request_uri_arr[0], "/ \t\n\r\0\x0B");
 

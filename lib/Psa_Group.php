@@ -45,7 +45,7 @@
  * $new_group_id = $group->save();
  * </code>
  *
- * <br><b>2)</b> 
+ * <br><b>2)</b>
  * If you want to add more columns to <i>psa_group</i> database table, extend <kbd>Psa_Group</kbd> class:
  * <code>
  * class MyGroup extends Psa_Group{
@@ -143,6 +143,7 @@ class Psa_Group extends Psa_Active_Record{
 	 *
 	 * @param array $only_columns Array with column names to restore from the database. If not set,
 	 * all columns which names are passed to the constructor are restored.
+	 * @return array Restored data from database.
 	 * @see save()
 	 * @throws Psa_Group_Exception
 	 */
@@ -153,8 +154,7 @@ class Psa_Group extends Psa_Active_Record{
 		}
 
 		try{
-			$this->restore_from_database($only_columns);
-			return;
+			return $this->restore_from_database($only_columns);
 		}
 		catch (Psa_Active_Record_Exception $e){
 			throw new Psa_Group_Exception("Group does not exists. Cannot restore data.", 304);
