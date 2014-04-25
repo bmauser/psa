@@ -293,6 +293,10 @@ class Psa_Validator{
 	/**
 	 * @ignore
 	 */
+	protected $msg_check_instanceof  = "Value is not an instance of %p1";
+	/**
+	 * @ignore
+	 */
 	protected $msg_default          = "Invalid value: %v";
 	/**
 	 * @ignore
@@ -339,7 +343,8 @@ class Psa_Validator{
 	 * <kbd>string</kbd>, <kbd>email</kbd>, <kbd>ip4</kbd>, <kbd>ip6</kbd>, <kbd>float</kbd>, <kbd>alpha</kbd>,
 	 * <kbd>num</kbd>, <kbd>alphanum</kbd>, <kbd>regex</kbd>, <kbd>domainsafe</kbd>,
 	 * <kbd>invalues</kbd>, <kbd>url</kbd>, <kbd>between</kbd>, <kbd>lenbetween</kbd>,
-	 * <kbd>equal</kbd>, <kbd>identical</kbd>, <kbd>hostname</kbd>, <kbd>callback</kbd><br>
+	 * <kbd>equal</kbd>, <kbd>identical</kbd>, <kbd>hostname</kbd>, <kbd>callback</kbd>,
+	 * <kbd>instanceof</kbd><br>
 	 *
 	 * If <var>$value</var> is an array, suffix <b><kbd>_array</kbd></b> can be added to any of these
 	 * types to validate each element of the array. For example, this is useful
@@ -604,14 +609,21 @@ class Psa_Validator{
 			for($i=1; $i<$validation_method_num_args; $i++){
 				if(is_array($method_params[$i]))
 					$val = '[' . implode(', ', $method_params[$i]) . ']';
+				if(is_object($method_params[$i]))
+					$val = get_class($method_params[$i]);
 				else
 					$val = $method_params[$i];
 				$message = str_replace('%p' . $i, $val, $message);
 			}
 		}
 
+		if(is_object($method_params[0]))
+			$value_str = 'Object';
+		else
+			$value_str = $method_params[0];
+
 		// replace %v in message with value. $method_params[0] is value to validate
-		return $message = str_replace('%v', is_array($method_params[0]) ? 'Array' : $method_params[0], $message);
+		return $message = str_replace('%v', $value_str, $message);
 	}
 
 
@@ -1040,6 +1052,22 @@ class Psa_Validator{
 
 		$regex = '^(?:(?:(?:[A-F0-9]{1,4}:){5}[A-F0-9]{1,4}|(?:[A-F0-9]{1,4}:){4}:[A-F0-9]{1,4}|(?:[A-F0-9]{1,4}:){3}(?::[A-F0-9]{1,4}){1,2}|(?:[A-F0-9]{1,4}:){2}(?::[A-F0-9]{1,4}){1,3}|[A-F0-9]{1,4}:(?::[A-F0-9]{1,4}){1,4}|(?:[A-F0-9]{1,4}:){1,5}|:(?::[A-F0-9]{1,4}){1,5}|:):(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}|(?:[A-F0-9]{1,4}:){6}:[A-F0-9]{1,4}|(?:[A-F0-9]{1,4}:){5}(?::[A-F0-9]{1,4}){1,2}|(?:[A-F0-9]{1,4}:){4}(?::[A-F0-9]{1,4}){1,3}|(?:[A-F0-9]{1,4}:){3}(?::[A-F0-9]{1,4}){1,4}|(?:[A-F0-9]{1,4}:){2}(?::[A-F0-9]{1,4}){1,5}|[A-F0-9]{1,4}:(?::[A-F0-9]{1,4}){1,6}|(?:[A-F0-9]{1,4}:){1,7}:|:(?::[A-F0-9]{1,4}){1,7})$';
 		if(preg_match('/'.$regex.'/i', $value))
+			return true;
+		return false;
+	}
+
+
+	/**
+	 * Returns true if $value is instance of $type.
+	 *
+	 * @param mixed $value
+	 * @param object|string $type
+	 * @return bool
+	 * @ignore
+	 */
+	public function check_instanceof($value, $type){
+
+		if($value instanceof $type)
 			return true;
 		return false;
 	}
