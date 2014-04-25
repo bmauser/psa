@@ -294,6 +294,10 @@ class Psa_Validator{
 	 * @ignore
 	 */
 	protected $msg_default          = "Invalid value: %v";
+	/**
+	 * @ignore
+	 */
+	protected $msg_required          = "%t value is required. "; // Custom message can be concatenated
 
 
 	/**
@@ -472,12 +476,17 @@ class Psa_Validator{
 		$value_to_validate = $params[0];
 		$validation_type = $params[1];
 
+		// remove second element because it is validation_type
+		array_splice($params, 1, 1);
+
 		// check if value can be empty
 		if($this->is_empty($value_to_validate)){
 			if(!$reqired)
 				return true;
 
-			return $this->fail_local("value is required for '{$validation_type}' validation", $value_to_validate, $validation_type, 601);
+			$message = $this->get_required_message($validation_type, $params);
+
+			return $this->fail_local($message, $value_to_validate, $validation_type, 601);
 		}
 
 		// if validation has to be run on array of elements
@@ -489,9 +498,12 @@ class Psa_Validator{
 				$validation_type = substr($validation_type, 0, -6);
 
 				$return = true;
+				$arr_params = $params; // copy paremeters
 
 				// validate each element
 				foreach ($value_to_validate as $data_key => $data_value){
+
+					$arr_params[0] = $data_value; // replace array with value to validate
 
 					// check if value can be empty
 					if($this->is_empty($data_value)){
@@ -499,12 +511,13 @@ class Psa_Validator{
 						if(!$reqired)
 							continue;
 						// data is required
-						else
-							return $this->fail_local("value is required for '{$validation_type}' validation", $data_value, $validation_type, 602);
+						else{
+							$message = $this->get_required_message($validation_type, $params);
+							return $this->fail_local($message, $data_value, $validation_type, 602);
+						}
 					}
-					$params[0] = $data_value;
-					$params[1] = $validation_type;
-					if(!$this->invoke_validation_method($params))
+
+					if(!$this->invoke_validation_method($validation_type, $arr_params))
 						$return = false;
 				}
 
@@ -516,20 +529,17 @@ class Psa_Validator{
 		}
 		// single value
 		else{
-			return $this->invoke_validation_method($params);
+			return $this->invoke_validation_method($validation_type, $params);
 		}
 	}
 
 
 	/**
-	 * Invokes validation functions and puts error messages into $this->errors array
+	 * Invokes validation methods.
 	 *
 	 * @ignore
 	 */
-	protected function invoke_validation_method($params){
-
-		$value_to_validate = $params[0];
-		$validation_type = $params[1];
+	protected function invoke_validation_method($validation_type, $params){
 
 		// name of the method to invoke
 		$validation_method_name = 'check_' . $validation_type;
@@ -540,50 +550,82 @@ class Psa_Validator{
 			// method reflection
 			$invoke_method = new ReflectionMethod($this, $validation_method_name);
 
-			// remove second element because it is validation_type
-			array_splice($params, 1, 1);
-
 			// call validating method
 			$validation_result = $invoke_method->invokeArgs($this, $params);
 
-			// call validating method
+			// if invalid
 			if(!$validation_result){
 
-				// how many arguments has validation_method
-				$invoke_method_num_args = $invoke_method->getNumberOfParameters();
+				$message = $this->get_validation_message($validation_type, $params, $invoke_method);
 
-				// default validation message
-				$message_var_name = 'msg_' . $validation_method_name;
-
-				// choose error message
-				if(isset($params[$invoke_method_num_args]) && is_string($params[$invoke_method_num_args]))
-					$message = $params[$invoke_method_num_args];
-				else if(isset($this->$message_var_name) && $this->$message_var_name)
-					$message = $this->$message_var_name;
-				else
-					$message = $this->msg_default;
-
-				if(count($params) > 1 && substr_count($message, '%p')){
-					// replace %p1, %p2, %p3... in message with function params
-					for($i=1; $i<$invoke_method_num_args; $i++){
-						if(is_array($params[$i]))
-							$val = '[' . implode(', ', $params[$i]) . ']';
-						else
-							$val = $params[$i];
-						$message = str_replace('%p' . $i, $val, $message);
-					}
-				}
-
-				// replace %v in message with value
-				$message = str_replace('%v', is_array($value_to_validate) ? 'Array' : $value_to_validate, $message);
-
-				return $this->fail_local($message, $value_to_validate, $validation_type, 604);
+				return $this->fail_local($message, $params[0], $validation_type, 604);
 			}
 
 			return true;
 		}
 		else
-			return $this->fail_local("undefined validation method check_{$validation_type}()", $value_to_validate, $validation_type, 605);
+			return $this->fail_local("Undefined validation method check_{$validation_type}()", $params[0], $validation_type, 605);
+	}
+
+
+	/**
+	 * Returns validation error message.
+	 *
+	 * @ignore
+	 */
+	protected function get_validation_message($validation_type, $method_params, ReflectionMethod $reflection_method = null, $only_parameter_message = null){
+
+		// default validation message
+		$message_var_name = 'msg_check_' . $validation_type;
+
+		if(!$reflection_method){
+
+			// name of the validation method
+			$validation_method_name = 'check_' . $validation_type;
+
+			$reflection_method = new ReflectionMethod($this, $validation_method_name);
+		}
+
+		// how many arguments has validation_method
+		$validation_method_num_args = $reflection_method->getNumberOfParameters();
+
+		// choose error message
+		if(isset($method_params[$validation_method_num_args]) && is_string($method_params[$validation_method_num_args]))
+			$message = $method_params[$validation_method_num_args];
+		else if($only_parameter_message)
+			return '';
+		else if(isset($this->$message_var_name) && $this->$message_var_name)
+			$message = $this->$message_var_name;
+		else
+			$message = $this->msg_default;
+
+		if(count($method_params) > 1 && substr_count($message, '%p')){
+			// replace %p1, %p2, %p3... in message with function params
+			for($i=1; $i<$validation_method_num_args; $i++){
+				if(is_array($method_params[$i]))
+					$val = '[' . implode(', ', $method_params[$i]) . ']';
+				else
+					$val = $method_params[$i];
+				$message = str_replace('%p' . $i, $val, $message);
+			}
+		}
+
+		// replace %v in message with value. $method_params[0] is value to validate
+		return $message = str_replace('%v', is_array($method_params[0]) ? 'Array' : $method_params[0], $message);
+	}
+
+
+	/**
+	 * Returns validation error message for required values.
+	 *
+	 * @ignore
+	 */
+	protected function get_required_message($validation_type, $method_params){
+
+		$message = str_replace('%t', $validation_type, $this->msg_required);
+		$message .= $this->get_validation_message($validation_type, $method_params, null, true);
+
+		return trim($message);
 	}
 
 
