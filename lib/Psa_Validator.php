@@ -626,7 +626,7 @@ class Psa_Validator{
 		else
 			$value_str = $method_params[0];
 
-		// replace %v in message with value. $method_params[0] is value to validate
+		// replace %v in message with value.
 		return $message = str_replace('%v', $value_str, $message);
 	}
 
@@ -1003,9 +1003,9 @@ class Psa_Validator{
 	 * @return bool
 	 * @ignore
 	 */
-	public function check_callback($param1 = null, $param2 = null, $param3 = null){
+	public function check_callback($value, $callback_function_name){
 
-		return call_user_func($param1, $param2, $param3);
+		return call_user_func($callback_function_name, $value);
 	}
 
 
