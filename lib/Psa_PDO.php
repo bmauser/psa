@@ -113,6 +113,7 @@
  *         catch (Psa_Db_Exception $e){
  *             // rollback
  *             $this->psa_database->pdo->rollback();
+ *             throw $e;
  *         }
  *
  *         // commit
