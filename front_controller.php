@@ -1,7 +1,7 @@
 <?php
 /**
  * Front controller script.
- * 
+ *
  * Your site index.php shoud only include this file, so all requests
  * will go through this script. It includes main PSA files, instances some objects and
  * calls psa_main() method of the Main class.
@@ -85,7 +85,7 @@ $psa_registry->psa_database = new Psa_PDO();
 
 
 // if in web mode
-if(isset($_SERVER['REQUEST_URI'])){
+if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']){
 	// get application base URL
 	if(isset($PSA_CFG['folders']['basedir_web']))
 		$psa_registry->basedir_web = $PSA_CFG['folders']['basedir_web'];
