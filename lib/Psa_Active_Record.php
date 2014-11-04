@@ -120,7 +120,7 @@ class Psa_Active_Record{
 	/**
 	 * Reference to Psa_Registry object.
 	 *
-	 * @var string
+	 * @var Psa_Registry
 	 * @ignore
 	 */
 	protected $psa_registry = null;
