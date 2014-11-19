@@ -106,7 +106,7 @@ class Psa_Logger extends Psa_Singleton{
 	 * Psa_Logger::get_instance()->log("Log message");
 	 * </code>
 	 *
-	 * @return object Psa_Logger
+	 * @return Psa_Logger
 	 */
 	public static function get_instance($class = null){
 		// this is needed that this class can be extended

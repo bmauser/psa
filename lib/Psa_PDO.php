@@ -378,7 +378,7 @@ class Psa_PDO{
 	 * Prepares a statement for execution.
 	 *
 	 * @param string $sql
-	 * @return object PDOStatement
+	 * @return PDOStatement
 	 * @see execute()
 	 */
 	public function prepare($sql) {
