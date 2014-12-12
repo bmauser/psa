@@ -120,7 +120,7 @@ class Psa_Active_Record{
 	/**
 	 * Reference to Psa_Registry object.
 	 *
-	 * @var string
+	 * @var Psa_Registry
 	 * @ignore
 	 */
 	protected $psa_registry = null;
@@ -142,6 +142,35 @@ class Psa_Active_Record{
 	 * @ignore
 	 */
 	protected $psa_modifiers = array();
+
+
+	/**
+	 * Array for SQL functions in SELECT query per column.
+	 *
+	 * Example:
+	 *
+	 * <code>
+	 * $psa_select_column_sql['username'] = "RPAD(username, 20, '*') AS username";
+	 * </code>
+	 *
+	 * @var array
+	 */
+	protected $psa_select_column_sql = array();
+
+
+	/**
+	 * Array for SQL functions in INSETR or UPDATE query per column.
+	 *
+	 * Example:
+	 *
+	 * <code>
+	 * $psa_insert_update_column_sql['username'] = "RPAD(?, 20, '*')";
+	 * </code>
+	 *
+	 * @var array
+	 * @ignore
+	 */
+	protected $psa_insert_update_column_sql = array();
 
 
 	/**
@@ -208,6 +237,18 @@ class Psa_Active_Record{
 
 		if(!$use_columns){
 			throw new Psa_Active_Record_Exception("Table column names not set", 701);
+		}
+
+		// select sql per column
+		if($this->psa_select_column_sql){
+			foreach ($this->psa_select_column_sql as $column_name => $sql) {
+
+				$col_arr_index = array_search ($column_name, $use_columns);
+
+				if($col_arr_index !== false){
+					$use_columns[$col_arr_index] = $sql;
+				}
+			}
 		}
 
 		if($custom_query){
@@ -278,13 +319,9 @@ class Psa_Active_Record{
 
 		if($this->psa_new_record){
 
-			$col_count = count($columns);
-
 			$col_names = implode(', ', array_keys($columns));
-			$t = array_fill(0, $col_count, '?');
-			$marks = implode(',', $t);
 
-			$sql = 'INSERT INTO ' . $this->psa_table_name . ' (' . $col_names . ') VALUES (' . $marks . ')';
+			$sql = 'INSERT INTO ' . $this->psa_table_name . ' (' . $col_names . ') VALUES (' . implode(',', $this->sql_values_for_save($columns)) . ')';
 			$this->psa_database->execute(array_values($columns), $this->psa_database->prepare($sql));
 
 			$this->psa_new_record = 0;
@@ -297,12 +334,12 @@ class Psa_Active_Record{
 			if(array_key_exists($this->psa_primary_key_field_name, $columns))
 				unset($columns[$this->psa_primary_key_field_name]);
 
-			$col_names = implode('=?, ', array_keys($columns)) . '=?';
+			$marks = $this->sql_values_for_save($columns, 'for update');
 
 			// put primary key field in the last place
 			$columns[] = $this->{$this->psa_primary_key_field_name};
 
-			$sql = 'UPDATE ' . $this->psa_table_name . ' SET ' . $col_names . ' WHERE ' . $this->psa_primary_key_field_name . '=?';
+			$sql = 'UPDATE ' . $this->psa_table_name . ' SET ' . implode(', ', $marks) . ' WHERE ' . $this->psa_primary_key_field_name . '=?';
 			$this->psa_database->execute(array_values($columns), $this->psa_database->prepare($sql));
 
 			return $this->{$this->psa_primary_key_field_name};
@@ -407,10 +444,11 @@ class Psa_Active_Record{
 		if($and_columns)
 			$use_columns = array_merge($use_columns, $and_columns);
 
-		if($call_modifier)
-			$modifier_count = $this->count_modifiers($call_modifier);
-
 		if($use_columns){
+
+			if($call_modifier)
+				$modifier_count = $this->count_modifiers($call_modifier);
+
 			foreach ($use_columns as $col_name){
 
 				if(isset($this->$col_name) && $this->$col_name !== null){
@@ -520,4 +558,32 @@ class Psa_Active_Record{
 
 		return 0;
 	}
+
+
+	/**
+	 * Returns part of sql query with values.
+	 *
+	 * @param array $columns
+	 * @ignore
+	 */
+	protected function sql_values_for_save($columns, $for_update = false){
+
+		$marks = array();
+
+		foreach ($columns as $column_name => $column_value) {
+			if($this->psa_insert_update_column_sql && array_key_exists($column_name, $this->psa_insert_update_column_sql))
+				$val = $this->psa_insert_update_column_sql[$column_name];
+			else
+				$val = '?';
+
+			if($for_update)
+				$marks[] = $column_name . '=' . $val;
+			else
+				$marks[] = $val;
+
+		}
+
+		return $marks;
+	}
+
 }
