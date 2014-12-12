@@ -106,7 +106,7 @@ class Psa_Logger extends Psa_Singleton{
 	 * Psa_Logger::get_instance()->log("Log message");
 	 * </code>
 	 *
-	 * @return object Psa_Logger
+	 * @return Psa_Logger
 	 */
 	public static function get_instance($class = null){
 		// this is needed that this class can be extended
@@ -189,8 +189,10 @@ class Psa_Logger extends Psa_Singleton{
 			$log_data['type'] = null;
 
 		// if not set user data, use data from $_SESSION['psa_current_user_data']
-		if(!@$log_data['user_id'] && !@$log_data['username'] && isset($_SESSION['psa_current_user_data']) && $_SESSION['psa_current_user_data'] instanceof Psa_User){
+		if((!isset($log_data['user_id']) or !$log_data['user_id']) && isset($_SESSION['psa_current_user_data']['id'])){
 			$log_data['user_id'] = $_SESSION['psa_current_user_data']['id'];
+		}
+		if((!isset($log_data['username']) or !$log_data['username']) && isset($_SESSION['psa_current_user_data']['username'])){
 			$log_data['username'] = $_SESSION['psa_current_user_data']['username'];
 		}
 

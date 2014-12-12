@@ -73,6 +73,13 @@
  */
 class Psa_Router extends Psa_Model{
 
+	/**
+	 * Array that holds Profile log data
+	 *
+	 * @var array
+	 */
+	protected $profile_log_data;
+
 
 	/**
 	 * Returns an array of URL elements after application base directory exploded by '/'.
@@ -207,26 +214,34 @@ class Psa_Router extends Psa_Model{
 			// create an instance of the Reflection_Method class
 			$invoke_method = new ReflectionMethod($object, $method_name);
 
-			// If profile log is enabled
-			if($this->psa_registry->PSA_CFG['profile_log'] && !isset($object->psa_no_profile_log)){
-				// request id for profile logging
-				static $request_id = null;
+			// if profile log is enabled
+			if(isset($this->psa_registry->PSA_CFG['profile_log']) && $this->psa_registry->PSA_CFG['profile_log'] && !isset($object->psa_no_profile_log))
+				$profile_log = 1;
+			else
+				$profile_log = 0;
 
-				$time_start = microtime(true);
+			// data for profile log
+			if($profile_log){
+
+				static $request_id = null; // unique ID for request
+
 				if(!$request_id)
-					$request_id = uniqid('', true);
+					$this->profile_log_data['request_id'] = uniqid('', true);
+
+				$this->profile_log_data['time_start'] = microtime(true);
+				$this->profile_log_data['method'] = $class_name . '->' . $method_name;
+				if($method_arguments)
+					$this->profile_log_data['method_arguments'] = print_r($method_arguments,true);
+				else
+					$this->profile_log_data['method_arguments'] = null;
 			}
 
 			// call method with arguments
 			$return = $invoke_method->invokeArgs($object, $method_arguments);
 
-			// If profile log is enabled
-			if($this->psa_registry->PSA_CFG['profile_log'] && !isset($object->psa_no_profile_log)){
-				$log_data['method'] = $class_name . '->' . $method_name;
-				$log_data['total_time'] = microtime(true) - $time_start;
-				$log_data['method_arguments'] = print_r($method_arguments,true);
-				$log_data['request_id'] = $request_id;
-				Psa_Profile_Logger::get_instance()->log($log_data);
+			// write profile log
+			if($profile_log){
+				$this->write_profile_log();
 			}
 		}
 		else{
@@ -234,5 +249,27 @@ class Psa_Router extends Psa_Model{
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * Writes profile log.
+	 *
+	 * @return bool
+	 */
+	function write_profile_log(){
+
+		if(isset($this->profile_log_data['time_start']) && $this->profile_log_data['time_start']){
+
+			// calculate time diff
+			$this->profile_log_data['total_time'] = microtime(true) - $this->profile_log_data['time_start'];
+
+			// write log
+			Psa_Profile_Logger::get_instance()->log($this->profile_log_data);
+
+			return true;
+		}
+
+		return false;
 	}
 }
