@@ -365,7 +365,13 @@ function prs($value, $return_only = false){
 	if(!Psa_Registry::get_instance()->PSA_CFG['develop_mode'])
 		return;
 
-	$return = '<pre>' . htmlspecialchars (print_r($value, TRUE)) . '</pre>';
+	// web mode
+	if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'])
+		$return = '<pre>' . htmlspecialchars (print_r($value, TRUE)) . '</pre>';
+	// cli mode
+	else
+		$return = print_r($value, TRUE);
+
 
 	if($return_only)
 		return $return;
