@@ -444,10 +444,10 @@ class Psa_Active_Record{
 			foreach ($use_columns as $col_name){
 
 				// include columns with no needed value in member vars
-				if(isset($this->psa_column_sql['insert_update_no_value']) && in_array($col_name, $this->psa_column_sql['insert_update_no_value'])){
-					$return[$col_name] = 'remove_from_query_params';
+				if(isset($this->psa_column_sql['insert_update_no_value'][$col_name])){
+					$return[$col_name] = 'psa_no_value';
 				}
-				// member var is set and is not NULL
+				// if member var is set and is not NULL
 				else if(isset($this->$col_name) && $this->$col_name !== null){
 
 					$return[$col_name] = $this->$col_name !== 'NULL' ? $this->$col_name : null;
@@ -566,8 +566,12 @@ class Psa_Active_Record{
 	 */
 	protected function prepare_values_for_query_params($columns){
 
-		if(($key = array_search('remove_from_query_params', $columns)) !== false) {
-			unset($columns[$key]);
+		// columns with no ? in query
+		if(isset($this->psa_column_sql['insert_update_no_value'])){
+			foreach ($columns as $column_name => $column_value) {
+				if(isset($this->psa_column_sql['insert_update_no_value'][$column_name]))
+					unset($columns[$column_name]);
+			}
 		}
 
 		return array_values($columns);
@@ -618,14 +622,19 @@ class Psa_Active_Record{
 	 */
 	protected function set_column_sql($column_name, $select_sql = null, $inset_update_sql = null, $insert_update_no_value = null){
 
-		if($select_sql)
-			$this->psa_column_sql['select'][$column_name] = $select_sql;
+		$tmp['select'] = $select_sql;
+		$tmp['insert_update'] = $inset_update_sql;
+		$tmp['insert_update_no_value'] = $insert_update_no_value;
 
-		if($inset_update_sql)
-			$this->psa_column_sql['insert_update'][$column_name] = $inset_update_sql;
+		foreach ($tmp as $key => $sql) {
+			if($sql)
+				$this->psa_column_sql[$key][$column_name] = $sql;
+			else if(isset($this->psa_column_sql[$key]) && array_key_exists($column_name, $this->psa_column_sql[$key]))
+				unset($this->psa_column_sql[$key][$column_name]);
 
-		if($insert_update_no_value)
-			$this->psa_column_sql['insert_update_no_value'][] = $column_name;
+			if(isset($this->psa_column_sql[$key]) && !$this->psa_column_sql[$key])
+				unset($this->psa_column_sql[$key]);
+		}
 	}
 
 }
