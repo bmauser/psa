@@ -456,3 +456,46 @@ function psa_is_int($value){
 
 	return false;
 }
+
+
+
+function CFG($selector = null){
+	
+	$CFG = &Psa_Registry::get_instance()->CFG;
+	
+	if(!$selector)
+		return $CFG;
+	
+	return psa_get_property($CFG, $selector, 'Config_Exception', 'Config value ' . $selector . ' not set');
+}
+
+
+
+function psa_get_property($object, $selector, $exception_class_name = null, $exception_message = null){
+
+	if(!$exception_class_name)
+		$exception_class_name = 'Psa_Exception';
+	
+	if(!$exception_message)
+		$exception_message = 'Value ' . $selector . ' not set';
+	
+	$selector_php = '';
+	$parts1 = explode('->', $selector);
+	
+	// construct php selector for eval
+	foreach($parts1 as $k1 => $v1){
+		
+		$parts2 = explode('.', $v1);
+		
+		foreach($parts2 as $k2 => $v2){
+			if($k2 > 0 or ($k1 == 0 && is_array($object)))
+				$selector_php .= "['" .  $v2 . "']";
+			else
+				$selector_php .= '->' . $v2;
+		}
+	}
+
+	$eval_line = 'if(isset($object' . $selector_php . ')) return $object' . $selector_php . '; else throw new ' . $exception_class_name . '(' . $exception_message . ');';
+
+	return eval($eval_line);
+}
