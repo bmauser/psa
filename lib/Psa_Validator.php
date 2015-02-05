@@ -488,6 +488,12 @@ class Psa_Validator{
 		// remove second element because it is validation_type
 		array_splice($params, 1, 1);
 
+		// if validation is for each array element
+		if(substr($validation_type, -6) == '_array'){
+			$validation_type = substr($validation_type, 0, -6);
+			$array_validation = 1;
+		}
+
 		// check if value can be empty
 		if($this->is_empty($value_to_validate)){
 			if(!$reqired)
@@ -499,12 +505,9 @@ class Psa_Validator{
 		}
 
 		// if validation has to be run on array of elements
-		if(substr($validation_type, -6) == '_array'){
+		if(isset($array_validation)){
 
 			if(is_array($value_to_validate)){
-
-				// find type of validation
-				$validation_type = substr($validation_type, 0, -6);
 
 				$return = true;
 				$arr_params = $params; // copy paremeters
