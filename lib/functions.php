@@ -458,20 +458,31 @@ function psa_is_int($value){
 }
 
 
+function N(){
 
-function CFG($selector = null){
 	
-	$CFG = &Psa_Registry::get_instance()->CFG;
+}
+
+
+function &PSA_CFG($selector = null){
+	
+	static $PSA_CFG = null;
+	
+	if($PSA_CFG === null){
+		include PSA_BASE_DIR . '/config.php';
+	}
 	
 	if(!$selector)
-		return $CFG;
+		return $PSA_CFG;
 	
-	return psa_get_property($CFG, $selector, 'Config_Exception', 'Config value ' . $selector . ' not set');
+	$ret = &psa_get_set_property_by_selector($PSA_CFG, $selector, 'PSA_CFG_Exception', 'Config value ' . $selector . ' not set');
+	
+	return $ret;
 }
 
 
 
-function psa_get_property($object, $selector, $exception_class_name = null, $exception_message = null){
+function &psa_get_set_property_by_selector(&$object, $selector, $exception_class_name = null, $exception_message = null){
 
 	if(!$exception_class_name)
 		$exception_class_name = 'Psa_Exception';
@@ -479,23 +490,36 @@ function psa_get_property($object, $selector, $exception_class_name = null, $exc
 	if(!$exception_message)
 		$exception_message = 'Value ' . $selector . ' not set';
 	
-	$selector_php = '';
 	$parts1 = explode('->', $selector);
+	$ref = &$object;
 	
-	// construct php selector for eval
 	foreach($parts1 as $k1 => $v1){
-		
 		$parts2 = explode('.', $v1);
-		
 		foreach($parts2 as $k2 => $v2){
-			if($k2 > 0 or ($k1 == 0 && is_array($object)))
-				$selector_php .= "['" .  $v2 . "']";
-			else
-				$selector_php .= '->' . $v2;
+			if($k2 > 0 or ($k1 == 0 && is_array($object))){
+				if(isset($ref[$v2])){
+					$ref = &$ref[$v2];
+					continue;
+				}
+			}
+			else if(isset($ref->$v2)){
+				$ref = &$ref->$v2;
+				continue;
+			}
+			
+			$not_isset = 1;
+			break 2;
 		}
 	}
 
-	$eval_line = 'if(isset($object' . $selector_php . ')) return $object' . $selector_php . '; else throw new ' . $exception_class_name . '(' . $exception_message . ');';
-
-	return eval($eval_line);
+	if(isset($not_isset)){
+		if($exception_class_name)
+			throw new $exception_class_name($exception_message);
+		else{
+			$return = null;
+			return $return;
+		}
+	}
+	
+	return $ref;
 }
