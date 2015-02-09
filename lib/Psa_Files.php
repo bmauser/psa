@@ -28,17 +28,21 @@
  * @version $Id: Psa_Files.php 169 2013-12-11 01:26:22Z bmauser $
  */
 
-
 /**
- * Class for collecting (registering) information about file paths in your application for autoloading.
+ * Class for collecting (registering) information about file paths in your
+ * application for autoloading.
  *
- * If <var>$PSA_CFG['develop_mode']</var> is true and <var>$PSA_CFG['develop_mode_register_files']</var>
- * is true, file registration is done on every request for convenience that you don't need to manually
+ * If <var>$PSA_CFG['develop_mode']</var> is true and
+ * <var>$PSA_CFG['develop_mode_register_files']</var>
+ * is true, file registration is done on every request for convenience that you
+ * don't need to manually
  * register files if you add some class to your project.
  *
- * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern singleton pattern}
+ * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern
+ * singleton pattern}
  * so you can get reference to Psa_Files object from any scope with
- * {@link get_instance()} method. You cannot make instance of Psa_Files object with the
+ * {@link get_instance()} method. You cannot make instance of Psa_Files object
+ * with the
  * <var>new</var> operator.
  *
  * @see register_files.php
@@ -234,19 +238,8 @@ class Psa_Files extends Psa_Singleton{
 		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
 
 		if(!file_exists($dir) or !$handle = opendir($dir)){
-
-			// if logging is enabled
-			/*
-			if($PSA_CFG['logging']['max_log_level'] >= 2){
-				// parameters for Psa_Logger::log() method
-				$log_data['message']  = "File registration: folder $dir don't exists or not readable";
-				$log_data['function'] = __FUNCTION__;
-				$log_data['level']    = 2;
-				Psa_Logger::get_instance()->log($log_data);
-			}
-			*/
-
-			return 0;
+			include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+			throw new Psa_File_Exception("Cannot open $dir to check files for autoloader.", 505);
 		}
 
 
@@ -254,7 +247,8 @@ class Psa_Files extends Psa_Singleton{
 
 			while(($file = readdir($handle)) !== false){
 
-				if ($file=='.' or $file=='..'  or strcasecmp($file,'.svn')==0 or strcasecmp($file,'.cvs')==0 or strcasecmp($file,'.git')==0){
+				// skip files which start with .
+				if($file[0] == '.'){
 					continue;
 				}
 
@@ -263,9 +257,9 @@ class Psa_Files extends Psa_Singleton{
 
 				if($recursion && is_dir($filepath)){
 					// call self for this directory
-					$this->check_files($filepath, $all_hook_types, $return, $recursion, $recursion_depth+1);
+					$this->check_files($filepath, $all_hook_types, $return, $recursion, $recursion_depth + 1);
 				}
-				// check for classes in php files
+				// foreach file
 				else{
 
 					// if file extension is '.php'
@@ -277,13 +271,62 @@ class Psa_Files extends Psa_Singleton{
 						else
 							$file_basename = basename($file, '.php');
 
+						$filepath =  realpath($filepath);
+						
 						// check if file is registered allready
 						if(isset($files['class_paths'][$file_basename])){
-							continue 1;
+							trigger_error($file_basename . " already regsitered for: " . $files['class_paths'][$file_basename], E_USER_NOTICE);
+							//continue 1;
 						}
 
-
-
+						$files['class_paths'][$file_basename] = $filepath;
+						
+						// .php file content
+						$file_content = file_get_contents($filepath);
+											
+						// if there is @getFunction tag
+						if(strpos($file_content, '@getFunction') !== false){
+							
+							// find all @getFunction tags in phpdoc
+							preg_match_all('/\* +@getFunction +(.*?)\n/', $file_content, $getfunction_comments);
+							
+							if($getfunction_comments[1]){
+								foreach ($getfunction_comments[1] as $doc_tag) {
+									$params = explode(' ', $doc_tag);
+									
+									$function_name = trim($params[0]);
+									
+									$files['doc_get_function'][$function_name] = array(
+											'function' => $function_name,
+											'target' => trim($params[1]),
+											'template' => trim($params[2]),
+											'from_file' => $filepath,
+									);
+								}
+							}
+						}
+						
+						
+						
+			
+							
+						
+						/*
+						// read file line by line
+						$fh = fopen($filepath, 'r');
+						while(!feof($fh)){
+							$line = fgets($fh);
+							
+							// find @asFunction tags
+							if(strpos($line, '@asFunction') !== false){
+								echo $line;
+							}
+							
+						}
+						fclose($fh);
+						*/
+						;
+						/*
 						// check for hooks
 						if($all_hook_types){
 
@@ -312,7 +355,7 @@ class Psa_Files extends Psa_Singleton{
 						else{
 							$files['class_paths'][$file_basename] = realpath($filepath);
 						}
-
+						*/
 					}
 				}
 			}

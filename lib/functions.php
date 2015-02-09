@@ -463,7 +463,12 @@ function N(){
 	
 }
 
-
+/**
+ * 
+ * @param unknown_type $selector
+ * @return NULL
+ * @getFunction \namespace\sdfsdf\fname \aaa\sdsd\target return_instance
+ */
 function &PSA_CFG($selector = null){
 	
 	static $PSA_CFG = null;
@@ -475,20 +480,32 @@ function &PSA_CFG($selector = null){
 	if(!$selector)
 		return $PSA_CFG;
 	
-	$ret = &psa_get_set_property_by_selector($PSA_CFG, $selector, 'PSA_CFG_Exception', 'Config value ' . $selector . ' not set');
+	return psa_get_set_property_by_selector($PSA_CFG, $selector, 'PSA_CFG_Exception', 'Config value ' . $selector . ' not set');
 	
-	return $ret;
 }
 
 
 
-function &psa_get_set_property_by_selector(&$object, $selector, $exception_class_name = null, $exception_message = null){
+/**
+ *
+ * @param unknown_type $selector
+ * @return NULL
+ * @getFunction \namespace\sdfsdf\fnxxxame \aaa\sdsd\target return_instance
+ * @getFunction \namespace\sdfsdf\fnxxdddxame \aaa\sdsd\target return_instance
+ */
+function &psa_get_set_property_by_selector(&$object, $selector, $exception_class_name = null, $exception_message = null, $use_cache = true){
 
+	static $cache;
+	
 	if(!$exception_class_name)
 		$exception_class_name = 'Psa_Exception';
 	
 	if(!$exception_message)
 		$exception_message = 'Value ' . $selector . ' not set';
+	
+	if($use_cache && isset($cache[$selector])){
+		return $cache[$selector];
+	}
 	
 	$parts1 = explode('->', $selector);
 	$ref = &$object;
@@ -512,14 +529,18 @@ function &psa_get_set_property_by_selector(&$object, $selector, $exception_class
 		}
 	}
 
+	// if not set
 	if(isset($not_isset)){
 		if($exception_class_name)
 			throw new $exception_class_name($exception_message);
 		else{
-			$return = null;
+			$return = null; 
 			return $return;
 		}
 	}
+	// save to cache
+	else if($use_cache)
+		$cache[$selector] = &$ref;
 	
 	return $ref;
 }
