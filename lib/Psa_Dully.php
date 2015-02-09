@@ -207,8 +207,8 @@ class Psa_Dully{
 	 */
 	function fetch($template_file){
 
-		// just to be sure that variable will not be overwritten with extract()
-		$sdf33saf2342as8dmm32 = $template_file;
+		// this name will be in template vars scope
+		$psa_sdf33saf2342as8dmm32 = $template_file;
 
 		// extract the template_values to local namespace
 		extract($this->template_values);
@@ -216,8 +216,8 @@ class Psa_Dully{
 		// start output buffering
 		ob_start();
 
-		// include the file
-		include $this->template_dir . '/' . $sdf33saf2342as8dmm32;
+		// include template file
+		include $this->template_dir . '/' . $psa_sdf33saf2342as8dmm32;
 
 		// get the contents and clean the buffer
 		return ob_get_clean();

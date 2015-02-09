@@ -275,7 +275,7 @@ class Psa_Files extends Psa_Singleton{
 						
 						// check if file is registered allready
 						if(isset($files['class_paths'][$file_basename])){
-							trigger_error($file_basename . " already regsitered for: " . $files['class_paths'][$file_basename], E_USER_NOTICE);
+							trigger_error('Name ' . $file_basename . " already regsitered for autoloading " . $files['class_paths'][$file_basename], E_USER_NOTICE);
 							//continue 1;
 						}
 
@@ -287,11 +287,11 @@ class Psa_Files extends Psa_Singleton{
 						// if there is @getFunction tag
 						if(strpos($file_content, '@getFunction') !== false){
 							
-							// find all @getFunction tags in phpdoc
-							preg_match_all('/\* +@getFunction +(.*?)\n/', $file_content, $getfunction_comments);
+							// find all @getFunction tags in phpdoc or // comments
+							preg_match_all('/(\*|\/\/) +@getFunction +(.*?)\n/', $file_content, $getfunction_comments);
 							
-							if($getfunction_comments[1]){
-								foreach ($getfunction_comments[1] as $doc_tag) {
+							if(isset($getfunction_comments[2])){
+								foreach ($getfunction_comments[2] as $doc_tag) {
 									$params = explode(' ', $doc_tag);
 									
 									$function_name = trim($params[0]);

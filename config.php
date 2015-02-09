@@ -83,7 +83,7 @@ $PSA_CFG['develop_mode_register_files'] = false;
  * File with data about registered files for autoloading.
  * Full filesystem path.
  */
-$PSA_CFG['autoload_data_file'] = PSA_BASE_DIR . '/autoload_data.php';
+$PSA_CFG['autoload_data_file'] = PSA_BASE_DIR . '/wri/autoload_data.php';
 
 
 /**
@@ -103,7 +103,7 @@ $PSA_CFG['autoload_data_file'] = PSA_BASE_DIR . '/autoload_data.php';
  */
 $PSA_CFG['folders']['autoload'][] = '..';  // psa/../
 $PSA_CFG['folders']['autoload'][] = 'lib'; // psa/lib/
-$PSA_CFG['folders']['autoload'][] = 'exceptions'; // psa/exceptions/
+$PSA_CFG['folders']['autoload'][] = 'lib/exceptions'; // psa/exceptions/
 
 
 /**

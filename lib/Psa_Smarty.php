@@ -32,7 +32,7 @@
 /**
  * Smarty main class.
  */
-include_once PSA_BASE_DIR . '/smarty/libs/Smarty.class.php';
+include_once PSA_BASE_DIR . '/lib/smarty/libs/Smarty.class.php';
 
 
 /**

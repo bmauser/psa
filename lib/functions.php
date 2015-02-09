@@ -493,6 +493,7 @@ function &PSA_CFG($selector = null){
  * @getFunction \namespace\sdfsdf\fnxxxame \aaa\sdsd\target return_instance
  * @getFunction \namespace\sdfsdf\fnxxdddxame \aaa\sdsd\target return_instance
  */
+// @getFunction \namespace\sdfsdf\tttme \aaa\sdsd\target return_instance
 function &psa_get_set_property_by_selector(&$object, $selector, $exception_class_name = null, $exception_message = null, $use_cache = true){
 
 	static $cache;
