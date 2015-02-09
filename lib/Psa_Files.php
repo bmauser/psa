@@ -103,11 +103,11 @@ class Psa_Files extends Psa_Singleton{
 				return 1;
 			}
 
-			include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+			include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
 			throw new Psa_File_Exception("No autoload data in file {$PSA_CFG['autoload_data_file']}. Try to register files.", 501);
 		}
 
-		include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
 		throw new Psa_File_Exception("Cannot open file {$PSA_CFG['autoload_data_file']}. Try to register files to create it.", 502);
 	}
 
@@ -176,7 +176,7 @@ class Psa_Files extends Psa_Singleton{
 					closedir($handle);
 				}
 				else{
-					include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+					include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
 					throw new Psa_File_Exception("Unable to open dir with hooks: $hook_folder_path", 503);
 				}
 			}
@@ -238,7 +238,7 @@ class Psa_Files extends Psa_Singleton{
 		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
 
 		if(!file_exists($dir) or !$handle = opendir($dir)){
-			include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
+			include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
 			throw new Psa_File_Exception("Cannot open $dir to check files for autoloader.", 505);
 		}
 
@@ -296,17 +296,18 @@ class Psa_Files extends Psa_Singleton{
 									
 									$function_name = trim($params[0]);
 									
-									$files['doc_get_function'][$function_name] = array(
+									//if(isset($files['@getFunction'][$function_name]))
+									//	trigger_error("Replaceing @getFunction $function_name from {$files['@getFunction'][$function_name]['tag_file']}", E_USER_NOTICE);
+									
+									$files['@getFunction'][$function_name] = array(
 											'function' => $function_name,
 											'target' => trim($params[1]),
 											'template' => trim($params[2]),
-											'from_file' => $filepath,
+											'tag_file' => $filepath,
 									);
 								}
 							}
 						}
-						
-						
 						
 			
 							
@@ -389,18 +390,80 @@ class Psa_Files extends Psa_Singleton{
 		// call register() method if no data is passed
 		if(!$files_data)
 			$files_data = $this->register();
-
+		
+		$this->write_autoload_file($files_data);
+		$this->write_getfunction_file($files_data['@getFunction']);
+	}
+	
+	
+	protected function write_autoload_file($files_data){
+		
 		// config array
 		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
-		$file_content = "<?php\n\n\$autoload_data = " . var_export($files_data, 1) . ";\n";
-
+		
+		$file_content = $this->autoload_file_content($files_data);
+		
 		// save file
-		if(file_put_contents($PSA_CFG['autoload_data_file'], $file_content)){
-			return 1;
-		}
-
-		include_once PSA_BASE_DIR . '/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception('Error saving data about registered files. Maybe file ' . $PSA_CFG['autoload_data_file'] . ' is not writeable.', 504);
+		if(file_put_contents($PSA_CFG['autoload_data_file'], $file_content))
+			return $file_content;
+		
+		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
+		throw new Psa_File_Exception('Error saving data about registered files to ' . $PSA_CFG['autoload_data_file'], 504);
+		
 	}
+	
+	
+	protected function write_getfunction_file($data){
+	
+		// config array
+		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
+		
+		$file_content = $this->getfunctions_file_content($data);
+		
+		// save file
+		if(file_put_contents($PSA_CFG['@getFunction_file'], $file_content))
+			return $file_content;
+		
+		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
+		throw new Psa_File_Exception('Error saving @getFunction file to ' . $PSA_CFG['@getFunction_file'], 506);
+		
+	}
+	
+	
+	protected function getfunctions_file_content($data){
+	
+		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
+		
+		include_once PSA_BASE_DIR . '/lib/Psa_Dully.php';
+		
+		$templates_dir =  PSA_BASE_DIR . '/' . $PSA_CFG['folders']['@getFunction']['template_dir'];
+		
+		$dully = new Psa_Dully($templates_dir);
+		
+		$content = "<?php\n";
+		
+		foreach ($data as $getFunction) {
+			
+			$template_file = $getFunction['template'] . '.php';
+			
+			if(file_exists($templates_dir . '/' . $template_file)){
+				$dully->assign('gf', $getFunction);
+				$content .= $dully->fetch($template_file);
+			}
+			else{
+				include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
+				throw new Psa_File_Exception('Template file for @getFunction $template_file doesn\'t exists', 507);
+			}
+		}
+	
+		return $content;
+	}
+	
+	
+	protected function autoload_file_content($files_data){
+		
+		return "<?php\n\n\$autoload_data['class_paths'] = " . var_export($files_data['class_paths'], 1) . ";\n";
+	}
+	
+	
 }

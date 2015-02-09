@@ -80,10 +80,15 @@ $PSA_CFG['develop_mode_register_files'] = false;
 
 
 /**
- * File with data about registered files for autoloading.
- * Full filesystem path.
+ * File with data about registered files for autoloading (full filesystem path).
  */
 $PSA_CFG['autoload_data_file'] = PSA_BASE_DIR . '/wri/autoload_data.php';
+
+
+/**
+ * File with data about registered files for autoloading (full filesystem path).
+ */
+$PSA_CFG['@getFunction_file'] = PSA_BASE_DIR . '/wri/getfunctions.php';
 
 
 /**
@@ -135,9 +140,15 @@ $PSA_CFG['folders']['smarty']['template_dir'] = '../templates';
 
 
 /**
- * Folder for Dully templates. Uncomment if you use Dully templates
+ * Folder for Dully templates. Uncomment if you use Psa_Dully class
  */
 // $PSA_CFG['folders']['dully']['template_dir'] = '../templates';
+
+
+/**
+ * Folders for @getFunction phpdoc tag templates. Relative from PSA_BASE_DIR folder.
+ */
+$PSA_CFG['folders']['@getFunction']['template_dir'] = 'lib/tpl';
 
 
 /**

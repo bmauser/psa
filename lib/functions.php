@@ -458,18 +458,30 @@ function psa_is_int($value){
 }
 
 
-function N(){
+function N($instance_name = null){
 
+	static $first_instance = null;
+	static $instances = array();
 	
+	// work with first instance
+	if($instance_name === null){
+		if($first_instance === null)
+			$first_instance = new stdClass();
+		
+		return $first_instance;
+	}
+	else{
+		if(!isset($instances['$instance_name']))
+			$instances['$instance_name'] = new stdClass();
+		
+		return $instances[$instance_name];
+	}
 }
 
 /**
- * 
- * @param unknown_type $selector
- * @return NULL
- * @getFunction \namespace\sdfsdf\fname \aaa\sdsd\target return_instance
+ * @getFunction PSA_CFG psa_get_config() propSelector
  */
-function &PSA_CFG($selector = null){
+function &psa_get_config(){
 	
 	static $PSA_CFG = null;
 	
@@ -477,23 +489,41 @@ function &PSA_CFG($selector = null){
 		include PSA_BASE_DIR . '/config.php';
 	}
 	
-	if(!$selector)
-		return $PSA_CFG;
-	
-	return psa_get_set_property_by_selector($PSA_CFG, $selector, 'PSA_CFG_Exception', 'Config value ' . $selector . ' not set');
-	
+	return $PSA_CFG;
 }
 
+
+/**
+ * @getFunction PSA_CFG1 $GLOBALS['PSA_CFG1'] propSelector
+ */
+
+
+$PSA_CFG1['aaa'] = 123;
+
+
+/*
+function &PSA_CFG($selector = null){
+
+	static $PSA_CFG = null;
+
+	if($PSA_CFG === null){
+		include PSA_BASE_DIR . '/config.php';
+	}
+
+	if(!$selector)
+		return $PSA_CFG;
+
+	return psa_get_set_property_by_selector($PSA_CFG, $selector, 'PSA_CFG_Exception', 'Config value ' . $selector . ' not set');
+
+}
+*/
 
 
 /**
  *
  * @param unknown_type $selector
  * @return NULL
- * @getFunction \namespace\sdfsdf\fnxxxame \aaa\sdsd\target return_instance
- * @getFunction \namespace\sdfsdf\fnxxdddxame \aaa\sdsd\target return_instance
  */
-// @getFunction \namespace\sdfsdf\tttme \aaa\sdsd\target return_instance
 function &psa_get_set_property_by_selector(&$object, $selector, $exception_class_name = null, $exception_message = null, $use_cache = true){
 
 	static $cache;
