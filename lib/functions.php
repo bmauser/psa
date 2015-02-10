@@ -463,19 +463,39 @@ function N($instance_name = null){
 	static $first_instance = null;
 	static $instances = array();
 	
-	// work with first instance
-	if($instance_name === null){
+	// select instance
+	if($instance_name === null){ // first instance
 		if($first_instance === null)
-			$first_instance = new stdClass();
-		
-		return $first_instance;
+			$instance = &$first_instance;
+		else
+			$instance = $first_instance;
 	}
-	else{
-		if(!isset($instances['$instance_name']))
-			$instances['$instance_name'] = new stdClass();
-		
-		return $instances[$instance_name];
+	else{ // named instance
+		if(!isset($instances[$instance_name])){
+			$instances[$instance_name] = null;
+			$instance = &$instances[$instance_name];
+		}
+		else
+			$instance = $instances[$instance_name];
 	}
+	
+	// make new instance
+	if($instance === null){
+		
+		$args = func_get_args();
+		
+		// if no constructor params
+		if(!isset($args[1])){
+			$instance = new stdClass();
+		}
+		else{
+			array_shift($args);
+			$ref = new ReflectionClass('stdClass');
+			$instance = $ref->newInstanceArgs($args);
+		}
+	}
+	
+	return $instance;
 }
 
 /**
@@ -537,6 +557,8 @@ function &psa_get_set_property_by_selector(&$object, $selector, $exception_class
 	if($use_cache && isset($cache[$selector])){
 		return $cache[$selector];
 	}
+	
+	// @todo check if is array or object
 	
 	$parts1 = explode('->', $selector);
 	$ref = &$object;
