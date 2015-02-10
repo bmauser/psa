@@ -150,18 +150,20 @@ class Psa_Active_Record{
 	 * Example:
 	 *
 	 * <code>
-	 * $psa_column_sql['select']['data'] = "RPAD(data, 20, '*') AS data";
-	 * $psa_column_sql['select']['event_time'] = "DATE_FORMAT(event_time, '%d.%m.%Y') AS event_time";
-	 * $psa_column_sql['insert_update']['data'] = "RPAD(?, 20, '*')";
-	 * $psa_column_sql['insert_update']['event_time'] = "NOW()";
-	 * $psa_column_sql['insert_update_no_value'][] = "event_time";
+	 * $psa_column_settings['col_name1']['select_sql'] = "RPAD(data, 20, '*') AS data";
+	 * $psa_column_settings['col_name2']['select_sql'] = "DATE_FORMAT(event_time, '%d.%m.%Y') AS event_time";
+	 * $psa_column_settings['col_name2']['insert_sql'] = "NOW()";
+	 * $psa_column_settings['col_name2']['no_update'] = true;
+	 * $psa_column_settings['col_name3']['insert_sql'] = "RPAD(?, 20, '*')";
+	 * $psa_column_settings['col_name4']['insert_sql'] = "FUNC()";
+	 * $psa_column_settings['col_name4']['insert_no_params'] = true;
 	 * </code>
 	 *
 	 * @var array
-	 * @see set_column_sql()
+	 * @see set_column_settings()
 	 * @ignore
 	 */
-	protected $psa_column_sql = array();
+	protected $psa_column_settings = array();
 
 
 
@@ -232,13 +234,10 @@ class Psa_Active_Record{
 		}
 
 		// select sql per column
-		if(isset($this->psa_column_sql['select'])){
-			foreach ($this->psa_column_sql['select'] as $column_name => $sql) {
-
-				$col_arr_index = array_search ($column_name, $use_columns);
-
-				if($col_arr_index !== false){
-					$use_columns[$col_arr_index] = $sql;
+		if($this->psa_column_settings){
+			foreach ($this->psa_column_settings as $column_name => $settings){
+				if(isset($settings['select_sql'])){
+					$use_columns[$column_name] = $settings['select_sql'];
 				}
 			}
 		}
@@ -249,7 +248,7 @@ class Psa_Active_Record{
 			$data = $this->psa_database->fetch_row();
 		}
 		else{
-			// construct query
+			// construct default query
 			$sql = 'SELECT ' . implode(', ', $use_columns)  . ' FROM ' . $this->psa_table_name . ' WHERE ' . $this->psa_primary_key_field_name . ' = ?';
 			$this->psa_database->execute(array( $this->{$this->psa_primary_key_field_name}), $sql);
 			$data = $this->psa_database->fetch_row();
@@ -307,14 +306,14 @@ class Psa_Active_Record{
 	 */
 	protected function save_to_database(array $only_columns = array(), array $and_columns = array()){
 
-		$columns = $this->columns_for_save($only_columns, $and_columns, 'before_save_to_database');
+		$query_data = $this->get_query_data($only_columns, $and_columns);
 
-		if($this->psa_new_record){
+		//prs($query_data);
 
-			$col_names = implode(', ', array_keys($columns));
+		// execute query
+		$this->psa_database->execute($query_data['params'], $query_data['sql']);
 
-			$sql = 'INSERT INTO ' . $this->psa_table_name . ' (' . $col_names . ') VALUES (' . implode(',', $this->sql_values_for_save($columns)) . ')';
-			$this->psa_database->execute($this->prepare_values_for_query_params($columns), $this->psa_database->prepare($sql));
+		if($query_data['operation'] == 'insert'){
 
 			$this->psa_new_record = 0;
 
@@ -322,20 +321,59 @@ class Psa_Active_Record{
 			return $this->{$this->psa_primary_key_field_name} = (int) $this->psa_database->last_insert_id($this->psa_sequence_name);
 		}
 		else{
+			return $this->{$this->psa_primary_key_field_name};
+		}
+	}
+
+
+	/**
+	 * Returns database query and params for binding.
+	 *
+	 * @see save_to_database()
+	 * @ignore
+	 */
+	protected function get_query_data(array $only_columns = array(), array $and_columns = array()){
+
+		$return = array();
+
+		// if is insert or update
+		if($this->psa_new_record)
+			$operation = 'insert';
+		else
+			$operation = 'update';
+
+
+		// array with columns involved in the query
+		$columns = $this->columns_for_save($only_columns, $and_columns, 'before_save_to_database', $operation);
+
+		if($operation == 'insert'){
+
+			// names of columns in query
+			$col_names = implode(', ', array_keys($columns));
+
+			// insert query
+			$return['sql'] = 'INSERT INTO ' . $this->psa_table_name . ' (' . $col_names . ') VALUES (' . implode(',', $this->sql_values_for_save($columns, $operation)) . ')';
+		}
+		else{
 			// remove  primary key field from $columns
 			if(array_key_exists($this->psa_primary_key_field_name, $columns))
 				unset($columns[$this->psa_primary_key_field_name]);
 
-			$marks = $this->sql_values_for_save($columns, 'for update');
+			// parts of sql with values
+			$marks = $this->sql_values_for_save($columns, $operation);
 
 			// put primary key field in the last place
 			$columns[] = $this->{$this->psa_primary_key_field_name};
 
-			$sql = 'UPDATE ' . $this->psa_table_name . ' SET ' . implode(', ', $marks) . ' WHERE ' . $this->psa_primary_key_field_name . '=?';
-			$this->psa_database->execute($this->prepare_values_for_query_params($columns), $this->psa_database->prepare($sql));
-
-			return $this->{$this->psa_primary_key_field_name};
+			// update query
+			$return['sql'] = 'UPDATE ' . $this->psa_table_name . ' SET ' . implode(', ', $marks) . ' WHERE ' . $this->psa_primary_key_field_name . '=?';
 		}
+
+		// values for query params
+		$return['params'] = $this->prepare_values_for_query_params($columns, $operation);
+		$return['operation'] = $operation;
+
+		return $return;
 	}
 
 
@@ -412,18 +450,19 @@ class Psa_Active_Record{
 
 
 	/**
-	 * Returns names and values for data to save.
+	 * Returns column names and values for query parameters.
 	 *
 	 * See {@link save_to_database()} method for description of arguments and NULL values.
 	 *
 	 * @param array $only_columns
 	 * @param array $and_columns
 	 * @param string $call_modifier
+	 * @param string $sql_operation 'insert' or 'update'
 	 * @return array Associative array with names and values.
 	 * @see save_to_database()
 	 * @ignore
 	 */
-	protected function columns_for_save(array $only_columns = array(), array $and_columns = array(), $call_modifier = null){
+	protected function columns_for_save(array $only_columns = array(), array $and_columns = array(), $call_modifier = null, $sql_operation = null){
 
 		$return = array();
 		$modifier_count = 0;
@@ -443,9 +482,13 @@ class Psa_Active_Record{
 
 			foreach ($use_columns as $col_name){
 
-				// include columns with no needed value in member vars
-				if(isset($this->psa_column_sql['insert_update_no_value'][$col_name])){
-					$return[$col_name] = 'psa_no_value';
+				// skip columns with no_insert or no_update setting
+				if(isset($this->psa_column_settings[$col_name]['no_' . $sql_operation]))
+					continue;
+
+				// include columns with no needed binded value
+				if(isset($this->psa_column_settings[$col_name][$sql_operation . '_no_params'])){
+					$return[$col_name] = 'psa_no_param';
 				}
 				// if member var is set and is not NULL
 				else if(isset($this->$col_name) && $this->$col_name !== null){
@@ -562,14 +605,15 @@ class Psa_Active_Record{
 	 * Returns array with values for query parameters.
 	 *
 	 * @param array $columns
+	 * @param string $sql_operation 'insert' or 'update'
 	 * @ignore
 	 */
-	protected function prepare_values_for_query_params($columns){
+	protected function prepare_values_for_query_params($columns, $sql_operation = null){
 
 		// columns with no ? in query
-		if(isset($this->psa_column_sql['insert_update_no_value'])){
+		if($sql_operation){
 			foreach ($columns as $column_name => $column_value) {
-				if(isset($this->psa_column_sql['insert_update_no_value'][$column_name]))
+				if(isset($this->psa_column_settings[$column_name][$sql_operation . '_no_params']))// or if($column_value == 'psa_no_param')
 					unset($columns[$column_name]);
 			}
 		}
@@ -579,22 +623,25 @@ class Psa_Active_Record{
 
 
 	/**
-	 * Returns part of sql query with values.
+	 * Returns part of SQL query with values.
 	 *
 	 * @param array $columns
+	 * @param string $operation 'insert' or 'update'
+	 * @return array
 	 * @ignore
 	 */
-	protected function sql_values_for_save($columns, $for_update = false){
+	protected function sql_values_for_save($columns, $sql_operation){
 
 		$marks = array();
 
 		foreach ($columns as $column_name => $column_value) {
-			if(isset($this->psa_column_sql['insert_update']) && array_key_exists($column_name, $this->psa_column_sql['insert_update']))
-				$val = $this->psa_column_sql['insert_update'][$column_name];
+
+			if(isset($this->psa_column_settings[$column_name][$sql_operation . '_sql']))
+				$val = $this->psa_column_settings[$column_name][$sql_operation . '_sql'];
 			else
 				$val = '?';
 
-			if($for_update)
+			if($sql_operation == 'update')
 				$marks[] = $column_name . '=' . $val;
 			else
 				$marks[] = $val;
@@ -606,34 +653,33 @@ class Psa_Active_Record{
 
 
 	/**
-	 * Function for setting custom SQL per column in select, insert and update queries.
+	 * Function for setting custom SQL per column in select, insert or update queries.
 	 *
 	 * Example:
 	 *
 	 * <code>
-	 * set_column_sql('date_created', "DATE_FORMAT(date_created, '%d.%m.%Y') AS date_created", NOW(), true);
-	 * set_column_sql('data', "RPAD(data, 20, '*') AS data");
+	 * $options['select_sql'] = "DATE_FORMAT(date_created, '%d.%m.%Y') AS date_created";
+	 * $options['insert_sql'] = "NOW()";
+	 * $options['no_update'] = true; // skip column in update query
+	 * $options['insert_no_params'] = true; // no bound query parameters in insert_sql
+	 *
+	 * set_column_settings('date_created', $options);
 	 * </code>
 	 *
 	 * @param string $column_name Name of the column.
-	 * @param string $select_sql SQL function for select query.
-	 * @param string $inset_update_sql SQL function for insert or update query.
-	 * @param bool $insert_update_no_value Flag that SQL insert/update function don't need a value from the member variable.
+	 * @param array $options Array with option values. Array keys can be: select_sql, insert_sql, update_sql, insert_update_sql, insert_no_params, update_no_params, no_insert, no_update
 	 */
-	protected function set_column_sql($column_name, $select_sql = null, $inset_update_sql = null, $insert_update_no_value = null){
+	protected function set_column_settings($column_name, Array $options){
 
-		$tmp['select'] = $select_sql;
-		$tmp['insert_update'] = $inset_update_sql;
-		$tmp['insert_update_no_value'] = $insert_update_no_value;
+		// set insert_sql and update_sql by insert_update_sql
+		if(isset($options['insert_update_sql']) && $options['insert_update_sql'])
+			$options['insert_sql'] = $options['update_sql'] = $options['insert_update_sql'];
 
-		foreach ($tmp as $key => $sql) {
-			if($sql)
-				$this->psa_column_sql[$key][$column_name] = $sql;
-			else if(isset($this->psa_column_sql[$key]) && array_key_exists($column_name, $this->psa_column_sql[$key]))
-				unset($this->psa_column_sql[$key][$column_name]);
-
-			if(isset($this->psa_column_sql[$key]) && !$this->psa_column_sql[$key])
-				unset($this->psa_column_sql[$key]);
+		foreach ($options as $option_name => $option) {
+			if($option)
+				$this->psa_column_settings[$column_name][$option_name] = $option;
+			else if(isset($this->psa_column_settings[$column_name]) && array_key_exists($option_name, $this->psa_column_settings[$column_name]))
+				unset($this->psa_column_settings[$column_name][$option_name]);
 		}
 	}
 
