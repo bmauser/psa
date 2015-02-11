@@ -458,41 +458,43 @@ function psa_is_int($value){
 }
 
 
-function N($instance_name = null){
 
-	static $first_instance = null;
-	static $instances = array();
+function psa_get_instance($class_name, $instance_name = null, array $constructor_args = null){
+
+	// instance store
+	static $first_instance = array();
+	static $instances = array();	
 	
-	// select instance
+	// get instance
 	if($instance_name === null){ // first instance
-		if($first_instance === null)
-			$instance = &$first_instance;
-		else
-			$instance = $first_instance;
-	}
-	else{ // named instance
-		if(!isset($instances[$instance_name])){
-			$instances[$instance_name] = null;
-			$instance = &$instances[$instance_name];
+		if(!isset($first_instance[$class_name])){
+			$first_instance[$class_name] = null;
+			$instance = &$first_instance[$class_name];
 		}
 		else
-			$instance = $instances[$instance_name];
+			$instance = $first_instance[$class_name];
+	}
+	else{ // named instance
+		if(!isset($instances[$class_name][$instance_name])){
+			$instances[$class_name][$instance_name] = null;
+			$instance = &$instances[$class_name][$instance_name];
+		}
+		else
+			$instance = $instances[$class_name][$instance_name];
 	}
 	
 	// make new instance
 	if($instance === null){
 		
-		$args = func_get_args();
-		
-		// if no constructor params
-		if(!isset($args[1])){
-			$instance = new stdClass();
+		if($constructor_args){
+			$ref = new ReflectionClass($class_name);
+			$instance = $ref->newInstanceArgs($constructor_args);
 		}
-		else{
-			array_shift($args);
-			$ref = new ReflectionClass('stdClass');
-			$instance = $ref->newInstanceArgs($args);
-		}
+		else
+			$instance = new $class_name();
+	}
+	else if($constructor_args){
+		throw new Psa_Exception("Trying to call constructor for existing instance of $class_name.");
 	}
 	
 	return $instance;
@@ -520,6 +522,10 @@ function &psa_get_config(){
 
 $PSA_CFG1['aaa'] = 123;
 
+
+/**
+ * @getFunction stdclas StdClass retInstance
+ */
 
 /*
 function &PSA_CFG($selector = null){
@@ -563,6 +569,7 @@ function &psa_get_set_property_by_selector(&$object, $selector, $exception_class
 	$parts1 = explode('->', $selector);
 	$ref = &$object;
 	
+	// find reference by selector
 	foreach($parts1 as $k1 => $v1){
 		$parts2 = explode('.', $v1);
 		foreach($parts2 as $k2 => $v2){

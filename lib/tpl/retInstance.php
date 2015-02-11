@@ -1,14 +1,18 @@
 
 
 /**
- * @getFunction defined in <?php echo $gf['tag_file'] ?> 
+ * From getFunction tag in <?php echo $gf['tag_file'] ?> 
  *
- * @param string $selector
+ * @param string $instance_name
  */
-function &<?php echo $gf['function'] ?>($action){
+function <?php echo $gf['function'] ?>($instance_name = null){
 	
-	if(!$selector)
-		return <?php echo $gf['target'] ?>;
+	// no arguments for constructor
+	if(func_num_args() <= 1)
+		return psa_get_instance('<?php echo $gf['target'] ?>', $instance_name);
 	
-	return psa_get_set_property_by_selector(<?php echo $gf['target'] ?>, $selector);	
+	// with constructor arguments
+	$args = func_get_args();
+	array_shift($args);
+	return call_user_func_array('psa_get_instance', array('<?php echo $gf['target'] ?>', $instance_name, $args));
 }

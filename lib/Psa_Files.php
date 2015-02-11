@@ -276,7 +276,7 @@ class Psa_Files extends Psa_Singleton{
 						// check if file is registered allready
 						if(isset($files['class_paths'][$file_basename])){
 							trigger_error('Name ' . $file_basename . " already regsitered for autoloading " . $files['class_paths'][$file_basename], E_USER_NOTICE);
-							//continue 1;
+							continue 1;
 						}
 
 						$files['class_paths'][$file_basename] = $filepath;

@@ -1,7 +1,7 @@
 
 
 /**
- * @getFunction defined in <?php echo $gf['tag_file'] ?> 
+ * From getFunction tag in <?php echo $gf['tag_file'] ?> 
  *
  * @param string $selector
  */
