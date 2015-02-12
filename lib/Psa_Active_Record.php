@@ -82,15 +82,6 @@ class Psa_Active_Record{
 
 
 	/**
-	 * Database connection object
-	 *
-	 * @var Psa_PDO
-	 * @ignore
-	 */
-	protected $psa_database;
-
-
-	/**
 	 * Array that holds names of table columns.
 	 *
 	 * @var array
@@ -115,15 +106,6 @@ class Psa_Active_Record{
 	 * @ignore
 	 */
 	protected $psa_primary_key_field_name = null;
-
-
-	/**
-	 * Reference to Psa_Registry object.
-	 *
-	 * @var Psa_Registry
-	 * @ignore
-	 */
-	protected $psa_registry = null;
 
 
 	/**
@@ -183,11 +165,9 @@ class Psa_Active_Record{
 	 */
 	protected function __construct($table_name, $primary_key_field_name, $primary_key_value = null, array $column_names = array(), $primary_key_sequence_name = null, Psa_PDO $database_connection = null){
 
-		$this->psa_registry = Psa_Registry::get_instance();
-
 		// reference to database object
 		if(!$database_connection)
-			$this->psa_database = $this->psa_registry->psa_database;
+			$this->psa_database = Reg()->psa_database;
 		else
 			$this->psa_database = $database_connection;
 
@@ -282,11 +262,11 @@ class Psa_Active_Record{
 	 */
 	protected function auto_set_column_names(){
 
-		if(!isset($this->psa_registry->PSA_CFG['pdo']['database'])){
+		if(!isset(Reg()->PSA_CFG['pdo']['database'])){
 			throw new Psa_Active_Record_Exception('Please set the database name to $PSA_CFG[\'pdo\'][\'database\'] configuration value or better pass the column names to constructor.', 703);
 		}
 
-		$sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = \'' . $this->psa_table_name . '\' AND table_schema = \'' . $this->psa_registry->PSA_CFG['pdo']['database'] . '\'';
+		$sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = \'' . $this->psa_table_name . '\' AND table_schema = \'' . Reg()->PSA_CFG['pdo']['database'] . '\'';
 		$this->psa_column_names = $this->psa_database->fetch_column(0, $sql);
 	}
 

@@ -68,7 +68,7 @@
  * @see Psa_Dully_View
  * @see Psa_Smarty
  */
-class Psa_Smarty_View extends Psa_View{
+class Psa_Smarty_View{
 
 
 	/**
@@ -87,18 +87,18 @@ class Psa_Smarty_View extends Psa_View{
 		parent::__construct();
 
 		// set reference to $psa_smarty object if exists
-		if(!$this->psa_registry->psa_smarty instanceof Psa_Smarty){
+		if(!Reg()->psa_smarty instanceof Psa_Smarty){
 
 			// include smarty class file
 			include_once PSA_BASE_DIR . '/lib/Psa_Smarty.php';
 
-			$this->psa_registry->psa_smarty = new Psa_Smarty;
+			Reg()->psa_smarty = new Psa_Smarty;
 
 			// assign result object to smarty
-			$this->psa_registry->psa_smarty->assign('psa_result', $this->psa_result);
-			$this->psa_registry->psa_smarty->assign('r', $this->psa_result);
+			Reg()->psa_smarty->assign('psa_result', $this->psa_result);
+			Reg()->psa_smarty->assign('r', $this->psa_result);
 		}
 
-		$this->psa_smarty = $this->psa_registry->psa_smarty;
+		$this->psa_smarty = Reg()->psa_smarty;
 	}
 }

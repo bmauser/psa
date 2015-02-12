@@ -58,7 +58,7 @@
  * <code>
  * <?php
  *
- * class example_model extends Psa_Model {
+ * class example_model {
  *
  * 	function get_numbers(){
  *
@@ -73,7 +73,7 @@
  * ?>
  * </code>
  */
-class Psa_Result extends Psa_Singleton {
+class Psa_Result {
 
 	/**
 	 * Returns object's instance.

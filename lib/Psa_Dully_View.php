@@ -68,7 +68,7 @@
  * @see Psa_Dully
  * @see Psa_Smarty_View
  */
-class Psa_Dully_View extends Psa_View{
+class Psa_Dully_View{
 
 
 	/**
@@ -88,21 +88,21 @@ class Psa_Dully_View extends Psa_View{
 		parent::__construct();
 
 		// set reference to $Psa_Dully object if exists
-		if(!$this->psa_registry->psa_dully instanceof Psa_Dully){
+		if(!Reg()->psa_dully instanceof Psa_Dully){
 
 			// include dully class file
 			include_once PSA_BASE_DIR . '/lib/Psa_Dully.php';
 
-			$this->psa_registry->psa_dully = new Psa_Dully;
+			Reg()->psa_dully = new Psa_Dully;
 
 			// folder with templates
-			$this->psa_dully->template_dir = $this->psa_registry->PSA_CFG['folders']['dully']['template_dir'];
+			$this->psa_dully->template_dir = Reg()->PSA_CFG['folders']['dully']['template_dir'];
 
 			// assign result object to dully
-			$this->psa_registry->psa_dully->assign('psa_result', $this->psa_result);
-			$this->psa_registry->psa_dully->assign('r', $this->psa_result);
+			Reg()->psa_dully->assign('psa_result', $this->psa_result);
+			Reg()->psa_dully->assign('r', $this->psa_result);
 		}
 
-		$this->psa_dully = $this->psa_registry->psa_dully;
+		$this->psa_dully = Reg()->psa_dully;
 	}
 }

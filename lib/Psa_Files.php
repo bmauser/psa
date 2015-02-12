@@ -56,7 +56,8 @@ function &eCfg(){
  * @see register_files.php
  *
  */
-class Psa_Files extends Psa_Singleton{
+class Psa_Files {
+
 
 	/**
 	 * Array which holds data about registered files.
@@ -67,24 +68,6 @@ class Psa_Files extends Psa_Singleton{
 	 * @var array
 	 */
 	public $files_data = array();
-
-
-	/**
-	 * Returns object's instance.
-	 *
-	 * You should statically call this method with scope resolution operator (::) which gives you
-	 * instance to the object from any scope in your application.
-	 *
-	 * <b>Example:</b>
-	 * <code>
-	 * $files = Psa_Files::get_instance();
-	 * </code>
-	 *
-	 * @return Psa_Files Instance of Psa_Files object.
-	 */
-	public static function get_instance($classname = __CLASS__){
-		return parent::get_instance($classname);
-	}
 
 
 	/**

@@ -41,7 +41,7 @@
  * <?php
  *
  * // model class
- * class search extends Psa_Model{
+ * class search {
  *
  *     // search method
  *     function filter($max_results, $only_pages){

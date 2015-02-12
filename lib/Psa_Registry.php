@@ -39,16 +39,16 @@
  * For example, you can add property to <kbd>Psa_Registry</kbd> object in your model method
  * by
  * <code>
- * $this->psa_registry->my_value = '123';
+ * Reg()->my_value = '123';
  * </code>
  * It implements {@link http://en.wikipedia.org/wiki/Singleton_pattern singleton pattern}
  * so you can get reference to registry object from any scope with
  * {@link get_instance()} method. You cannot make instance of Psa_Registry object with
  * the <var>new</var> operator.
  * 
- * @asFunction Reg Psa_Registry getInstance
+ * @asFunction Reg Psa_Registry propSelector
  */
-class Psa_Registry extends Psa_Singleton {
+class Psa_Registry {
 
 
 	/**
@@ -99,24 +99,4 @@ class Psa_Registry extends Psa_Singleton {
 	 */
 	public $psa_dully = null;
 
-
-	/**
-	 * Returns object's instance.
-	 *
-	 * You should statically call this method with scope resolution operator (::) which gives you
-	 * instance to the object from any scope in your application.
-	 * Example:
-	 * <code>
-	 * <?php
-	 *
-	 * $registry = Psa_Registry::get_instance();
-	 *
-	 * ?>
-	 * </code>
-	 *
-	 * @return Psa_Registry
-	 */
-	public static function get_instance($classname = __CLASS__){
-		return parent::get_instance($classname);
-	}
 }

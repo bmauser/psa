@@ -229,7 +229,7 @@ class Psa_User extends Psa_Active_Record{
 				if(!$this->username or !$this->password)
 					throw new Psa_User_Exception("Username and password not set.", 203);
 
-				$sql = "SELECT <COLUMNS> FROM {$this->psa_registry->PSA_CFG['database']['table']['user']} WHERE username=? AND password=?";
+				$sql = 'SELECT <COLUMNS> FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE username=? AND password=?';
 				$q_params = array($this->username, $this->password);
 				return $this->restore_from_database(array(), $sql, $q_params);
 			}
@@ -389,7 +389,7 @@ class Psa_User extends Psa_Active_Record{
 
 			// add to group
 			if($action == 1){
-				$sql = "INSERT INTO {$this->psa_registry->PSA_CFG['database']['table']['user_in_group']} (user_id, group_id) VALUES (?, ?)";
+				$sql = 'INSERT INTO ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' (user_id, group_id) VALUES (?, ?)';
 				$q_params = array($this->id, $group_id_value);
 			}
 			// remove from group
@@ -397,21 +397,21 @@ class Psa_User extends Psa_Active_Record{
 
 				// remove all groups
 				if($group_id_value == 'all'){
-					$sql = "DELETE FROM {$this->psa_registry->PSA_CFG['database']['table']['user_in_group']} WHERE user_id=?";
+					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE user_id=?';
 					$q_params = array($this->id);
 				}
 				// remove specific group
 				else{
-					$sql = "DELETE FROM {$this->psa_registry->PSA_CFG['database']['table']['user_in_group']} WHERE user_id=? AND group_id=?";
+					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE user_id=? AND group_id=?';
 					$q_params = array($this->id, $group_id_value);
 				}
 			}
 
 			// run query against the database
-			$this->psa_database->execute($q_params, $sql);
+			Db()->execute($q_params, $sql);
 
 			// if no rows affected user already wasn't or was in the group depending on $action
-			if($this->psa_database->affected_rows() <= 0)
+			if(Db()->affected_rows() <= 0)
 				$failed = 1;
 			else
 				$success = 1;
@@ -420,7 +420,7 @@ class Psa_User extends Psa_Active_Record{
 		if($success){
 
 			// write log
-			if($this->psa_registry->PSA_CFG['logging']['max_log_level'] >= 2)
+			if(Reg()->PSA_CFG['logging']['max_log_level'] >= 2)
 				$this->log("Group membership changed: " . implode(',',$group_id) . " action=" . ($action ? 'add' : 'remove'),__METHOD__,2);
 
 			if(!$failed)
@@ -455,17 +455,17 @@ class Psa_User extends Psa_Active_Record{
 
 			// update user in the database
 			if($this->id){
-				$sql = "UPDATE {$this->psa_registry->PSA_CFG['database']['table']['user']} SET password = ? WHERE id = ?";
+				$sql = 'UPDATE ' . Reg()->PSA_CFG['database']['table']['user'] . ' SET password = ? WHERE id = ?';
 				$q_params = array($new_password, $this->id);
 			}
 			else{
-				$sql = "UPDATE {$this->psa_registry->PSA_CFG['database']['table']['user']} SET password = ? WHERE username = ?";
+				$sql = 'UPDATE ' . Reg()->PSA_CFG['database']['table']['user'] . ' SET password = ? WHERE username = ?';
 				$q_params = array($new_password, $this->username);
 			}
 
 			// run query against the database
 			try{
-				$this->psa_database->execute($q_params, $sql);
+				Db()->execute($q_params, $sql);
 
 				// write log
 				$this->log("Password changed",__METHOD__,2);
@@ -502,17 +502,17 @@ class Psa_User extends Psa_Active_Record{
 
 		// update user in the database
 		if($this->id){
-			$sql = "SELECT id FROM {$this->psa_registry->PSA_CFG['database']['table']['user']} WHERE password = ? AND id = ?";
+			$sql = 'SELECT id FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE password = ? AND id = ?';
 			$q_params = array($database_password, $this->id);
 		}
 		else{
-			$sql = "SELECT id FROM {$this->psa_registry->PSA_CFG['database']['table']['user']} WHERE password = ? AND username = ?";
+			$sql = 'SELECT id FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE password = ? AND username = ?';
 			$q_params = array($database_password, $this->username);
 		}
 
-		$this->psa_database->execute($q_params, $sql);
+		Db()->execute($q_params, $sql);
 
-		$row = $this->psa_database->fetch_row();
+		$row = Db()->fetch_row();
 
 		if($row['id'])
 			return 1;
@@ -535,7 +535,7 @@ class Psa_User extends Psa_Active_Record{
 	public function password_hash($password){
 
 		// return hash
-		return hash($this->psa_registry->PSA_CFG['password_hash'], $password);
+		return hash(Reg()->PSA_CFG['password_hash'], $password);
 	}
 
 
@@ -551,7 +551,7 @@ class Psa_User extends Psa_Active_Record{
 	protected function log($message, $method = '', $level = 1, $type = ''){
 
 		// if logging is enabled
-		if($this->psa_registry->PSA_CFG['logging']['max_log_level'] >= $level){
+		if(Reg()->PSA_CFG['logging']['max_log_level'] >= $level){
 
 			$log_data['user_id']  = $this->id;
 			$log_data['username'] = $this->username;
@@ -593,12 +593,12 @@ class Psa_User extends Psa_Active_Record{
 		$sql = "SELECT psa_user_in_group.group_id, psa_group.name FROM psa_user_in_group JOIN psa_group ON psa_user_in_group.group_id = psa_group.id WHERE psa_user_in_group.user_id = ?";
 		$q_params = array($this->id);
 
-		$this->psa_database->execute($q_params, $sql);
+		Db()->execute($q_params, $sql);
 
 		$groups = array();
 
 		// for each fetched row
-		while($row = $this->psa_database->fetch_row()){
+		while($row = Db()->fetch_row()){
 			$groups[$row['group_id']] = $row['name'];
 		}
 

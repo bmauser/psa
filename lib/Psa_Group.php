@@ -284,7 +284,7 @@ class Psa_Group extends Psa_Active_Record{
 
 			// add to group
 			if($action == 1){
-				$sql = "INSERT INTO {$this->psa_registry->PSA_CFG['database']['table']['user_in_group']} (group_id, user_id) VALUES (?, ?)";
+				$sql = 'INSERT INTO ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' (group_id, user_id) VALUES (?, ?)';
 				$q_params = array($this->id, $user_id_value);
 			}
 			// remove from group
@@ -292,26 +292,26 @@ class Psa_Group extends Psa_Active_Record{
 
 				// remove all users from the group
 				if($user_id_value == 'all'){
-					$sql = "DELETE FROM {$this->psa_registry->PSA_CFG['database']['table']['user_in_group']} WHERE group_id=?";
+					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE group_id=?';
 					$q_params = array($this->id);
 				}
 				// remove specific user from the group
 				else{
-					$sql = "DELETE FROM {$this->psa_registry->PSA_CFG['database']['table']['user_in_group']} WHERE group_id=? AND user_id =?";
+					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE group_id=? AND user_id =?';
 					$q_params = array($this->id, $user_id_value);
 				}
 			}
 
 			try{
 				// run query against the database
-				$this->psa_database->execute($q_params, $sql);
+				Db()->execute($q_params, $sql);
 			}
 			catch(Psa_Db_Exception $e){
 				$failed = 1;
 			}
 
 			// if no rows affected user already wasn't or was in the group depending on $action
-			if($this->psa_database->affected_rows() <= 0)
+			if(Db()->affected_rows() <= 0)
 				$failed = 1;
 			else
 				$success = 1;
@@ -320,7 +320,7 @@ class Psa_Group extends Psa_Active_Record{
 		if($success){
 
 			// write log
-			if($this->psa_registry->PSA_CFG['logging']['max_log_level'] >= 2)
+			if(Reg()->PSA_CFG['logging']['max_log_level'] >= 2)
 				$this->log("Members of group changed: " . implode(',', $user_id) . " action=" . ($action ? 'add' : 'remove'), __METHOD__, 2);
 
 			if(!$failed)
@@ -343,7 +343,7 @@ class Psa_Group extends Psa_Active_Record{
 	protected function log($message, $method = '', $level = 1, $type = ''){
 
 		// if logging is enabled
-		if($this->psa_registry->PSA_CFG['logging']['max_log_level'] >= $level){
+		if(Reg()->PSA_CFG['logging']['max_log_level'] >= $level){
 
 			$log_data['group_id'] = $this->id;
 			$log_data['groupname'] = $this->name;

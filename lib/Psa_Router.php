@@ -47,7 +47,7 @@
  *     function psa_main(){
  *
  *         // put basedir_web into psa_result object to be available in all templates
- *         $this->psa_result->basedir_web = $this->psa_registry->basedir_web;
+ *         $this->psa_result->basedir_web = Reg()->basedir_web;
  *
  *         // start session
  *         session_start();
@@ -71,7 +71,7 @@
  * in the first autoload directory (set by <var>$PSA_CFG['folders']['autoload']</var> in {@link config.php}). Use Main.php file as bootstrap
  * file for your application.
  */
-class Psa_Router extends Psa_Model{
+class Psa_Router {
 
 	/**
 	 * Array that holds Profile log data
@@ -114,8 +114,8 @@ class Psa_Router extends Psa_Model{
 
 		// If application root folder is in subfolder from server root like: www.example.com/my/application/
 		// remove unnecessary part of the path. In case of url above that would be '/my/application'.
-		if($this->psa_registry->basedir_web)
-			$request_uri_arr[0] = implode('', explode($this->psa_registry->basedir_web, $request_uri_arr[0], 2));
+		if(Reg()->basedir_web)
+			$request_uri_arr[0] = implode('', explode(Reg()->basedir_web, $request_uri_arr[0], 2));
 
 		$request_uri_arr[0] = trim($request_uri_arr[0], "/ \t\n\r\0\x0B");
 
@@ -157,9 +157,9 @@ class Psa_Router extends Psa_Model{
 			$url_arr = $this->explode_url($request_uri);
 
 		// controller name
-		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : $this->psa_registry->PSA_CFG['mvc']['default_controller_name']) . $this->psa_registry->PSA_CFG['mvc']['default_controller_suffix'];
+		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : Reg()->PSA_CFG['mvc']['default_controller_name']) . Reg()->PSA_CFG['mvc']['default_controller_suffix'];
 		// action name
-		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : $this->psa_registry->PSA_CFG['mvc']['default_action_name']) . $this->psa_registry->PSA_CFG['mvc']['default_action_suffix'];
+		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : Reg()->PSA_CFG['mvc']['default_action_name']) . Reg()->PSA_CFG['mvc']['default_action_suffix'];
 		// action arguments
 		$return['arguments'] = isset($url_arr[2]) ? array_slice($url_arr, 2) : array();
 
@@ -215,7 +215,7 @@ class Psa_Router extends Psa_Model{
 			$invoke_method = new ReflectionMethod($object, $method_name);
 
 			// if profile log is enabled
-			if(isset($this->psa_registry->PSA_CFG['profile_log']) && $this->psa_registry->PSA_CFG['profile_log'] && !isset($object->psa_no_profile_log))
+			if(isset(Reg()->PSA_CFG['profile_log']) && Reg()->PSA_CFG['profile_log'] && !isset($object->psa_no_profile_log))
 				$profile_log = 1;
 			else
 				$profile_log = 0;

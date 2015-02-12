@@ -40,16 +40,15 @@ define('PSA_BASE_DIR', dirname(__FILE__));
 
 // include required files
 include PSA_BASE_DIR . '/config.php';
-include PSA_BASE_DIR . '/lib/Psa_Singleton.php';
 include PSA_BASE_DIR . '/lib/Psa_Files.php';
-include PSA_BASE_DIR . '/lib/Psa_Registry.php';
+//include PSA_BASE_DIR . '/lib/Psa_Registry.php';
 include PSA_BASE_DIR . '/lib/functions.php';
 
 
 $PSA_CFG['logging']['max_log_level'] = 0; // disable logging
 
 // put PSA config array to registry
-Psa_Registry::get_instance()->PSA_CFG = $PSA_CFG;
+Reg()->PSA_CFG = $PSA_CFG;
 
 // register files
 $files_data = Psa_Files::get_instance()->register();

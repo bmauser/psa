@@ -173,30 +173,30 @@ class Psa_Logger{
 			// write log to database
 			else if(Cfg()['logging']['storage'][$log_storage]['type'] == 'database'){
 
-				if(!($this->database instanceof Psa_PDO)){
+				if(!($this->db instanceof Psa_PDO)){
 
 					// should new database connection be opened
 					if(@Cfg()['logging']['new_database_connection']){
-						$psa_registry = Psa_Registry::get_instance();
-						if(!(@$psa_registry->psa_log_database_connection instanceof Psa_PDO)){
-							$psa_registry->psa_log_database_connection = new Psa_PDO();
+						
+						if(!(@Reg()->psa_log_database_connection instanceof Psa_PDO)){
+							Reg()->psa_log_database_connection = new Psa_PDO();
 						}
-						$this->database = $psa_registry->psa_log_database_connection;
+						$this->db = Reg()->psa_log_database_connection;
 					}
 					else{
 						// existing database connection
-						$this->database = Psa_Registry::get_instance()->psa_database;
+						$this->db = Reg()->psa_database;
 					}
 				}
 
 				// prepare database query if not already prepared
 				if(!$this->prepared_query){
-					$this->prepared_query = $this->database->prepare($this->format_database_log_query($log_storage));
+					$this->prepared_query = $this->db->prepare($this->format_database_log_query($log_storage));
 				}
 
 				// run query against the database
 				try{
-					$this->database->execute($this->format_database_log_query_params($log_data), $this->prepared_query, 1);
+					$this->db->execute($this->format_database_log_query_params($log_data), $this->prepared_query, 1);
 				}
 				catch(PDOException $e){
 

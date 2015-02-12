@@ -43,10 +43,7 @@
  */
 function psa_del_user_group($id, $user_or_group){
 
-	if($id && $user_or_group){
-
-		// database object
-		$psa_database = Psa_Registry::get_instance()->psa_database;
+	if($id && $user_or_group){;
 		
 		// if $id is not array make it array for foreach loop
 		if(!is_array($id))
@@ -78,14 +75,14 @@ function psa_del_user_group($id, $user_or_group){
 			}
 			// delete user or groups by name
 			else{
-				$sql = "DELETE FROM {$table} WHERE $name_column = " . $psa_database->escape($id_value);
+				$sql = "DELETE FROM {$table} WHERE $name_column = " . Db()->escape($id_value);
 			}
 
 			// run query against the database
-			$psa_database->query($sql);
+			Db()->query($sql);
 
 			// if no rows affected
-			if($psa_database->affected_rows() <= 0){
+			if(Db()->affected_rows() <= 0){
 				$failed = 1;
 				$log_data['message']  = 'Unable to delete ' . (($user_or_group == 1) ? 'user' : 'group') . ". Maybe does not exists.";
 			}
@@ -187,17 +184,6 @@ function psa_delete_group($group){
  * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array
  * with all classes and their paths. There is a command line helper script <kbd>register_files.php</kbd> for that.
  *
- * For example, you can just extend <i>Psa_Model</i> class without including its .php file:
- * <code>
- * <?php
- * class My_Model extends Psa_Model{
- * 	function some_function(){
- * 		// ... something here
- * 	}
- * }
- * ?>
- * </code>
- *
  * @see Psa_Files::register()
  */
 function psa_autoload($class_name){
@@ -282,7 +268,7 @@ function psa_is_user_in_group($user, $group){
 
 		$sql = "SELECT * FROM " . Cfg()['database']['table']['user_in_group'] . " WHERE user_id = '$user' AND group_id = '$group'";
 
-		$row = Psa_Registry::get_instance()->psa_database->fetch_row($sql);
+		$row = Reg()->psa_database->fetch_row($sql);
 
 		if(isset($row['user_id']) && $row['user_id'])
 			return 1;

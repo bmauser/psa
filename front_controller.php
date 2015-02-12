@@ -68,11 +68,9 @@ include PSA_BASE_DIR . '/lib/Psa_Files.php';
 include PSA_BASE_DIR . '/lib/Psa_Registry.php';
 
 
-// registry object
-$psa_registry = Psa_Registry::get_instance();
 
 // put $PSA_CFG config array to the registry
-$psa_registry->PSA_CFG = $PSA_CFG;
+Reg()->PSA_CFG = $PSA_CFG;
 
 
 // register files on every request
@@ -84,19 +82,16 @@ if($PSA_CFG['develop_mode'] && $PSA_CFG['develop_mode_register_files']){
 // register psa_autoload() function as __autoload() implementation
 spl_autoload_register('psa_autoload');
 
-// database connection wrapper object
-$psa_registry->psa_database = new Psa_PDO();
-
 
 
 // if in web mode
 if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']){
 	// get application base URL
 	if(isset($PSA_CFG['folders']['basedir_web']))
-		$psa_registry->basedir_web = $PSA_CFG['folders']['basedir_web'];
+		Reg()->basedir_web = $PSA_CFG['folders']['basedir_web'];
 	else
-		$psa_registry->basedir_web = str_replace('/' . basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
-	$psa_registry->base_url = (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $psa_registry->basedir_web;
+		Reg()->basedir_web = str_replace('/' . basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+	Reg()->base_url = (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . Reg()->basedir_web;
 }
 
 
@@ -104,8 +99,6 @@ if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']){
 include PSA_BASE_DIR . '/' . $PSA_CFG['folders']['autoload'][0] . '/Main.php';
 
 
-// remove from global scope
-unset($PSA_CFG, $psa_registry);
 
 
 // call application

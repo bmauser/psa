@@ -37,7 +37,7 @@
  * database access. Methods in this class are wrappers for corresponding PDO methods.
  *
  * If you don't want to use methods from this class in your models, you can use
- * same database connection that can be accessed through <var>$this->psa_database->pdo</var>
+ * same database connection that can be accessed through <var>Db()->pdo</var>
  * which is PDO object.
  *
  * See in examples how to interact with database in model methods.
@@ -45,25 +45,25 @@
  * <br><b>Examples:</b>
  *
  * <br><code>
- * class my_model extends Psa_Model {
+ * class my_model{
  *
  *     // returns all records from a database table
  *     function get_all_records(){
  *
- *         $this->psa_database->query("SELECT * FROM table");
- *         return $this->psa_database->fetch_all();
+ *         Db()->query("SELECT * FROM table");
+ *         return Db()->fetch_all();
  *     }
  *
  *
  *     // or the same as above
  *     function get_all_records1(){
- *         return $this->psa_database->fetch_all("SELECT * FROM table");
+ *         return Db()->fetch_all("SELECT * FROM table");
  *     }
  *
  *
  *     // returns one row from the table
  *     function get_one_row(){
- *         return $this->psa_database->fetch_row("SELECT * FROM table WHERE id = 123");
+ *         return Db()->fetch_row("SELECT * FROM table WHERE id = 123");
  *     }
  *
  *
@@ -72,7 +72,7 @@
  *
  *         $sum = 0;
  *
- *         $this->psa_database->query("SELECT * FROM table");
+ *         Db()->query("SELECT * FROM table");
  *         while($row = $database->fetch_row()){
  *             $sum += $row['column1'] + $row['column2'] + $row['column3'];
  *         }
@@ -91,9 +91,9 @@
  *         $qparams = array($value1, $value2, $value3);
  *
  *         // execute query
- *         $this->psa_database->execute($qparams, $sql);
+ *         Db()->execute($qparams, $sql);
  *
- *         return $this->psa_database->last_insert_id();
+ *         return Db()->last_insert_id();
  *     }
  *
  *
@@ -102,27 +102,28 @@
  *
  *         // start transaction
  *         // be sure to have database connection before beginTransaction()
- *         $this->psa_database->connect();
- *         $this->psa_database->pdo->beginTransaction();
+ *         Db()->connect();
+ *         Db()->pdo->beginTransaction();
  *
  *         try{
- *             $this->psa_database->execute(array($value1), "INSERT INTO table1 (column1) VALUES (?)");
+ *             Db()->execute(array($value1), "INSERT INTO table1 (column1) VALUES (?)");
  *
- *             $this->psa_database->execute(array($value2), "INSERT INTO table2 (column2) VALUES (?)");
+ *             Db()->execute(array($value2), "INSERT INTO table2 (column2) VALUES (?)");
  *         }
  *         catch (Psa_Db_Exception $e){
  *             // rollback
- *             $this->psa_database->pdo->rollback();
+ *             Db()->pdo->rollback();
  *             throw $e;
  *         }
  *
  *         // commit
- *         $this->psa_database->pdo->commit();
+ *         Db()->pdo->commit();
  *     }
  * }
  * </code>
  *
  * @see config.php
+ * @asFunction Db Psa_PDO getInstance
  */
 
 
