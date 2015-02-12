@@ -61,7 +61,7 @@ class Psa_Logger{
 	 * @var Psa_PDO
 	 * @ignore
 	 */
-	protected $database = null;
+	protected $db = null;
 
 
 	/**

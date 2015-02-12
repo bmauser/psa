@@ -1,10 +1,10 @@
 <?php
 //@todo
-include PSA_BASE_DIR . '/wri/asfunctions.php';
+//include PSA_BASE_DIR . '/wri/asfunctions.php';
 
-function &eCfg(){
-	return psa_get_config();
-}
+//function &eCfg(){
+//	return psa_get_config();
+//}
 
 
 /**

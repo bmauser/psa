@@ -59,7 +59,7 @@ else{
 
 
 // include required files
-//include PSA_BASE_DIR . '/wri/asfunctions.php';
+include PSA_BASE_DIR . '/wri/asfunctions.php';
 include PSA_BASE_DIR . '/lib/functions.php';
 include PSA_BASE_DIR . '/lib/Psa_Singleton.php';
 include PSA_BASE_DIR . '/lib/Psa_PDO.php';
@@ -75,7 +75,7 @@ Reg()->PSA_CFG = $PSA_CFG;
 
 // register files on every request
 if($PSA_CFG['develop_mode'] && $PSA_CFG['develop_mode_register_files']){
-	Psa_Files::get_instance()->save();
+	Files()->save();
 }
 
 

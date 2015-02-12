@@ -41,8 +41,9 @@ define('PSA_BASE_DIR', dirname(__FILE__));
 // include required files
 include PSA_BASE_DIR . '/config.php';
 include PSA_BASE_DIR . '/lib/Psa_Files.php';
-//include PSA_BASE_DIR . '/lib/Psa_Registry.php';
+include PSA_BASE_DIR . '/lib/Psa_Registry.php';
 include PSA_BASE_DIR . '/lib/functions.php';
+include PSA_BASE_DIR . '/wri/asfunctions.php';
 
 
 $PSA_CFG['logging']['max_log_level'] = 0; // disable logging
@@ -51,10 +52,10 @@ $PSA_CFG['logging']['max_log_level'] = 0; // disable logging
 Reg()->PSA_CFG = $PSA_CFG;
 
 // register files
-$files_data = Psa_Files::get_instance()->register();
+$files_data = Files()->register();
 
 // save to file
-Psa_Files::get_instance()->save($files_data);
+Files()->save($files_data);
 
 // echo results
 print_r($files_data);

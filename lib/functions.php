@@ -192,7 +192,7 @@ function psa_autoload($class_name){
 
 	// read data from generated autoload_data.php file
 	if(!$psa_files){
-		$psa_files = Psa_Files::get_instance();
+		$psa_files = Files();
 		$psa_files->set_data();
 	}
 
@@ -394,6 +394,23 @@ function &psa_get_config(){
 	}
 	
 	return $PSA_CFG;
+}
+
+
+/**
+ * @asFunction Cfg psa_get_config() propSelector
+ *
+ * @return Array
+ */
+function &psa_get_reg(){
+
+	static $reg = null;
+
+	if($reg === null){
+		$reg = new Psa_Registry();
+	}
+
+	return $reg;
 }
 
 
