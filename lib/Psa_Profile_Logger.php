@@ -36,17 +36,10 @@
 /**
  * This class handles profile logging.
  * 
+ * @asFunction ProfileLogger Psa_Profile_Logger getInstance
  * @ignore
  */
 class Psa_Profile_Logger extends Psa_Logger{
-
-
-	/**
-	 * returns Psa_Profile_Logger instance
-	 */
-	public static function get_instance($class = null){
-		return parent::get_instance(__CLASS__);
-	}
 
 
 	/**
@@ -63,7 +56,7 @@ class Psa_Profile_Logger extends Psa_Logger{
 	protected function format_database_log_query($log_storage){
 
 		// log query. Should be formated for prepared query.
-		return "INSERT INTO " . Psa_Registry::get_instance()->PSA_CFG['logging']['storage'][$log_storage]['target'] . " (method, total_time, method_arguments, client_ip, log_time, request_id) VALUES (?,?,?,?,NOW(),?)";
+		return "INSERT INTO " . Cfg()['logging']['storage'][$log_storage]['target'] . " (method, total_time, method_arguments, client_ip, log_time, request_id) VALUES (?,?,?,?,NOW(),?)";
 	}
 
 

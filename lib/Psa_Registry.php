@@ -45,6 +45,8 @@
  * so you can get reference to registry object from any scope with
  * {@link get_instance()} method. You cannot make instance of Psa_Registry object with
  * the <var>new</var> operator.
+ * 
+ * @asFunction Reg Psa_Registry getInstance
  */
 class Psa_Registry extends Psa_Singleton {
 

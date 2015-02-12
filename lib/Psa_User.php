@@ -542,13 +542,10 @@ class Psa_User extends Psa_Active_Record{
 	/**
 	 * Handles logging for this class.
 	 *
-	 * It calls log() method of Psa_Logger object.
-	 *
 	 * @param string $message log message
 	 * @param string $method class method which writes log message
 	 * @param int $level log level
 	 * @param string $type 'general', 'error', 'warning' ...
-	 * @see Psa_Logger::log()
 	 * @ignore
 	 */
 	protected function log($message, $method = '', $level = 1, $type = ''){
@@ -556,14 +553,13 @@ class Psa_User extends Psa_Active_Record{
 		// if logging is enabled
 		if($this->psa_registry->PSA_CFG['logging']['max_log_level'] >= $level){
 
-			// parameters for Psa_Logger::log() method
 			$log_data['user_id']  = $this->id;
 			$log_data['username'] = $this->username;
 			$log_data['message']  = $message;
 			$log_data['function'] = $method;
 			$log_data['level']    = $level;
 			$log_data['type']     = $type;
-			Psa_Logger::get_instance()->log($log_data);
+			Logger()->log($log_data);
 		}
 	}
 

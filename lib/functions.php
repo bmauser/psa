@@ -45,12 +45,9 @@ function psa_del_user_group($id, $user_or_group){
 
 	if($id && $user_or_group){
 
-		// config array
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
 		// database object
 		$psa_database = Psa_Registry::get_instance()->psa_database;
-
+		
 		// if $id is not array make it array for foreach loop
 		if(!is_array($id))
 			$id = array($id);
@@ -60,12 +57,12 @@ function psa_del_user_group($id, $user_or_group){
 
 		// work with users
 		if($user_or_group == 1){
-			$table = $PSA_CFG['database']['table']['user'];
+			$table = Cfg()['database']['table']['user'];
 			$name_column = 'username';
 		}
 		// work with groups
 		else if($user_or_group == 2){
-			$table = $PSA_CFG['database']['table']['group'];
+			$table = Cfg()['database']['table']['group'];
 			$name_column = 'name';
 		}
 
@@ -97,8 +94,8 @@ function psa_del_user_group($id, $user_or_group){
 			}
 
 			// logging
-			if($PSA_CFG['logging']['max_log_level'] >= 2){
-				// parameters for Psa_Logger::log() method
+			if(Cfg()['logging']['max_log_level'] >= 2){
+				// parameters for Logger
 				$log_data['function'] = __FUNCTION__;
 				$log_data['level']    = 2;
 
@@ -115,7 +112,7 @@ function psa_del_user_group($id, $user_or_group){
 						$log_data['groupname'] = $id_value;
 				}
 
-				Psa_Logger::get_instance()->log($log_data);
+				Logger()->log($log_data);
 			}
 		}
 
@@ -180,134 +177,13 @@ function psa_delete_group($group){
 
 
 /**
- * Executes (runs) hooks.
- *
- * It includes hooks files, makes new instances of hook classes and calls member methods.
- *
- * Hooks are called <i>by type</i>. Hook type is the name of the class it extends.
- * First argument should be an array with elements like in the example below:
- * <code>
- * // $run is array that will be argument for psa_run_hooks() function
- * // Structure should be: $run['hook_type']['hook_method'] = array('method_argument1','method_argument2',...);
- * $run['After_User_Delete']['psa_main'] = array(177);
- * psa_run_hooks($run);
- *
- * // or the same in one line
- * psa_run_hooks(array('After_User_Delete' => array('psa_main' => array(177))));
- * </code>
- * This example calls method <kbd>psa_main</kbd> with one argument (177) from all registered
- * <kbd>After_User_Delete</kbd> hooks.
- *
- * <br><b>How to make hooks</b>
- *
- * <b>1)</b> Put the file with the hook definition class into the folder listed in
- * <var>$PSA_CFG['folders']['hook_def'][]</var>.
- * You can make it abstract class to force method implementation in child classes like this:
- * <code>
- * <?php
- *
- * abstract class After_User_Delete extends Psa_Model{
- *
- *     abstract function main($user_id); // ypu can call this method as you like
- * }
- *
- * ?>
- * </code>
- *
- * <b>2)</b> Put the file with the hook class into the folder listed in <var>$PSA_CFG['folders']['hook_autoload'][]</var>.
- * <code>
- * <?php
- *
- * class MyHook extends After_User_Delete{
- *
- *     function main($user_id){
- *
- *         // Do something here. For example, delete users home folder.
- *     }
- * }
- *
- * ?>
- * </code>
- *
- * <b>3)</b> Put call to <kbd>psa_run_hooks()</kbd> function in your code where is needed.
- * <code>
- * // invoke main() methods in all hooks that extend After_User_Delete class
- * psa_run_hooks(array('After_User_Delete' => array('main' => array($user_id))));
- *
- * </code>
- *
- * <br><b>Note:</b> If there are more hooks of the same type, they are called in no special order.
- *
- * <br><b>Note:</b> When a new hook or a hook definition class is added, you have to register files for autoloading.
- *
- * @param array $run_data Array with data what to run.
- * @param bool $disable_unregistered_exception if true, exception that hook is not registered (
- * or doesn't exists) won't be thrown.
- * @return int 1 for success (all hooks are executed), 0 can be returned when the second
- * argument is set to false and there is no hooks registered.
- * @see Psa_Files::register()
- * @throws Psa_Exception
- */
-function psa_run_hooks($run_data, $disable_unregistered_exception = true){
-
-	// return if hooks are disabled
-	$psa_registry = Psa_Registry::get_instance();
-	if(isset($psa_registry->psa_disable_hooks) && $psa_registry->psa_disable_hooks)
-		return;
-
-	// exit if $run_data is not array
-	if(!is_array($run_data)){
-		throw new Psa_Exception('Invalid first argument for psa_run_hooks() function. Not an array.', 11);
-	}
-
-	$hook_type = key($run_data);
-
-	$psa_files = Psa_Files::get_instance();
-
-	// if file is registered
-	if(isset($psa_files->files_data['hooks'][$hook_type]))
-		$files_data = $psa_files->files_data['hooks'][$hook_type];
-	else{
-		if(!$disable_unregistered_exception){
-			throw new Psa_Exception("Trying to run unregistered hook $hook_type. Try to register files.", 12);
-		}
-		else
-			return 0;
-	}
-
-
-	// set default return value
-	$return = 1;
-
-	$router = new Psa_Router();
-
-	// $files_data is array with data used to instance classes and run methods (class name, method name, file name)
-	foreach ($files_data as $files_data_key => $files_data_value){
-
-		$include_file = $files_data_value;
-		$file_class = $files_data_key;
-		$file_methods_data = &$run_data[$hook_type]; // array of method names and arguments
-
-		// call object methods
-		if(is_array($file_methods_data)){
-			foreach ($file_methods_data as $file_method_name => $file_method_args){
-				$router->dispach($file_class, $file_method_name, $file_method_args, $disable_unregistered_exception);
-			}
-		}
-	}
-
-	return $return;
-}
-
-
-/**
  * This function is registered with the PHP <kbd>spl_autoload_register()</kbd> function as <kbd>__autoload()</kbd> implementation
  * used to auto include .php files.
  *
  * Thus, if you want to extend some class you don't have to include its file, it will be included automatically.
  *
  * <b>Note:</b> Class autoloading will be working only in folders specified with
- * <var>$PSA_CFG['folders']['autoload'][]</var> and <var>$PSA_CFG['folders']['hook_autoload'][]</var> configuration
+ * <var>$PSA_CFG['folders']['autoload'][]</var>  configuration
  * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array
  * with all classes and their paths. There is a command line helper script <kbd>register_files.php</kbd> for that.
  *
@@ -362,7 +238,7 @@ function psa_autoload($class_name){
  */
 function prs($value, $return_only = false){
 
-	if(!Psa_Registry::get_instance()->PSA_CFG['develop_mode'])
+	if(!Cfg()['develop_mode'])
 		return;
 
 	// web mode
@@ -399,14 +275,12 @@ function prs($value, $return_only = false){
  */
 function psa_is_user_in_group($user, $group){
 
-	$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
 	$user = (int)$user;
 	$group = (int)$group;
 
 	if($user && $group){
 
-		$sql = "SELECT * FROM {$PSA_CFG['database']['table']['user_in_group']} WHERE user_id = '$user' AND group_id = '$group'";
+		$sql = "SELECT * FROM " . Cfg()['database']['table']['user_in_group'] . " WHERE user_id = '$user' AND group_id = '$group'";
 
 		$row = Psa_Registry::get_instance()->psa_database->fetch_row($sql);
 
@@ -458,15 +332,24 @@ function psa_is_int($value){
 }
 
 
-
-function psa_get_instance($class_name, $instance_name = null, array $constructor_args = null){
+/**
+ * @todo
+ * 
+ * @param unknown $class_name
+ * @param string $instance_name
+ * @param array $constructor_args
+ * @throws Psa_Exception
+ * @return Ambigous <unknown, NULL>
+ */
+function psa_get_instance($class_name, $instance_name = null, array $constructor_args = null, $is_function = false, $only_first_instance = false){
 
 	// instance store
 	static $first_instance = array();
 	static $instances = array();	
+
 	
-	// get instance
-	if($instance_name === null){ // first instance
+	// select instance
+	if($instance_name === null or $only_first_instance){ // first instance
 		if(!isset($first_instance[$class_name])){
 			$first_instance[$class_name] = null;
 			$instance = &$first_instance[$class_name];
@@ -486,7 +369,15 @@ function psa_get_instance($class_name, $instance_name = null, array $constructor
 	// make new instance
 	if($instance === null){
 		
-		if($constructor_args){
+		// if function name is passed
+		if($is_function){
+			if($constructor_args)
+				$instance = call_user_func_array($class_name, $constructor_args);
+			else
+				$instance = $class_name();
+		}
+		
+		else if($constructor_args){
 			$ref = new ReflectionClass($class_name);
 			$instance = $ref->newInstanceArgs($constructor_args);
 		}
@@ -500,8 +391,13 @@ function psa_get_instance($class_name, $instance_name = null, array $constructor
 	return $instance;
 }
 
+
+
+
 /**
- * @getFunction PSA_CFG psa_get_config() propSelector
+ * @asFunction Cfg psa_get_config() propSelector
+ * 
+ * @return Array
  */
 function &psa_get_config(){
 	
@@ -513,36 +409,6 @@ function &psa_get_config(){
 	
 	return $PSA_CFG;
 }
-
-
-/**
- * @getFunction PSA_CFG1 $GLOBALS['PSA_CFG1'] propSelector
- */
-
-
-$PSA_CFG1['aaa'] = 123;
-
-
-/**
- * @getFunction stdclas StdClass retInstance
- */
-
-/*
-function &PSA_CFG($selector = null){
-
-	static $PSA_CFG = null;
-
-	if($PSA_CFG === null){
-		include PSA_BASE_DIR . '/config.php';
-	}
-
-	if(!$selector)
-		return $PSA_CFG;
-
-	return psa_get_set_property_by_selector($PSA_CFG, $selector, 'PSA_CFG_Exception', 'Config value ' . $selector . ' not set');
-
-}
-*/
 
 
 /**

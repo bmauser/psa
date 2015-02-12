@@ -265,7 +265,7 @@ class Psa_Router extends Psa_Model{
 			$this->profile_log_data['total_time'] = microtime(true) - $this->profile_log_data['time_start'];
 
 			// write log
-			Psa_Profile_Logger::get_instance()->log($this->profile_log_data);
+			ProfileLogger()->log($this->profile_log_data);
 
 			return true;
 		}

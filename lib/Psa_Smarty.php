@@ -51,17 +51,15 @@ class Psa_Smarty extends Smarty{
 
 	function __construct($template_dir = null){
 
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
 		// call parent constructor
 		parent::__construct();
 
 		// Smarty folder configuration
-		$this->cache_dir    = PSA_BASE_DIR . '/' . $PSA_CFG['folders']['smarty']['cache_dir'];
-		$this->config_dir   = PSA_BASE_DIR . '/' . $PSA_CFG['folders']['smarty']['config_dir'];
-		$this->compile_dir  = PSA_BASE_DIR . '/' . $PSA_CFG['folders']['smarty']['compile_dir'];
+		$this->cache_dir    = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['cache_dir'];
+		$this->config_dir   = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['config_dir'];
+		$this->compile_dir  = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['compile_dir'];
 		if(!$template_dir)
-			$template_dir = $PSA_CFG['folders']['smarty']['template_dir'];
+			$template_dir = Cfg()['folders']['smarty']['template_dir'];
 		$this->template_dir = PSA_BASE_DIR . '/' . $template_dir;
 
 		$this->use_sub_dirs = true;
@@ -70,7 +68,7 @@ class Psa_Smarty extends Smarty{
 		$this->error_reporting = error_reporting() & ~E_NOTICE;
 
 		// in develop mode
-		if($PSA_CFG['develop_mode']){
+		if(Cfg()['develop_mode']){
 			$this->force_compile = true;
 		}
 	}

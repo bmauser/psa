@@ -1,4 +1,12 @@
 <?php
+//@todo
+include PSA_BASE_DIR . '/wri/asfunctions.php';
+
+function &eCfg(){
+	return psa_get_config();
+}
+
+
 /**
  * The MIT License (MIT)
  *
@@ -94,32 +102,26 @@ class Psa_Files extends Psa_Singleton{
 	 */
 	public function set_data() {
 
-		// config array
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
-		if (include $PSA_CFG['autoload_data_file']) {
+		if (include Cfg()['autoload_data_file']) {
 			if(isset($autoload_data)){
 				$this->files_data = $autoload_data;
 				return 1;
 			}
 
 			include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-			throw new Psa_File_Exception("No autoload data in file {$PSA_CFG['autoload_data_file']}. Try to register files.", 501);
+			throw new Psa_File_Exception('No autoload data in file ' . Cfg()['autoload_data_file'] . '. Try to register files.', 501);
 		}
 
 		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception("Cannot open file {$PSA_CFG['autoload_data_file']}. Try to register files to create it.", 502);
+		throw new Psa_File_Exception('Cannot open file ' . Cfg()['autoload_data_file'] . '. Try to register files to create it.', 502);
 	}
 
 
 	/**
 	 * Registers files.
 	 *
-	 * It searches for .php files in folders defined by <var>$PSA_CFG['folders']['hook_def']</var>,
-	 * <var>$PSA_CFG['folders']['autoload']</var> and <var>$PSA_CFG['folders']['hook_autoload']</var> and
+	 * It searches for .php files in folders defined by <var>$PSA_CFG['folders']['autoload']</var> and
 	 * returns array with file names and corresponding paths.
-	 * It will search in content of .php files located in folders listed in <var>$PSA_CFG['folders']['hook_autoload']</var>
-	 * array for classes that extends hook classes.
 	 *
 	 * Returning array may look like this:
 	 * <code>
@@ -131,92 +133,34 @@ class Psa_Files extends Psa_Singleton{
 	 *             [Sum_View] => /app/psa/../views/Sum_View.php
 	 *             [Default_Controller] => /app/psa/../controllers/Default_Controller.php
 	 *             [Unauthorized_Exception] => /app/psa/../exceptions/Unauthorized_Exception.php
-	 *             [Psa_Hook_After_Group_Create] => /psa/hooks/Psa_Hook_After_Group_Create.php
 	 *             ....
-	 *         )
-	 *
-	 *     [hooks] => Array
-	 *         (
-	 *             [Psa_Hook_Before_Group_Delete] => Array
-	 *                 (
-	 *                     [My_Hook1] => /app/psa/../hooks/My_Hook1.php
-	 *                     [My_Hook2] => /pplication/psa/../hooks/My_Hook2.php
-	 *                 )
 	 *         )
 	 * )
 	 * </code>
 	 *
 	 * @return array|int Array with files data.
 	 * @param array $additional_autoload_folders Array with paths.
-	 * @param array $additional_hook_autoload_folders Array with paths.
 	 * @see save()
 	 * @see config.php
 	 */
-	function register($additional_autoload_folders = array(), $additional_hook_autoload_folders = array()){
-
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
-		$all_hook_types = array();
-
-		// find all available hook types from file names in each $PSA_CFG['folders']['hook_def'] dir
-		if(isset($PSA_CFG['folders']['hook_def']) && $PSA_CFG['folders']['hook_def']){
-			foreach ($PSA_CFG['folders']['hook_def'] as $hooks_folder) {
-
-				$hook_folder_path = PSA_BASE_DIR . '/' . $hooks_folder;
-
-				if ($handle = @opendir($hook_folder_path)) {
-					while (false !== ($file = readdir($handle))) {
-
-						if(substr($file, -4, 4) == '.php'){
-							// get the part of the filename to the first dot. This is the name of the hook class.
-							$psa_hook_class_name = str_replace(strstr($file, '.'), '', $file);
-							$all_hook_types[$psa_hook_class_name] = $hook_folder_path . '/' . $file;
-						}
-					}
-					closedir($handle);
-				}
-				else{
-					include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-					throw new Psa_File_Exception("Unable to open dir with hooks: $hook_folder_path", 503);
-				}
-			}
-		}
+	function register($additional_autoload_folders = array()){
 
 		$return = array();
 
-		// search for files inside folders specified in $PSA_CFG['folders']['autoload'] array
-		$folders_autoload = $PSA_CFG['folders']['autoload'];
+		// search for files inside folders specified in Cfg()['folders']['autoload'] array
+		$folders_autoload = Cfg()['folders']['autoload'];
 		if($additional_autoload_folders){
 			$folders_autoload = array_merge($folders_autoload, $additional_autoload_folders);
 		}
 		if(is_array($folders_autoload)){
 			foreach ($folders_autoload as $folder_path){
 
-				$this->check_files(PSA_BASE_DIR . "/$folder_path", null, $return);
-			}
-		}
-
-		// search for hooks inside folders specified in $PSA_CFG['folders']['hook_autoload'] array
-		if(isset($PSA_CFG['folders']['hook_autoload']))
-			$folders_hook_autoload = $PSA_CFG['folders']['hook_autoload'];
-		else
-			$folders_hook_autoload = array();
-		if($additional_hook_autoload_folders){
-			$folders_hook_autoload = array_merge($folders_hook_autoload, $additional_hook_autoload_folders);
-		}
-		if(is_array($folders_hook_autoload) && $all_hook_types){
-			foreach ($folders_hook_autoload as $folder_path){
-				$this->check_files(PSA_BASE_DIR . "/$folder_path", $all_hook_types, $return);
+				$this->check_files(PSA_BASE_DIR . "/$folder_path", $return);
 			}
 		}
 
 		if(!isset($return['class_paths']))
 			$return['class_paths'] = array();
-
-		// put also hooks into return array which will be used for class autoloading
-		if($all_hook_types){
-			$return['class_paths'] = array_merge($return['class_paths'], $all_hook_types);
-		}
 
 		return $this->files_data = $return;
 	}
@@ -231,11 +175,9 @@ class Psa_Files extends Psa_Singleton{
 	 * @return int 1-sucess, 0-if cannot open <kbd>$dir</kbd>
 	 * @ignore
 	 */
-	protected function check_files($dir, $all_hook_types = null, &$return, $recursion = false, $recursion_depth = 0){
+	protected function check_files($dir, &$return, $recursion = false, $recursion_depth = 0){
 
 		static $files = array();
-
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
 
 		if(!file_exists($dir) or !$handle = opendir($dir)){
 			include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
@@ -257,7 +199,7 @@ class Psa_Files extends Psa_Singleton{
 
 				if($recursion && is_dir($filepath)){
 					// call self for this directory
-					$this->check_files($filepath, $all_hook_types, $return, $recursion, $recursion_depth + 1);
+					$this->check_files($filepath, $return, $recursion, $recursion_depth + 1);
 				}
 				// foreach file
 				else{
@@ -271,7 +213,12 @@ class Psa_Files extends Psa_Singleton{
 						else
 							$file_basename = basename($file, '.php');
 
+						// file full path
 						$filepath =  realpath($filepath);
+						
+						// get data from @asFunction tags
+						$this->get_asFunction_tags($filepath, $files);
+						
 						
 						// check if file is registered allready
 						if(isset($files['class_paths'][$file_basename])){
@@ -279,84 +226,26 @@ class Psa_Files extends Psa_Singleton{
 							continue 1;
 						}
 
+						// save class path
 						$files['class_paths'][$file_basename] = $filepath;
 						
-						// .php file content
-						$file_content = file_get_contents($filepath);
-											
-						// if there is @getFunction tag
-						if(strpos($file_content, '@getFunction') !== false){
-							
-							// find all @getFunction tags in phpdoc or // comments
-							preg_match_all('/(\*|\/\/) +@getFunction +(.*?)\n/', $file_content, $getfunction_comments);
-							
-							if(isset($getfunction_comments[2])){
-								foreach ($getfunction_comments[2] as $doc_tag) {
-									$params = explode(' ', $doc_tag);
-									
-									$function_name = trim($params[0]);
-									
-									//if(isset($files['@getFunction'][$function_name]))
-									//	trigger_error("Replaceing @getFunction $function_name from {$files['@getFunction'][$function_name]['tag_file']}", E_USER_NOTICE);
-									
-									$files['@getFunction'][$function_name] = array(
-											'function' => $function_name,
-											'target' => trim($params[1]),
-											'template' => trim($params[2]),
-											'tag_file' => $filepath,
-									);
-								}
-							}
-						}
+
+						
 						
 			
 							
-						
 						/*
-						// read file line by line
-						$fh = fopen($filepath, 'r');
-						while(!feof($fh)){
-							$line = fgets($fh);
-							
-							// find @asFunction tags
-							if(strpos($line, '@asFunction') !== false){
-								echo $line;
-							}
-							
-						}
-						fclose($fh);
-						*/
-						;
-						/*
-						// check for hooks
-						if($all_hook_types){
-
-							// Entire file content.
-							// I guess you won't have large .php files to consume all memory limited by memory_limit php.ini directive
-							$file_content = file_get_contents($filepath);
-
-							// skip files that contains 'PSA_SKIP_FILE_REGISTER' text anywhere
-							if(!(strpos($file_content,'PSA_SKIP_FILE_REGISTER') === false))
-								continue;
-
-
-							foreach ($all_hook_types as $hook_class_name => $hook_file_path){
-
-								// match class name that extends hook class
-								if(preg_match_all('/class +([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*).*? extends +' . $hook_class_name . '/', $file_content, $matches)){
-
-									foreach ($matches[1] as $hook_name) {
-										$files['hooks'][$hook_class_name][$hook_name] = realpath($filepath);
-										$files['class_paths'][$hook_name] = realpath($filepath);
-									}
-								}
-							}
-						}
-						// register all files
-						else{
-							$files['class_paths'][$file_basename] = realpath($filepath);
-						}
-						*/
+						 @asFunction PSA_CFG psa_get_config() propSelector
+						 @return asdasdasd
+						 @asFunction Message MessageCoo getInstance ret:\asdasd\UserObject 
+						 @asFunction Logger from>\aass\asasa\Class  getInstance ret:\asdasd\UserObject
+						 * 
+						 @asFunction Cfg \sadsd\asddsa\sads() propSelector
+						 @asFunction Reg \sadsd\asddsa\sads propSelector
+						 * 
+						 @asFunction Cfg \sadsd\asddsa\sads() getInstance
+						 @asFunction Reg \sadsd\asddsa\sads getInstance
+						 */
 					}
 				}
 			}
@@ -392,67 +281,110 @@ class Psa_Files extends Psa_Singleton{
 			$files_data = $this->register();
 		
 		$this->write_autoload_file($files_data);
-		$this->write_getfunction_file($files_data['@getFunction']);
+		$this->write_asFunction_file($files_data['@asFunction']);
+	}
+	
+	
+	protected function get_asFunction_tags($filepath, &$files){
+	
+		// .php file content
+		$source = file_get_contents($filepath);
+		
+		$return = array();
+		
+		// if there is @asFunction tag
+		if(strpos($source, '@asFunction') !== false){
+				
+			// find all @asFunction tags in phpdoc or // comments
+			preg_match_all('/(\*|\/\/) +@asFunction +(.*?)\n/', $source, $asFunction_comments);
+				
+			if(isset($asFunction_comments[2])){
+				foreach ($asFunction_comments[2] as $doc_tag) {
+						
+					$params = explode(' ', trim(preg_replace('/\s+/', ' ', $doc_tag)));
+					
+					// invalid asFunction comment
+					if(count($params) < 3){
+						trigger_error("Invalid @asFunction tag $doc_tag in $filepath", E_USER_NOTICE);
+						continue;
+					}
+					
+					$function_name = trim($params[0]);
+					$target = trim($params[1]);
+					
+					if(substr($target, -2) == '()'){
+						$target = substr($target, 0, -2);
+						$target_is_function = 1;
+					}
+					else
+						$target_is_function = 0;
+
+					//if(isset($files['@asFunction'][$function_name]))
+					//	trigger_error("Replaceing @asFunction $function_name from {$files['@asFunction'][$function_name]['tag_file']}", E_USER_NOTICE);
+						
+					$files['@asFunction'][$function_name] = array(
+							'function' => $function_name,
+							'target' => $target,
+							'target_is_function' => $target_is_function,
+							'template' => trim($params[2]),
+							'tag_file' => $filepath,
+							'params' => array_slice($params, 3),
+					);
+				}
+			}
+		}
 	}
 	
 	
 	protected function write_autoload_file($files_data){
 		
-		// config array
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-		
 		$file_content = $this->autoload_file_content($files_data);
 		
 		// save file
-		if(file_put_contents($PSA_CFG['autoload_data_file'], $file_content))
+		if(file_put_contents(Cfg()['autoload_data_file'], $file_content))
 			return $file_content;
 		
 		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception('Error saving data about registered files to ' . $PSA_CFG['autoload_data_file'], 504);
+		throw new Psa_File_Exception('Error saving data about registered files to ' . Cfg()['autoload_data_file'], 504);
 		
 	}
 	
 	
-	protected function write_getfunction_file($data){
-	
-		// config array
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
+	protected function write_asFunction_file($data){
 		
-		$file_content = $this->getfunctions_file_content($data);
+		$file_content = $this->asfunctions_file_content($data);
 		
 		// save file
-		if(file_put_contents($PSA_CFG['@getFunction_file'], $file_content))
+		if(file_put_contents(Cfg()['@asFunction_file'], $file_content))
 			return $file_content;
 		
 		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception('Error saving @getFunction file to ' . $PSA_CFG['@getFunction_file'], 506);
+		throw new Psa_File_Exception('Error saving @asFunction file to ' . Cfg()['@asFunction_file'], 506);
 		
 	}
 	
 	
-	protected function getfunctions_file_content($data){
-	
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
+	protected function asfunctions_file_content($data){
 		
 		include_once PSA_BASE_DIR . '/lib/Psa_Dully.php';
 		
-		$templates_dir =  PSA_BASE_DIR . '/' . $PSA_CFG['folders']['@getFunction']['template_dir'];
+		$templates_dir =  PSA_BASE_DIR . '/' . Cfg()['folders']['@asFunction']['template_dir'];
 		
 		$dully = new Psa_Dully($templates_dir);
 		
 		$content = "<?php\n";
 		
-		foreach ($data as $getFunction) {
+		foreach ($data as $asFunction) {
 			
-			$template_file = $getFunction['template'] . '.php';
+			$template_file = $asFunction['template'] . '.php';
 			
 			if(file_exists($templates_dir . '/' . $template_file)){
-				$dully->assign('gf', $getFunction);
+				$dully->assign('gf', $asFunction);
 				$content .= $dully->fetch($template_file);
 			}
 			else{
 				include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-				throw new Psa_File_Exception('Template file for @getFunction $template_file doesn\'t exists', 507);
+				throw new Psa_File_Exception("Template file for @asFunction $template_file doesn't exists", 507);
 			}
 		}
 	

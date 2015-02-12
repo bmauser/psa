@@ -88,7 +88,7 @@ $PSA_CFG['autoload_data_file'] = PSA_BASE_DIR . '/wri/autoload_data.php';
 /**
  * File with data about registered files for autoloading (full filesystem path).
  */
-$PSA_CFG['@getFunction_file'] = PSA_BASE_DIR . '/wri/getfunctions.php';
+$PSA_CFG['@asFunction_file'] = PSA_BASE_DIR . '/wri/asfunctions.php';
 
 
 /**
@@ -112,25 +112,6 @@ $PSA_CFG['folders']['autoload'][] = 'lib/exceptions'; // psa/exceptions/
 
 
 /**
- * Hook definition classes location.
- * Folders in $PSA_CFG['folders']['hook_def'] array will be checked for classes that define hooks.
- * You can add more locations by adding elements to this array.
- * Paths in this array must be relative to PSA_BASE_DIR folder.
- */
-//$PSA_CFG['folders']['hook_def'][] = 'hooks_def';
-
-
-/**
- * Hooks locations.
- * Folders in $PSA_CFG['folders']['hook_autoload'] array will be checked (non recursively) for files
- * that extends hook classes.
- * You can add more locations by adding elements to this array.
- * Paths in this array must be relative to PSA_BASE_DIR folder.
- */
-//$PSA_CFG['folders']['hook_autoload'][] = '../hooks';
-
-
-/**
  * Folders for Smarty templates. Relative from PSA_BASE_DIR folder. See http://smarty.php.net/ for details.
  */
 $PSA_CFG['folders']['smarty']['cache_dir']    = '../templates/smarty/cache';       // must be writable to web server
@@ -148,7 +129,7 @@ $PSA_CFG['folders']['smarty']['template_dir'] = '../templates';
 /**
  * Folders for @getFunction phpdoc tag templates. Relative from PSA_BASE_DIR folder.
  */
-$PSA_CFG['folders']['@getFunction']['template_dir'] = 'lib/tpl';
+$PSA_CFG['folders']['@asFunction']['template_dir'] = 'lib/tpl';
 
 
 /**

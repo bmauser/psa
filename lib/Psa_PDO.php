@@ -259,8 +259,6 @@ class Psa_PDO{
 		// if connected to the database
 		if(!$this->pdo){
 
-			$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
 			// if connection parameters are passed as method arguments
 			if($dsn){
 				$this->dsn = $dsn;
@@ -271,11 +269,11 @@ class Psa_PDO{
 
 			// if connection parameters are not set as object properties use default
 			else if(!$this->dsn){
-				$this->dsn = $PSA_CFG['pdo']['dsn'];
-				$this->username = $PSA_CFG['pdo']['username'];
-				$this->password = $PSA_CFG['pdo']['password'];
-				if(isset($PSA_CFG['pdo']['driver_options']))
-					$this->driver_options = $PSA_CFG['pdo']['driver_options'];
+				$this->dsn = Cfg()['pdo']['dsn'];
+				$this->username = Cfg()['pdo']['username'];
+				$this->password = Cfg()['pdo']['password'];
+				if(isset(Cfg()['pdo']['driver_options']))
+					$this->driver_options = Cfg()['pdo']['driver_options'];
 			}
 
 			// Connect to database server
@@ -298,7 +296,7 @@ class Psa_PDO{
 				$message = "Unable to connect to database. $msg1 " . $e->getMessage();
 
 				// log message cannot be written into the database if there is problem with database connection
-				if($PSA_CFG['logging']['storage']['psa_default']['type'] == 'database')
+				if(Cfg()['logging']['storage']['psa_default']['type'] == 'database')
 					throw new Psa_Db_Exception($message, $e->getCode(), false);
 				else
 					throw new Psa_Db_Exception($message, $e->getCode());

@@ -82,8 +82,8 @@ class Psa_Exception extends Exception{
 	protected function log($log_message){
 
 		// if logging is enabled
-		if(Psa_Registry::get_instance()->PSA_CFG['logging']['max_log_level'] >= 1){
-			// parameters for Psa_Logger::log() method
+		if(Cfg()['logging']['max_log_level'] >= 1){
+			
 			if(is_array($log_message)){
 				$log_data = &$log_message;
 			}
@@ -99,7 +99,7 @@ class Psa_Exception extends Exception{
 			if(!@$log_data['type'])
 				$log_data['type'] = get_class($this);
 
-			Psa_Logger::get_instance()->log($log_data);
+			Logger()->log($log_data);
 		}
 	}
 }

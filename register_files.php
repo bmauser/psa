@@ -20,7 +20,6 @@
  * @package PSA
  * @see Psa_Files::register()
  * @see Psa_Files::save()
- * @see psa_run_hooks()
  * @version $Id: register_files.php 142 2013-09-26 17:10:52Z bmauser $
  */
 

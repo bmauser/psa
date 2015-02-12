@@ -35,47 +35,16 @@
  * Logs are by default written to database into <i>psa_log</i> table, but can be also
  * written to a file depending on the settings in {@link config.php} file.
  *
- * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern singleton pattern}
- * to ensure that there is only one instance of the {@link Psa_Logger} object and
- * to allow that this single instance is easily accessible from any scope.
- * You cannot not make an instance of {@link Psa_Logger} object with the <kbd>new</kbd> operator,
- * call static method {@link get_instance()} instead.
- *
- * <br><b>Examples:</b>
+ * <br><b>Example:</b>
  *
  * <br><b>1)</b> Log a single message.
  * <code>
- * Psa_Logger::get_instance()->log("Log message");
+ * Logger()->log("Log message");
  * </code>
- *
- * <br><b>2)</b> If you want to extend this class you can write your child class like this:
- * <code>
- * <?php
- * class My_Logger extends Psa_Logger
- * {
- *    // returns My_Logger instance
- *    public static function get_instance()
- *    {
- *       return parent::get_instance(__CLASS__);
- *    }
- *
- *    // your method for database query
- *    function format_database_log_query($log_storage){
- *    		//...
- *    }
- *
- *    // your method for parameters for prepared query
- *    function format_database_log_query_params($log_data){
- *    		//...
- *    }
- * }
- *
- * // call log method
- * My_Logger::get_instance()->log("log message");
- * ?>
- * </code>
+ * 
+ * @asFunction Logger Psa_Logger getInstance
  */
-class Psa_Logger extends Psa_Singleton{
+class Psa_Logger{
 
 	/**
 	 * Prepared query.
@@ -93,28 +62,6 @@ class Psa_Logger extends Psa_Singleton{
 	 * @ignore
 	 */
 	protected $database = null;
-
-
-	/**
-	 * Returns the instance of the {@link Psa_Logger} object.
-	 *
-	 * You should statically call this method with the scope resolution operator (::) which gives you
-	 * the access to the logging object from anywhere in your application, whether it is from a function,
-	 * a method, or the global scope.
-	 * Example:
-	 * <code>
-	 * Psa_Logger::get_instance()->log("Log message");
-	 * </code>
-	 *
-	 * @return Psa_Logger
-	 */
-	public static function get_instance($class = null){
-		// this is needed that this class can be extended
-		if($class)
-			return parent::get_instance($class);
-		else
-			return parent::get_instance(__CLASS__);
-	}
 
 
 	/**
@@ -153,7 +100,7 @@ class Psa_Logger extends Psa_Singleton{
 	 * $log_data['type']     = 'some_type';
 	 *
 	 * // write log
-	 * Psa_Logger::get_instance()->log($log_data);
+	 * Logger()->log($log_data);
 	 *
 	 * ?>
 	 * </code>
@@ -169,9 +116,6 @@ class Psa_Logger extends Psa_Singleton{
 	 * @see config.php
 	 */
 	public function log($log_data, $log_storage = 'psa_default'){
-
-		// config array
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
 
 		// if $log_data is not array
 		if(!is_array($log_data)){
@@ -198,17 +142,17 @@ class Psa_Logger extends Psa_Singleton{
 
 
 		// if logging is enabled
-		if($PSA_CFG['logging']['max_log_level'] >= $log_data['level']){
+		if(Cfg()['logging']['max_log_level'] >= $log_data['level']){
 
 			// write log to file
-			if($PSA_CFG['logging']['storage'][$log_storage]['type'] == 'file'){
+			if(Cfg()['logging']['storage'][$log_storage]['type'] == 'file'){
 
 				// format log message
 				$message = $this->format_file_log($log_data);
 
 				// open log file
-				if (!$handle = fopen($PSA_CFG['logging']['storage'][$log_storage]['target'], 'a')){
-					trigger_error("Cannot open log file: {$PSA_CFG['logging']['storage'][$log_storage]['target']}");
+				if (!$handle = fopen(Cfg()['logging']['storage'][$log_storage]['target'], 'a')){
+					trigger_error('Cannot open log file: ' . Cfg()['logging']['storage'][$log_storage]['target']);
 					return 0;
 				}
 
@@ -216,7 +160,7 @@ class Psa_Logger extends Psa_Singleton{
 				else{
 					// if error writing to file
 					if (!fwrite($handle, $message)){
-						trigger_error("Cannot write to log file: {$PSA_CFG['logging']['storage'][$log_storage]['target']}");
+						trigger_error('Cannot write to log file: ' . Cfg()['logging']['storage'][$log_storage]['target']);
 						fclose($handle);
 						return 0;
 					}
@@ -227,12 +171,12 @@ class Psa_Logger extends Psa_Singleton{
 				}
 			}
 			// write log to database
-			else if($PSA_CFG['logging']['storage'][$log_storage]['type'] == 'database'){
+			else if(Cfg()['logging']['storage'][$log_storage]['type'] == 'database'){
 
 				if(!($this->database instanceof Psa_PDO)){
 
 					// should new database connection be opened
-					if(@$PSA_CFG['logging']['new_database_connection']){
+					if(@Cfg()['logging']['new_database_connection']){
 						$psa_registry = Psa_Registry::get_instance();
 						if(!(@$psa_registry->psa_log_database_connection instanceof Psa_PDO)){
 							$psa_registry->psa_log_database_connection = new Psa_PDO();
@@ -256,10 +200,10 @@ class Psa_Logger extends Psa_Singleton{
 				}
 				catch(PDOException $e){
 
-					$message = "Unable to write log message to database table '{$PSA_CFG['logging']['storage'][$log_storage]['target']}' " . $e->getMessage();
+					$message = 'Unable to write log message to database table ' . Cfg()['logging']['storage'][$log_storage]['target'] . ' ' . $e->getMessage();
 
 					// log message cannot be written into the database if there is problem with database connection
-					if($PSA_CFG['logging']['storage']['psa_default']['type'] == 'database'){
+					if(Cfg()['logging']['storage']['psa_default']['type'] == 'database'){
 						trigger_error($message);
 						throw new Psa_Logger_Exception($message, $e->getCode(), false);
 					}
@@ -291,7 +235,7 @@ class Psa_Logger extends Psa_Singleton{
 	protected function format_database_log_query($log_storage){
 
 		// log query. Should be formated for prepared query.
-		return "INSERT INTO " . Psa_Registry::get_instance()->PSA_CFG['logging']['storage'][$log_storage]['target'] . " (client_ip, log_time, request_uri, user_agent, referer, type, username, user_id, message, function, group_id, groupname) VALUES (?,NOW(),?,?,?,?,?,?,?,?,?,?)";
+		return "INSERT INTO " . Cfg()['logging']['storage'][$log_storage]['target'] . " (client_ip, log_time, request_uri, user_agent, referer, type, username, user_id, message, function, group_id, groupname) VALUES (?,NOW(),?,?,?,?,?,?,?,?,?,?)";
 	}
 
 
@@ -334,17 +278,14 @@ class Psa_Logger extends Psa_Singleton{
 	 */
 	protected function format_file_log($log_data){
 
-		// config array
-		$PSA_CFG = Psa_Registry::get_instance()->PSA_CFG;
-
 		// format log message
-		if(@$PSA_CFG['logging']['more_lines']){
+		if(@Cfg()['logging']['more_lines']){
 			$new_line = "\r\n";
-			$message = "\r\n" . '[' . date($PSA_CFG['logging']['time_format']) . "] " . $new_line . '=====================' . $new_line;
+			$message = "\r\n" . '[' . date(Cfg()['logging']['time_format']) . "] " . $new_line . '=====================' . $new_line;
 		}
 		else{
 			$new_line = '';
-			$message = '[' . date($PSA_CFG['logging']['time_format']) . "] " . $new_line;
+			$message = '[' . date(Cfg()['logging']['time_format']) . "] " . $new_line;
 		}
 
 		if(@$log_data['message'])

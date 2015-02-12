@@ -40,6 +40,10 @@
 define('PSA_BASE_DIR', dirname(__FILE__));
 
 
+
+
+
+
 // include PSA config file
 include PSA_BASE_DIR . '/config.php';
 
@@ -55,6 +59,7 @@ else{
 
 
 // include required files
+//include PSA_BASE_DIR . '/wri/asfunctions.php';
 include PSA_BASE_DIR . '/lib/functions.php';
 include PSA_BASE_DIR . '/lib/Psa_Singleton.php';
 include PSA_BASE_DIR . '/lib/Psa_PDO.php';
