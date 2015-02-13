@@ -54,7 +54,7 @@
  * <var>new</var> operator.
  *
  * @see register_files.php
- *
+ * @asFunction Files Psa_Files getInstance
  */
 class Psa_Files {
 
@@ -224,7 +224,7 @@ class Psa_Files {
 						 @asFunction Logger from>\aass\asasa\Class  getInstance ret:\asdasd\UserObject
 						 * 
 						 @asFunction Cfg \sadsd\asddsa\sads() propSelector
-						 @asFunction Reg \sadsd\asddsa\sads propSelector
+						 @asFunction Reg \sadsd\asddsa\sads[] propSelector
 						 * 
 						 @asFunction Cfg \sadsd\asddsa\sads() getInstance
 						 @asFunction Reg \sadsd\asddsa\sads getInstance
@@ -295,12 +295,18 @@ class Psa_Files {
 					$function_name = trim($params[0]);
 					$target = trim($params[1]);
 					
-					if(substr($target, -2) == '()'){
+					$target_type = 'class';
+					
+					if(substr($target, -2) == '()')
+						$target_type = 'function';
+					else if(substr($target, -2) == '[]')
+						$target_type = 'array';
+					else if(substr_count($target, '$'))
+						$target_type = 'object';
+					
+					// remove () or []
+					if($target_type == 'function' or $target_type == 'array')
 						$target = substr($target, 0, -2);
-						$target_is_function = 1;
-					}
-					else
-						$target_is_function = 0;
 
 					//if(isset($files['@asFunction'][$function_name]))
 					//	trigger_error("Replaceing @asFunction $function_name from {$files['@asFunction'][$function_name]['tag_file']}", E_USER_NOTICE);
@@ -308,7 +314,7 @@ class Psa_Files {
 					$files['@asFunction'][$function_name] = array(
 							'function' => $function_name,
 							'target' => $target,
-							'target_is_function' => $target_is_function,
+							'target_type' => $target_type,
 							'template' => trim($params[2]),
 							'tag_file' => $filepath,
 							'params' => array_slice($params, 3),

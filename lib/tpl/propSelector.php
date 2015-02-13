@@ -7,8 +7,17 @@
  */
 function &<?php echo $gf['function'] ?>($selector = null){
 	
-	if(!$selector)
-		return <?php echo $gf['target'] ?><?php if($gf['target_is_function']){ ?>()<?php } ?>;
+	static $obj = null;
 	
-	return psa_get_set_property_by_selector(<?php echo $gf['target'] ?><?php if($gf['target_is_function']){ ?>()<?php } ?>, $selector);	
+	if($obj === null){
+		<?php if($gf['target_type'] == 'function'){ ?>$obj = <?php echo $gf['target'] ?>();
+		<?php } elseif($gf['target_type'] == 'array'){ ?>$obj = &<?php echo $gf['target'] ?>;
+		<?php } elseif($gf['target_type'] == 'object'){ ?>$obj = <?php echo $gf['target'] ?>;
+		<?php } else { ?>$obj = new <?php echo $gf['target'] ?>();<?php } ?>
+	}
+	
+	if(!$selector)
+		return $obj;
+	
+	return psa_get_set_property_by_selector($obj, $selector);	
 }

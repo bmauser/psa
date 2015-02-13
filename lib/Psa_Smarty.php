@@ -45,6 +45,7 @@ include_once PSA_BASE_DIR . '/lib/smarty/libs/Smarty.class.php';
  *
  * @see Psa_Dully
  * @see Psa_Smarty_View
+ * @asFunction Smarty Psa_Smarty getInstance
  */
 class Psa_Smarty extends Smarty{
 
@@ -59,7 +60,7 @@ class Psa_Smarty extends Smarty{
 		$this->config_dir   = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['config_dir'];
 		$this->compile_dir  = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['compile_dir'];
 		if(!$template_dir)
-			$template_dir = Cfg()['folders']['smarty']['template_dir'];
+			$template_dir = Cfg()['folders']['template_dir'];
 		$this->template_dir = PSA_BASE_DIR . '/' . $template_dir;
 
 		$this->use_sub_dirs = true;
@@ -71,6 +72,9 @@ class Psa_Smarty extends Smarty{
 		if(Cfg()['develop_mode']){
 			$this->force_compile = true;
 		}
+		
+		// assign result object to 
+		$this->assign('r', Res());
 	}
 }
 

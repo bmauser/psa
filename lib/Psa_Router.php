@@ -46,8 +46,8 @@
  *     // you have to define psa_main() method in your child class
  *     function psa_main(){
  *
- *         // put basedir_web into psa_result object to be available in all templates
- *         $this->psa_result->basedir_web = Reg()->basedir_web;
+ *         // put basedir_web into Result object to be available in all templates
+ *         Res()->basedir_web = Reg()->basedir_web;
  *
  *         // start session
  *         session_start();
@@ -70,6 +70,8 @@
  * your <i>Main</i> class to extend <i>Psa_Router</i> class. <i>Main</i> class should be defined in the Main.php file, which is placed
  * in the first autoload directory (set by <var>$PSA_CFG['folders']['autoload']</var> in {@link config.php}). Use Main.php file as bootstrap
  * file for your application.
+ * 
+ * @asFunction Router Psa_Router getInstance
  */
 class Psa_Router {
 

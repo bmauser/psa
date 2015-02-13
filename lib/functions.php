@@ -378,42 +378,6 @@ function psa_get_instance($class_name, $instance_name = null, array $constructor
 }
 
 
-
-
-/**
- * @asFunction Cfg psa_get_config() propSelector
- * 
- * @return Array
- */
-function &psa_get_config(){
-	
-	static $PSA_CFG = null;
-	
-	if($PSA_CFG === null){
-		include PSA_BASE_DIR . '/config.php';
-	}
-	
-	return $PSA_CFG;
-}
-
-
-/**
- * @asFunction Cfg psa_get_config() propSelector
- *
- * @return Array
- */
-function &psa_get_reg(){
-
-	static $reg = null;
-
-	if($reg === null){
-		$reg = new Psa_Registry();
-	}
-
-	return $reg;
-}
-
-
 /**
  *
  * @param unknown_type $selector

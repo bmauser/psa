@@ -114,16 +114,10 @@ $PSA_CFG['folders']['autoload'][] = 'lib/exceptions'; // psa/exceptions/
 /**
  * Folders for Smarty templates. Relative from PSA_BASE_DIR folder. See http://smarty.php.net/ for details.
  */
+$PSA_CFG['folders']['template_dir'] = '../templates';
 $PSA_CFG['folders']['smarty']['cache_dir']    = '../templates/smarty/cache';       // must be writable to web server
 $PSA_CFG['folders']['smarty']['config_dir']   = '../templates/smarty/configs';
 $PSA_CFG['folders']['smarty']['compile_dir']  = '../templates/smarty/templates_c'; // must be writable to web server
-$PSA_CFG['folders']['smarty']['template_dir'] = '../templates';
-
-
-/**
- * Folder for Dully templates. Uncomment if you use Psa_Dully class
- */
-// $PSA_CFG['folders']['dully']['template_dir'] = '../templates';
 
 
 /**

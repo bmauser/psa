@@ -202,7 +202,7 @@
  * }
  * </code>
  *
- *
+ * @asFunction Validator Psa_Validator getInstance
  */
 class Psa_Validator{
 

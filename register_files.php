@@ -39,6 +39,7 @@ define('PSA_BASE_DIR', dirname(__FILE__));
 
 
 // include required files
+include PSA_BASE_DIR . '/lib/Psa.php';
 include PSA_BASE_DIR . '/config.php';
 include PSA_BASE_DIR . '/lib/Psa_Files.php';
 include PSA_BASE_DIR . '/lib/Psa_Registry.php';

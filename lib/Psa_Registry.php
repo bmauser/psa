@@ -52,21 +52,6 @@ class Psa_Registry {
 
 
 	/**
-	 * PSA configuration array.
-	 * @var array
-	 */
-	public $PSA_CFG;
-
-
-	/**
-	 * Application configuration array.
-	 *
-	 * @var array
-	 */
-	public $CFG;
-
-
-	/**
 	 * Application folder from web root folder.
 	 *
 	 * @var string
@@ -80,23 +65,5 @@ class Psa_Registry {
 	 * @var string
 	 */
 	public $base_url;
-
-
-	/**
-	 * Reference to Smarty template engine object.
-	 *
-	 * This instance is used by classes that extend {@link Psa_Smarty_View} class.
-	 * @var Psa_Smarty
-	 */
-	public $psa_smarty = null;
-
-
-	/**
-	 * Reference to Dully template engine object.
-	 *
-	 * This instance is used by classes that extend {@link Psa_Dully_View} class.
-	 * @var Psa_Dully
-	 */
-	public $psa_dully = null;
 
 }

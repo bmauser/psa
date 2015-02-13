@@ -151,6 +151,7 @@
  *
  * @see Psa_Dully_View
  * @see Psa_Smarty
+ * @asFunction Dully Psa_Dully getInstance
  */
 class Psa_Dully{
 
@@ -235,5 +236,6 @@ class Psa_Dully{
 	function display($template_file){
 		echo $this->fetch($template_file);
 	}
+	
 }
 
