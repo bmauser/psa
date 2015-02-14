@@ -1,6 +1,15 @@
 <?php
+/**
+ * @package PSA
+ */
 
 
+// @asFunction Session $_SESSION[] propSelector
+/**
+ * 
+ * @todo
+ *
+ */
 class Psa{
 
 	

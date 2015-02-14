@@ -1,31 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA
- * @version $Id: Psa_User.php 150 2013-10-24 16:32:54Z bmauser $
  */
 
 
@@ -86,7 +61,7 @@
  * $user->add_group(array(3,5,7));
  * </code>
  */
-class Psa_User extends Psa_Active_Record{
+class Psa_User extends ActiveRecord{
 
 
 	/**
@@ -155,7 +130,7 @@ class Psa_User extends Psa_Active_Record{
 		else{
 
 			// is int
-			if(psa_is_int($user_id_or_username)){
+			if(isInt($user_id_or_username)){
 				$this->id = (int) $user_id_or_username;
 				parent::__construct('psa_user', 'id', $this->id, $table_columns, 'psa_user_id_seq');
 			}
@@ -231,7 +206,7 @@ class Psa_User extends Psa_Active_Record{
 
 				$sql = 'SELECT <COLUMNS> FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE username=? AND password=?';
 				$q_params = array($this->username, $this->password);
-				return $this->restore_from_database(array(), $sql, $q_params);
+				return $this->restoreFromDatabase(array(), $sql, $q_params);
 			}
 			else if($this->id or $this->username){
 
@@ -240,11 +215,11 @@ class Psa_User extends Psa_Active_Record{
 						return $this->restore_from_session();
 					}
 					catch (Psa_Active_Record_Exception $e){
-						return $this->restore_from_database();
+						return $this->restoreFromDatabase();
 					}
 				}
 				else
-					return $this->restore_from_database();
+					return $this->restoreFromDatabase();
 			}
 			else
 				throw new Psa_User_Exception('Cannot restore user data. User id or username not set', 204);
@@ -285,13 +260,13 @@ class Psa_User extends Psa_Active_Record{
 			// hash new password
 			$this->password = $this->password_hash($this->password);
 
-			parent::save_to_database($only_columns, array('password'));
+			parent::saveToDatabase($only_columns, array('password'));
 
 			// write log
 			$this->log('New user created', __METHOD__, 2);
 		}
 		else{
-			parent::save_to_database($only_columns);
+			parent::saveToDatabase($only_columns);
 		}
 
 		return $this->id;
@@ -411,7 +386,7 @@ class Psa_User extends Psa_Active_Record{
 			Db()->execute($q_params, $sql);
 
 			// if no rows affected user already wasn't or was in the group depending on $action
-			if(Db()->affected_rows() <= 0)
+			if(Db()->affectedRows() <= 0)
 				$failed = 1;
 			else
 				$success = 1;
@@ -512,7 +487,7 @@ class Psa_User extends Psa_Active_Record{
 
 		Db()->execute($q_params, $sql);
 
-		$row = Db()->fetch_row();
+		$row = Db()->fetchRow();
 
 		if($row['id'])
 			return 1;
@@ -598,7 +573,7 @@ class Psa_User extends Psa_Active_Record{
 		$groups = array();
 
 		// for each fetched row
-		while($row = Db()->fetch_row()){
+		while($row = Db()->fetchRow()){
 			$groups[$row['group_id']] = $row['name'];
 		}
 
@@ -647,10 +622,10 @@ class Psa_User extends Psa_Active_Record{
 		}
 
 		if($this->id)
-			$_SESSION['psa_current_user_data']['id'] = $this->id;
+			Session()['psa_current_user_data']['id'] = $this->id;
 
 		if($this->username)
-			$_SESSION['psa_current_user_data']['username'] = $this->username;
+			Session()['psa_current_user_data']['username'] = $this->username;
 
 		$this->save_to_session();
 

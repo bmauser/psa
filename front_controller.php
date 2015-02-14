@@ -6,34 +6,12 @@
  * will go through this script. It includes main PSA files, instances some objects and
  * calls psa_main() method of the Main class.
  *
- *
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA
- * @version $Id: front_controller.php 171 2013-12-11 17:43:52Z bmauser $
  */
+
+
+
+
 
 
 // PSA main directory
@@ -62,7 +40,7 @@ else{
 include PSA_BASE_DIR . '/wri/asfunctions.php';
 include PSA_BASE_DIR . '/lib/functions.php';
 include PSA_BASE_DIR . '/lib/Psa_Singleton.php';
-include PSA_BASE_DIR . '/lib/Psa_PDO.php';
+include PSA_BASE_DIR . '/lib/Db.php';
 include PSA_BASE_DIR . '/lib/Psa_Logger.php';
 include PSA_BASE_DIR . '/lib/Psa_Files.php';
 include PSA_BASE_DIR . '/lib/Psa_Registry.php';
@@ -79,8 +57,8 @@ if($PSA_CFG['develop_mode'] && $PSA_CFG['develop_mode_register_files']){
 }
 
 
-// register psa_autoload() function as __autoload() implementation
-spl_autoload_register('psa_autoload');
+// register autoloader() function as __autoload() implementation
+spl_autoload_register('autoloader');
 
 
 

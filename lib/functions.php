@@ -1,47 +1,22 @@
 <?php
 /**
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA
- * @version $Id: functions.php 142 2013-09-26 17:10:52Z bmauser $
  */
 
 
 /**
  * Deletes a user or a group. Removes all data about the user or group from the database.
- * Do not use this function directly. Use psa_delete_group() and psa_delete_user() wrapper functions.
+ * Do not use this function directly. Use deleteGroup() and deleteUser() wrapper functions.
  *
  * @param int|array|string $id id of the user|group or array with user|group ids. 'all' for
  * deleting all users|groups.
  * @param int $user_or_group what to delete. 1-user, 2-group
  * @return int 0 for failure, 1 for success, -1 user|group (or more users|groups) not exists
- * @see psa_delete_group()
- * @see psa_delete_user()
+ * @see deleteGroup()
+ * @see deleteUser()
  * @ignore
  */
-function psa_del_user_group($id, $user_or_group){
+function deleteUserGroup($id, $user_or_group){
 
 	if($id && $user_or_group){;
 		
@@ -54,12 +29,12 @@ function psa_del_user_group($id, $user_or_group){
 
 		// work with users
 		if($user_or_group == 1){
-			$table = Cfg()['database']['table']['user'];
+			$table = Cfg('database.table.user');
 			$name_column = 'username';
 		}
 		// work with groups
 		else if($user_or_group == 2){
-			$table = Cfg()['database']['table']['group'];
+			$table = Cfg('database.table.group');
 			$name_column = 'name';
 		}
 
@@ -70,7 +45,7 @@ function psa_del_user_group($id, $user_or_group){
 			if($id_value == 'all')
 				$sql = "DELETE FROM {$table}";
 			// delete user or groups by id
-			else if(psa_is_int($id_value)){
+			else if(isInt($id_value)){
 				$sql = "DELETE FROM {$table} WHERE id = '$id_value'";
 			}
 			// delete user or groups by name
@@ -82,7 +57,7 @@ function psa_del_user_group($id, $user_or_group){
 			Db()->query($sql);
 
 			// if no rows affected
-			if(Db()->affected_rows() <= 0){
+			if(Db()->affectedRows() <= 0){
 				$failed = 1;
 				$log_data['message']  = 'Unable to delete ' . (($user_or_group == 1) ? 'user' : 'group') . ". Maybe does not exists.";
 			}
@@ -91,19 +66,19 @@ function psa_del_user_group($id, $user_or_group){
 			}
 
 			// logging
-			if(Cfg()['logging']['max_log_level'] >= 2){
+			if(Cfg('logging.max_log_level') >= 2){
 				// parameters for Logger
 				$log_data['function'] = __FUNCTION__;
 				$log_data['level']    = 2;
 
 				if($user_or_group == 1){
-					if(psa_is_int($id_value))
+					if(isInt($id_value))
 						$log_data['user_id'] = $id_value;
 					else
 						$log_data['username'] = $id_value;
 				}
 				else if($user_or_group == 2){
-					if(psa_is_int($id_value))
+					if(isInt($id_value))
 						$log_data['group_id'] = $id_value;
 					else
 						$log_data['groupname'] = $id_value;
@@ -130,21 +105,21 @@ function psa_del_user_group($id, $user_or_group){
  *
  * <code>
  * // delete user with ID 123
- * psa_delete_user(123);
+ * deleteUser(123);
  *
  * // delete user with usename 'my_user'
- * psa_delete_user('my_user');
+ * deleteUser('my_user');
  *
  * // delete more users
- * psa_delete_user(array(1, 3, 5, 'my_user'))
+ * deleteUser(array(1, 3, 5, 'my_user'))
  * </code>
  *
  * @param int|array|string $user ID or username or array with user
  * IDs or usernames. "<kbd>all</kbd>" to delete all users.
  * @return int 0 for failure, 1 for success, -1 if an user (or more users) don't exist
  */
-function psa_delete_user($user){
-	return psa_del_user_group($user, 1);
+function deleteUser($user){
+	return deleteUserGroup($user, 1);
 }
 
 
@@ -155,21 +130,21 @@ function psa_delete_user($user){
  *
  * <code>
  * // delete group with ID 123
- * psa_delete_group(123);
+ * deleteGroup(123);
  *
  * // delete group with name 'my_group'
- * psa_delete_group('my_group');
+ * deleteGroup('my_group');
  *
  * // delete more groups
- * psa_delete_group(array(1, 3, 5, 'my_group'))
+ * deleteGroup(array(1, 3, 5, 'my_group'))
  * </code>
  *
  * @param int|array|string $group ID or group name or array with group IDs or group names.
  * "<kbd>all</kbd>" to delete all groups.
  * @return int 0 for failure, 1 for success, -1 if a group (or more groups) don't exist
  */
-function psa_delete_group($group){
-	return psa_del_user_group($group, 2);
+function deleteGroup($group){
+	return deleteUserGroup($group, 2);
 }
 
 
@@ -186,7 +161,7 @@ function psa_delete_group($group){
  *
  * @see Psa_Files::register()
  */
-function psa_autoload($class_name){
+function autoloader($class_name){
 
 	static $psa_files = null;
 
@@ -251,7 +226,7 @@ function prs($value, $return_only = false){
  * <b>Example:</b>
  *
  * <code>
- * if(psa_is_user_in_group(2, 55))
+ * if(isUserInGroup(2, 55))
  * 	echo 'User with ID 2 is in the group with ID 55';
  * </code>
  *
@@ -259,16 +234,16 @@ function prs($value, $return_only = false){
  * @param int $group group ID
  * @return bool 1 if user is a member of the group, otherwise 0
  */
-function psa_is_user_in_group($user, $group){
+function isUserInGroup($user, $group){
 
 	$user = (int)$user;
 	$group = (int)$group;
 
 	if($user && $group){
 
-		$sql = "SELECT * FROM " . Cfg()['database']['table']['user_in_group'] . " WHERE user_id = '$user' AND group_id = '$group'";
+		$sql = "SELECT * FROM " . Cfg('database.table.user_in_group') . " WHERE user_id = '$user' AND group_id = '$group'";
 
-		$row = Reg()->psa_database->fetch_row($sql);
+		$row = Reg()->psa_database->fetchRow($sql);
 
 		if(isset($row['user_id']) && $row['user_id'])
 			return 1;
@@ -279,37 +254,12 @@ function psa_is_user_in_group($user, $group){
 
 
 /**
- * Adds a given path to the PHP <var>include_path</var> configuration directive.
- *
- * It can be useful when you work with some externals libraries.
- *
- * <b>Example:</b>
- *
- * <code>
- * psa_add_include_path('/usr/share/somefolder');
- * </code>
- *
- * @param string $path path to add to <var>include_path</var>
- * @return string|bool returns the old include_path on success or FALSE on failure.
- * @see http://www.php.net/manual/en/ini.core.php#ini.include-path
- */
-function psa_add_include_path($path){
-
-	if($path){
-		return set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-	}
-
-	return false;
-}
-
-
-/**
  * Checks is the given <var>$value</var> an integer.
  *
  * @return bool
  * @ignore
  */
-function psa_is_int($value){
+function isInt($value){
 
 	if(strval(intval($value)) === (string) $value)
 		return true;
@@ -327,7 +277,7 @@ function psa_is_int($value){
  * @throws Psa_Exception
  * @return Ambigous <unknown, NULL>
  */
-function psa_get_instance($class_name, $instance_name = null, array $constructor_args = null, $is_function = false, $only_first_instance = false){
+function getInstance($class_name, $instance_name = null, array $constructor_args = null, $is_function = false, $only_first_instance = false){
 
 	// instance store
 	static $first_instance = array();
@@ -383,7 +333,7 @@ function psa_get_instance($class_name, $instance_name = null, array $constructor
  * @param unknown_type $selector
  * @return NULL
  */
-function &psa_get_set_property_by_selector(&$object, $selector, $exception_class_name = null, $exception_message = null, $use_cache = true){
+function &getPropertyBySelector(&$object, $selector, $exception_class_name = null, $exception_message = null, $use_cache = true){
 
 	static $cache;
 	

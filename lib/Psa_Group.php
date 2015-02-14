@@ -1,31 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA
- * @version $Id: Psa_Group.php 144 2013-09-30 23:12:52Z bmauser $
  */
 
 /**
@@ -63,14 +38,14 @@
  * $group->save();
  * </code>
  *
- * Because this class extends {@link Psa_Active_Record} you can save data in the database table
+ * Because this class extends {@link ActiveRecord} you can save data in the database table
  * by setting corresponding object member variables and call {@link save()} method. After calling
  * {@link restore()} method, corresponding object member variables will have values fetched from the
  * database.
  *
- * @see Psa_Active_Record
+ * @see ActiveRecord
  */
-class Psa_Group extends Psa_Active_Record{
+class Psa_Group extends ActiveRecord{
 
 	/**
 	 * Group ID.
@@ -117,7 +92,7 @@ class Psa_Group extends Psa_Active_Record{
 		// existing group
 		else{
 			// is int
-			if(psa_is_int($group_id_or_name)){
+			if(isInt($group_id_or_name)){
 				$this->id = (int) $group_id_or_name;
 				parent::__construct('psa_group', 'id', $this->id, $table_columns, 'psa_group_id_seq');
 			}
@@ -154,7 +129,7 @@ class Psa_Group extends Psa_Active_Record{
 		}
 
 		try{
-			return $this->restore_from_database($only_columns);
+			return $this->restoreFromDatabase($only_columns);
 		}
 		catch (Psa_Active_Record_Exception $e){
 			throw new Psa_Group_Exception("Group does not exists. Cannot restore data.", 304);
@@ -177,12 +152,12 @@ class Psa_Group extends Psa_Active_Record{
 
 		if($this->psa_new_record && $this->name){
 
-			$this->save_to_database($only_columns);
+			$this->saveToDatabase($only_columns);
 
 			$log_message = "New group created";
 		}
 		else{
-			$this->save_to_database();
+			$this->saveToDatabase();
 			$log_message = "Group data saved";
 		}
 
@@ -311,7 +286,7 @@ class Psa_Group extends Psa_Active_Record{
 			}
 
 			// if no rows affected user already wasn't or was in the group depending on $action
-			if(Db()->affected_rows() <= 0)
+			if(Db()->affectedRows() <= 0)
 				$failed = 1;
 			else
 				$success = 1;

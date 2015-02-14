@@ -8,32 +8,7 @@
 
 
 /**
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA/more
- * @version $Id: Psa_Files.php 169 2013-12-11 01:26:22Z bmauser $
  */
 
 /**
@@ -85,7 +60,7 @@ class Psa_Files {
 	 */
 	public function set_data() {
 
-		if (include Cfg()['autoload_data_file']) {
+		if (include Cfg('autoload_data_file')) {
 			if(isset($autoload_data)){
 				$this->files_data = $autoload_data;
 				return 1;
@@ -131,7 +106,7 @@ class Psa_Files {
 		$return = array();
 
 		// search for files inside folders specified in Cfg()['folders']['autoload'] array
-		$folders_autoload = Cfg()['folders']['autoload'];
+		$folders_autoload = Cfg('folders.autoload');
 		if($additional_autoload_folders){
 			$folders_autoload = array_merge($folders_autoload, $additional_autoload_folders);
 		}
@@ -330,7 +305,7 @@ class Psa_Files {
 		$file_content = $this->autoload_file_content($files_data);
 		
 		// save file
-		if(file_put_contents(Cfg()['autoload_data_file'], $file_content))
+		if(file_put_contents(Cfg('autoload_data_file'), $file_content))
 			return $file_content;
 		
 		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
@@ -344,7 +319,7 @@ class Psa_Files {
 		$file_content = $this->asfunctions_file_content($data);
 		
 		// save file
-		if(file_put_contents(Cfg()['@asFunction_file'], $file_content))
+		if(file_put_contents(Cfg('@asFunction_file'), $file_content))
 			return $file_content;
 		
 		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
@@ -357,7 +332,7 @@ class Psa_Files {
 		
 		include_once PSA_BASE_DIR . '/lib/Psa_Dully.php';
 		
-		$templates_dir =  PSA_BASE_DIR . '/' . Cfg()['folders']['@asFunction']['template_dir'];
+		$templates_dir =  PSA_BASE_DIR . '/' . Cfg('folders.@asFunction.template_dir');
 		
 		$dully = new Psa_Dully($templates_dir);
 		

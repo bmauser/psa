@@ -1,31 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA/more
- * @version $Id: Psa_Smarty.php 142 2013-09-26 17:10:52Z bmauser $
  */
 
 
@@ -56,11 +31,11 @@ class Psa_Smarty extends Smarty{
 		parent::__construct();
 
 		// Smarty folder configuration
-		$this->cache_dir    = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['cache_dir'];
-		$this->config_dir   = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['config_dir'];
-		$this->compile_dir  = PSA_BASE_DIR . '/' . Cfg()['folders']['smarty']['compile_dir'];
+		$this->cache_dir    = PSA_BASE_DIR . '/' . Cfg('folders.smarty.cache_dir');
+		$this->config_dir   = PSA_BASE_DIR . '/' . Cfg('folders.smarty.config_dir');
+		$this->compile_dir  = PSA_BASE_DIR . '/' . Cfg('folders.smarty.compile_dir');
 		if(!$template_dir)
-			$template_dir = Cfg()['folders']['template_dir'];
+			$template_dir = Cfg('folders.template_dir');
 		$this->template_dir = PSA_BASE_DIR . '/' . $template_dir;
 
 		$this->use_sub_dirs = true;
@@ -69,7 +44,7 @@ class Psa_Smarty extends Smarty{
 		$this->error_reporting = error_reporting() & ~E_NOTICE;
 
 		// in develop mode
-		if(Cfg()['develop_mode']){
+		if(isset(Cfg()['develop_mode'])){
 			$this->force_compile = true;
 		}
 		

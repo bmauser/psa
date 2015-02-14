@@ -1,31 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Bojan Mauser
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA
- * @version $Id: Psa_Logger.php 171 2013-12-11 17:43:52Z bmauser $
  */
 
 
@@ -58,7 +33,7 @@ class Psa_Logger{
 	/**
 	 * Database connection.
 	 *
-	 * @var Psa_PDO
+	 * @var Db
 	 * @ignore
 	 */
 	protected $db = null;
@@ -133,25 +108,25 @@ class Psa_Logger{
 			$log_data['type'] = null;
 
 		// if not set user data, use data from $_SESSION['psa_current_user_data']
-		if((!isset($log_data['user_id']) or !$log_data['user_id']) && isset($_SESSION['psa_current_user_data']['id'])){
-			$log_data['user_id'] = $_SESSION['psa_current_user_data']['id'];
+		if((!isset($log_data['user_id']) or !$log_data['user_id']) && isset(Session()['psa_current_user_data']['id'])){
+			$log_data['user_id'] = Session()['psa_current_user_data']['id'];
 		}
-		if((!isset($log_data['username']) or !$log_data['username']) && isset($_SESSION['psa_current_user_data']['username'])){
-			$log_data['username'] = $_SESSION['psa_current_user_data']['username'];
+		if((!isset($log_data['username']) or !$log_data['username']) && isset(Session()['psa_current_user_data']['username'])){
+			$log_data['username'] = Session()['psa_current_user_data']['username'];
 		}
 
 
 		// if logging is enabled
-		if(Cfg()['logging']['max_log_level'] >= $log_data['level']){
+		if(Cfg('logging.max_log_level') >= $log_data['level']){
 
 			// write log to file
-			if(Cfg()['logging']['storage'][$log_storage]['type'] == 'file'){
+			if(Cfg("logging.storage.{$log_storage}.type") == 'file'){
 
 				// format log message
 				$message = $this->format_file_log($log_data);
 
 				// open log file
-				if (!$handle = fopen(Cfg()['logging']['storage'][$log_storage]['target'], 'a')){
+				if (!$handle = fopen(Cfg("logging.storage.{$log_storage}.target"), 'a')){
 					trigger_error('Cannot open log file: ' . Cfg()['logging']['storage'][$log_storage]['target']);
 					return 0;
 				}
@@ -173,13 +148,13 @@ class Psa_Logger{
 			// write log to database
 			else if(Cfg()['logging']['storage'][$log_storage]['type'] == 'database'){
 
-				if(!($this->db instanceof Psa_PDO)){
+				if(!($this->db instanceof Db)){
 
 					// should new database connection be opened
-					if(@Cfg()['logging']['new_database_connection']){
+					if(isset(Cfg()['logging']['new_database_connection'])){
 						
-						if(!(@Reg()->psa_log_database_connection instanceof Psa_PDO)){
-							Reg()->psa_log_database_connection = new Psa_PDO();
+						if(!(@Reg()->psa_log_database_connection instanceof Db)){
+							Reg()->psa_log_database_connection = Db();
 						}
 						$this->db = Reg()->psa_log_database_connection;
 					}
@@ -235,7 +210,7 @@ class Psa_Logger{
 	protected function format_database_log_query($log_storage){
 
 		// log query. Should be formated for prepared query.
-		return "INSERT INTO " . Cfg()['logging']['storage'][$log_storage]['target'] . " (client_ip, log_time, request_uri, user_agent, referer, type, username, user_id, message, function, group_id, groupname) VALUES (?,NOW(),?,?,?,?,?,?,?,?,?,?)";
+		return "INSERT INTO " . Cfg("logging.storage.{$log_storage}.target") . " (client_ip, log_time, request_uri, user_agent, referer, type, username, user_id, message, function, group_id, groupname) VALUES (?,NOW(),?,?,?,?,?,?,?,?,?,?)";
 	}
 
 
@@ -279,13 +254,13 @@ class Psa_Logger{
 	protected function format_file_log($log_data){
 
 		// format log message
-		if(@Cfg()['logging']['more_lines']){
+		if(isset(Cfg()['logging']['more_lines'])){
 			$new_line = "\r\n";
-			$message = "\r\n" . '[' . date(Cfg()['logging']['time_format']) . "] " . $new_line . '=====================' . $new_line;
+			$message = "\r\n" . '[' . date(Cfg('logging.time_format')) . "] " . $new_line . '=====================' . $new_line;
 		}
 		else{
 			$new_line = '';
-			$message = '[' . date(Cfg()['logging']['time_format']) . "] " . $new_line;
+			$message = '[' . date(Cfg('logging.time_format')) . "] " . $new_line;
 		}
 
 		if(@$log_data['message'])

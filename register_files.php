@@ -15,12 +15,7 @@
  * 
  * <b>Note:</b> This script can be called only in CLI mode.
  *
- * @link http://code.google.com/p/phpstartapp/
- * @author Bojan Mauser <bmauser@gmail.com>
  * @package PSA
- * @see Psa_Files::register()
- * @see Psa_Files::save()
- * @version $Id: register_files.php 142 2013-09-26 17:10:52Z bmauser $
  */
 
 /**
