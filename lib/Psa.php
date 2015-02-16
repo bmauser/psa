@@ -4,7 +4,7 @@
  */
 
 
-// @asFunction Session $_SESSION[] propSelector
+// @asFunction Session $_SESSION propSelector
 /**
  * 
  * @todo
@@ -12,25 +12,21 @@
  */
 class Psa{
 
+	public $instances;
+	
+	
 	
 	// * @asFunction Res stdClass getInstance
 	
-	/**
-	 * @asFunction Psa Psa::get_new_instance() getInstance
-	 * 
-	 * @return Psa
-	 */
-	static function get_new_instance(){
-		return new Psa();
-	}
+	// * @asFunction Psa Psa getInstance
 	
 	
 	/**
-	 * @asFunction Cfg Psa::get_config_array() propSelector
+	 * @asFunction Cfg Psa::getConfig() propSelector
 	 *
 	 * @return Array
 	 */
-	static function &get_config_array(){
+	static function &getConfig(){
 	
 		static $PSA_CFG = null;
 	

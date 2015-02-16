@@ -274,7 +274,7 @@ function isInt($value){
  * @param unknown $class_name
  * @param string $instance_name
  * @param array $constructor_args
- * @throws Psa_Exception
+ * @throws PsaException
  * @return Ambigous <unknown, NULL>
  */
 function getInstance($class_name, $instance_name = null, array $constructor_args = null, $is_function = false, $only_first_instance = false){
@@ -321,7 +321,7 @@ function getInstance($class_name, $instance_name = null, array $constructor_args
 			$instance = new $class_name();
 	}
 	else if($constructor_args){
-		throw new Psa_Exception("Trying to call constructor for existing instance of $class_name.");
+		throw new PsaException("Trying to call constructor for existing instance of $class_name.");
 	}
 	
 	return $instance;
@@ -338,7 +338,7 @@ function &getPropertyBySelector(&$object, $selector, $exception_class_name = nul
 	static $cache;
 	
 	if(!$exception_class_name)
-		$exception_class_name = 'Psa_Exception';
+		$exception_class_name = 'PsaException';
 	
 	if(!$exception_message)
 		$exception_message = 'Value ' . $selector . ' not set';

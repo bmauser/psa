@@ -41,9 +41,9 @@ include PSA_BASE_DIR . '/wri/asfunctions.php';
 include PSA_BASE_DIR . '/lib/functions.php';
 include PSA_BASE_DIR . '/lib/Psa_Singleton.php';
 include PSA_BASE_DIR . '/lib/Db.php';
-include PSA_BASE_DIR . '/lib/Psa_Logger.php';
+include PSA_BASE_DIR . '/lib/Logger.php';
 include PSA_BASE_DIR . '/lib/Psa_Files.php';
-include PSA_BASE_DIR . '/lib/Psa_Registry.php';
+include PSA_BASE_DIR . '/lib/Registry.php';
 
 
 

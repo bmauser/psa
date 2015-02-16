@@ -7,10 +7,10 @@
 /**
  * This class handles profile logging.
  * 
- * @asFunction ProfileLogger Psa_Profile_Logger getInstance
+ * @asFunction ProfileLogger ProfileLogger getInstance
  * @ignore
  */
-class Psa_Profile_Logger extends Psa_Logger{
+class ProfileLogger extends Logger{
 
 
 	/**
@@ -24,7 +24,7 @@ class Psa_Profile_Logger extends Psa_Logger{
 	/**
 	 * returns database query
 	 */
-	protected function format_database_log_query($log_storage){
+	protected function formatDatabaseLogQuery($log_storage){
 
 		// log query. Should be formated for prepared query.
 		return "INSERT INTO " . Cfg("logging.storage.{$log_storage}.target") . " (method, total_time, method_arguments, client_ip, log_time, request_id) VALUES (?,?,?,?,NOW(),?)";
@@ -34,7 +34,7 @@ class Psa_Profile_Logger extends Psa_Logger{
 	/**
 	 * returns parameters for prepared query
 	 */
-	protected function format_database_log_query_params($log_data){
+	protected function formatDatabaseLogQueryParams($log_data){
 
 		// parameters for prepared log query
 		return array(

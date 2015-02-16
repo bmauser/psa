@@ -66,12 +66,12 @@ class Psa_Files {
 				return 1;
 			}
 
-			include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-			throw new Psa_File_Exception('No autoload data in file ' . Cfg()['autoload_data_file'] . '. Try to register files.', 501);
+			include_once PSA_BASE_DIR . '/lib/exceptions/FileException.php';
+			throw new FileException('No autoload data in file ' . Cfg()['autoload_data_file'] . '. Try to register files.', 501);
 		}
 
-		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception('Cannot open file ' . Cfg()['autoload_data_file'] . '. Try to register files to create it.', 502);
+		include_once PSA_BASE_DIR . '/lib/exceptions/FileException.php';
+		throw new FileException('Cannot open file ' . Cfg()['autoload_data_file'] . '. Try to register files to create it.', 502);
 	}
 
 
@@ -138,8 +138,8 @@ class Psa_Files {
 		static $files = array();
 
 		if(!file_exists($dir) or !$handle = opendir($dir)){
-			include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-			throw new Psa_File_Exception("Cannot open $dir to check files for autoloader.", 505);
+			include_once PSA_BASE_DIR . '/lib/exceptions/FileException.php';
+			throw new FileException("Cannot open $dir to check files for autoloader.", 505);
 		}
 
 
@@ -224,12 +224,12 @@ class Psa_Files {
 	 * By default the data is stored in <kbd>autoload_data.php</kbd> file. You can change that with
 	 * <var>$PSA_CFG['autoload_data_file']</var> config value.
 	 * If called without arguments, it first calls {@link register()} method.
-	 * Throws {@link Psa_File_Exception} on error.
+	 * Throws {@link FileException} on error.
 	 *
 	 * @param array $files_data array returned from {@link register()} method
 	 * @see register()
 	 * @see config.php
-	 * @throws Psa_File_Exception
+	 * @throws FileException
 	 * @return int 1 for sucess
 	 */
 	function save($files_data = null){
@@ -274,13 +274,11 @@ class Psa_Files {
 					
 					if(substr($target, -2) == '()')
 						$target_type = 'function';
-					else if(substr($target, -2) == '[]')
-						$target_type = 'array';
 					else if(substr_count($target, '$'))
-						$target_type = 'object';
+						$target_type = 'var';
 					
 					// remove () or []
-					if($target_type == 'function' or $target_type == 'array')
+					if($target_type == 'function')
 						$target = substr($target, 0, -2);
 
 					//if(isset($files['@asFunction'][$function_name]))
@@ -308,8 +306,8 @@ class Psa_Files {
 		if(file_put_contents(Cfg('autoload_data_file'), $file_content))
 			return $file_content;
 		
-		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception('Error saving data about registered files to ' . Cfg()['autoload_data_file'], 504);
+		include_once PSA_BASE_DIR . '/lib/exceptions/FileException.php';
+		throw new FileException('Error saving data about registered files to ' . Cfg()['autoload_data_file'], 504);
 		
 	}
 	
@@ -322,19 +320,19 @@ class Psa_Files {
 		if(file_put_contents(Cfg('@asFunction_file'), $file_content))
 			return $file_content;
 		
-		include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-		throw new Psa_File_Exception('Error saving @asFunction file to ' . Cfg()['@asFunction_file'], 506);
+		include_once PSA_BASE_DIR . '/lib/exceptions/FileException.php';
+		throw new FileException('Error saving @asFunction file to ' . Cfg()['@asFunction_file'], 506);
 		
 	}
 	
 	
 	protected function asfunctions_file_content($data){
 		
-		include_once PSA_BASE_DIR . '/lib/Psa_Dully.php';
+		include_once PSA_BASE_DIR . '/lib/Dully.php';
 		
 		$templates_dir =  PSA_BASE_DIR . '/' . Cfg('folders.@asFunction.template_dir');
 		
-		$dully = new Psa_Dully($templates_dir);
+		$dully = new Dully($templates_dir);
 		
 		$content = "<?php\n";
 		
@@ -347,8 +345,8 @@ class Psa_Files {
 				$content .= $dully->fetch($template_file);
 			}
 			else{
-				include_once PSA_BASE_DIR . '/lib/exceptions/Psa_File_Exception.php';
-				throw new Psa_File_Exception("Template file for @asFunction $template_file doesn't exists", 507);
+				include_once PSA_BASE_DIR . '/lib/exceptions/FileException.php';
+				throw new FileException("Template file for @asFunction $template_file doesn't exists", 507);
 			}
 		}
 	

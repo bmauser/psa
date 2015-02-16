@@ -4,13 +4,13 @@
  */
 
 
-include_once 'Psa_Exception.php';
+include_once 'PsaException.php';
 
 
 /**
  * This exception will be raised by some methods from the {@link ActiveRecord} class.
  */
-class Psa_Active_Record_Exception extends Psa_Exception{
+class ActiveRecordException extends PsaException{
 
 }
 

@@ -18,11 +18,10 @@ include_once PSA_BASE_DIR . '/lib/smarty/libs/Smarty.class.php';
  *
  * If you need a new Smarty object you can instance this class.
  *
- * @see Psa_Dully
- * @see Psa_Smarty_View
- * @asFunction Smarty Psa_Smarty getInstance
+ * @see Dully
+ * @asFunction Smarty Smarty getInstance
  */
-class Psa_Smarty extends Smarty{
+class Smarty extends Smarty{
 
 
 	function __construct($template_dir = null){

@@ -11,7 +11,7 @@
  * for your custom exceptions. If logs are enabled in {@link config.php} file 
  * exception messages will be logged.
  */
-class Psa_Exception extends Exception{
+class PsaException extends Exception{
 
 
 	/**
@@ -44,7 +44,7 @@ class Psa_Exception extends Exception{
 	 * Writes a log message.
 	 *
 	 * @param string|array $log_message message to be logged or associative
-	 * array with values for {@link Psa_Logger::log()} method. If you pass
+	 * array with values for {@link Logger::log()} method. If you pass
 	 * array some elements, if not set, will get default values.
 	 * Default values are:
 	 * - for <kbd>'function'</kbd> element is return from <kbd>getTraceAsString()</kbd>
@@ -52,7 +52,7 @@ class Psa_Exception extends Exception{
 	 * - for <kbd>'level'</kbd> element is 1
 	 * - for <kbd>'type'</kbd> element is <kbd>'exception'</kbd>.
 	 *
-	 * @see Psa_Logger::log()
+	 * @see Logger::log()
 	 */
 	protected function log($log_message){
 

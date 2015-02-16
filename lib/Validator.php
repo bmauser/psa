@@ -22,7 +22,7 @@
  *     function filter($max_results, $only_pages){
  *
  *         // input validation
- *         $validator = new Psa_Validator();
+ *         $validator = new Validator();
  *         $validator->required($max_results, 'int');
  *         $validator->optional($only_pages, 'int_array');
  *
@@ -45,7 +45,7 @@
  *
  * <code>
  *
- * $val = new Psa_Validator();
+ * $val = new Validator();
  *
  * // Finds whether the given $value is between (or equal) 10 and 20.
  * $val->required($value, 'between', 10, 20);
@@ -125,7 +125,7 @@
  *
  * <code>
  *
- * $val = new Psa_Validator();
+ * $val = new Validator();
  *
  * // each element of $array should be integger
  * $val->required($array, 'int_array');
@@ -144,7 +144,7 @@
  *
  * <code>
  *
- * $val = new Psa_Validator();
+ * $val = new Validator();
  *
  * $val->required($value, 'id', 'Not valid product ID');
  *
@@ -159,7 +159,7 @@
  * any other built-in action. See the source code of this class for more examples.
  *
  * <code>
- * class MyValidator extends Psa_validator{
+ * class MyValidator extends Validator{
  *
  *     // Error message for 5to9 validation
  *     // %v will be replaced with value to validate, and %p1, %p2...
@@ -177,9 +177,9 @@
  * }
  * </code>
  *
- * @asFunction Validator Psa_Validator getInstance
+ * @asFunction Validator Validator getInstance
  */
-class Psa_Validator{
+class Validator{
 
 
 	// Default error messages.
@@ -331,7 +331,7 @@ class Psa_Validator{
 	 *
 	 * @param mixed $p,... Unlimited optional number of additional parameters that will be passed as
 	 * second, third,... parameter to <i>check_</i> methods.
-	 * @throws Psa_Validation_Exception
+	 * @throws ValidationException
 	 * @see optional()
 	 * @return bool
 	 */
@@ -347,13 +347,13 @@ class Psa_Validator{
 	 * This method does the same as {@link required()} method, the only difference is that
 	 * evaluated value can be empty string or null.
 	 * For example this can be useful for values from optional HTML form elements.
-	 * See example in {@link Psa_Validator class description} and for description of parameters
+	 * See example in {@link Validator class description} and for description of parameters
 	 * see {@link required()} method.
 	 *
 	 * @param mixed $value See {@link required()} method.
 	 * @param string $type See {@link required()} method.
 	 * @param mixed $p,... See {@link required()} method.
-	 * @throws Psa_Validation_Exception
+	 * @throws ValidationException
 	 * @see required()
 	 * @return bool
 	 */
@@ -387,12 +387,12 @@ class Psa_Validator{
 
 
 	/**
-	 * Just throws {@link Psa_Validation_Exception}.
+	 * Just throws {@link ValidationException}.
 	 *
 	 * <br><b>Example:</b><br>
 	 *
 	 * <br><code>
-	 * $val = new Psa_Validator();
+	 * $val = new Validator();
 	 *
 	 * if($password != 'abc123')
 	 *     $val->fail('You entered invalid password.');
@@ -401,15 +401,15 @@ class Psa_Validator{
 	 *
 	 * @param string $message Exception message.
 	 * @param int $code Exception code.
-	 * @throws Psa_Validation_Exception
+	 * @throws ValidationException
 	 */
 	public function fail($message = '', $code = 610){
-		throw new Psa_Validation_Exception($message, $code);
+		throw new ValidationException($message, $code);
 	}
 
 
 	/**
-	 * Throws Psa_Validation_Exception and sets $this->errors.
+	 * Throws ValidationException and sets $this->errors.
 	 *
 	 * @ignore
 	 */
@@ -424,7 +424,7 @@ class Psa_Validator{
 		if($this->no_exceptions)
 			return false;
 
-		throw new Psa_Validation_Exception($message, $code);
+		throw new ValidationException($message, $code);
 	}
 
 
@@ -445,14 +445,14 @@ class Psa_Validator{
 	/**
 	 * Validates values set by {@link required()} and {@link optional()} methods.
 	 * If validation of any value fails, raises exception (or returns false, see {@link __construct()}),
-	 * otherwise returns true. See example in {@link Psa_Validator class description}.
-	 * It will throw {@link Psa_Validation_Exception} when validation fails. For example, you can
+	 * otherwise returns true. See example in {@link Validator class description}.
+	 * It will throw {@link ValidationException} when validation fails. For example, you can
 	 * catch this exception in controller and call another action.
 	 *
 	 * @see required()
 	 * @see optional()
 	 * @return bool
-	 * @throws Psa_Validation_Exception
+	 * @throws ValidationException
 	 * @ignore
 	 */
 	protected function validate($reqired, $params){
@@ -716,7 +716,7 @@ class Psa_Validator{
 	 * @ignore
 	 */
 	public function check_id($value){
-		if(Psa_Validator::check_int($value) && $value > 0)
+		if(Validator::check_int($value) && $value > 0)
 			return true;
 		return false;
 	}
@@ -728,10 +728,10 @@ class Psa_Validator{
 	 * Examples:
 	 *
 	 * <code>
-	 * Psa_Validator::check_date('22.22.2222', 'mm.dd.yyyy'); // returns false
-	 * Psa_Validator::check_date('11/30/2008', 'mm/dd/yyyy'); // returns true
-	 * Psa_Validator::check_date('30-01-2008', 'dd-mm-yyyy'); // returns true
-	 * Psa_Validator::check_date('2008 01 30', 'yyyy mm dd'); // returns true
+	 * Validator::check_date('22.22.2222', 'mm.dd.yyyy'); // returns false
+	 * Validator::check_date('11/30/2008', 'mm/dd/yyyy'); // returns true
+	 * Validator::check_date('30-01-2008', 'dd-mm-yyyy'); // returns true
+	 * Validator::check_date('2008 01 30', 'yyyy mm dd'); // returns true
 	 * </code>
 	 *
 	 * @param string $value the variable being evaluated.

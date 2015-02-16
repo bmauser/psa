@@ -17,9 +17,9 @@
  * Logger()->log("Log message");
  * </code>
  * 
- * @asFunction Logger Psa_Logger getInstance
+ * @asFunction Logger Logger getInstance
  */
-class Psa_Logger{
+class Logger{
 
 	/**
 	 * Prepared query.
@@ -54,7 +54,7 @@ class Psa_Logger{
 	 *     [group_id] => 3               // group ID
 	 *     [groupname] => test           // group name
 	 *     [message] => new user created // log message
-	 *     [function] => Psa_User::save  // method or function name that created the log record
+	 *     [function] => User::save  // method or function name that created the log record
 	 *     [level] => 2                  // Log level, default 1. Integer. If greater than <var>$PSA_CFG['logging']['level']</var> log will not be saved.
 	 *     [type] => general             // Log message type. Class name for exceptions or custom string value.
 	 * )
@@ -86,7 +86,7 @@ class Psa_Logger{
 	 * @return int 0 for failure, 1 for success, -1 logging is disabled or the log level for the message is set too low
 	 * (bigger number than <var>$PSA_CFG['logging']['max_log_level'] </var>).
 	 * @see get_instance()
-	 * @see format_file_log()
+	 * @see formatFileLog()
 	 * @see format_database_log()
 	 * @see config.php
 	 */
@@ -123,7 +123,7 @@ class Psa_Logger{
 			if(Cfg("logging.storage.{$log_storage}.type") == 'file'){
 
 				// format log message
-				$message = $this->format_file_log($log_data);
+				$message = $this->formatFileLog($log_data);
 
 				// open log file
 				if (!$handle = fopen(Cfg("logging.storage.{$log_storage}.target"), 'a')){
@@ -166,12 +166,12 @@ class Psa_Logger{
 
 				// prepare database query if not already prepared
 				if(!$this->prepared_query){
-					$this->prepared_query = $this->db->prepare($this->format_database_log_query($log_storage));
+					$this->prepared_query = $this->db->prepare($this->formatDatabaseLogQuery($log_storage));
 				}
 
 				// run query against the database
 				try{
-					$this->db->execute($this->format_database_log_query_params($log_data), $this->prepared_query, 1);
+					$this->db->execute($this->formatDatabaseLogQueryParams($log_data), $this->prepared_query, 1);
 				}
 				catch(PDOException $e){
 
@@ -180,10 +180,10 @@ class Psa_Logger{
 					// log message cannot be written into the database if there is problem with database connection
 					if(Cfg()['logging']['storage']['psa_default']['type'] == 'database'){
 						trigger_error($message);
-						throw new Psa_Logger_Exception($message, $e->getCode(), false);
+						throw new LoggerException($message, $e->getCode(), false);
 					}
 					else
-						throw new Psa_Logger_Exception($message, $e->getCode());
+						throw new LoggerException($message, $e->getCode());
 				}
 
 				return 1;
@@ -199,15 +199,15 @@ class Psa_Logger{
 	 *
 	 * Override this method if you want to change the log format in the database. You will have
 	 * to manually alter the log database table if you wish to add some new columns into it.
-	 * This method has to have the matching {@link format_database_log_query_params()} method.
+	 * This method has to have the matching {@link formatDatabaseLogQueryParams()} method.
 	 *
 	 * @param int $log_storage see {@link log()} method
-	 * @see format_database_log_query_params()
-	 * @see format_file_log()
+	 * @see formatDatabaseLogQueryParams()
+	 * @see formatFileLog()
 	 * @see log()
 	 * @return string
 	 */
-	protected function format_database_log_query($log_storage){
+	protected function formatDatabaseLogQuery($log_storage){
 
 		// log query. Should be formated for prepared query.
 		return "INSERT INTO " . Cfg("logging.storage.{$log_storage}.target") . " (client_ip, log_time, request_uri, user_agent, referer, type, username, user_id, message, function, group_id, groupname) VALUES (?,NOW(),?,?,?,?,?,?,?,?,?,?)";
@@ -215,16 +215,16 @@ class Psa_Logger{
 
 
 	/**
-	 * Returns array of parameters for prepared query from {@link format_database_log_query()} method.
+	 * Returns array of parameters for prepared query from {@link formatDatabaseLogQuery()} method.
 	 *
 	 * @param array $log_data see {@link log()} method
 	 * @param int $log_storage see {@link log()} method
-	 * @see format_database_log_query()
-	 * @see format_file_log()
+	 * @see formatDatabaseLogQuery()
+	 * @see formatFileLog()
 	 * @see log()
 	 * @return array
 	 */
-	protected function format_database_log_query_params($log_data){
+	protected function formatDatabaseLogQueryParams($log_data){
 
 		// parameters for prepared log query
 		return array(@$_SERVER["REMOTE_ADDR"],
@@ -251,7 +251,7 @@ class Psa_Logger{
 	 * @see log()
 	 * @return string
 	 */
-	protected function format_file_log($log_data){
+	protected function formatFileLog($log_data){
 
 		// format log message
 		if(isset(Cfg()['logging']['more_lines'])){

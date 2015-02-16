@@ -11,7 +11,7 @@
  * <br><b>1)</b> Create a new user group:
  * <code>
  * // if you want to create a new user group use 'new' as argument to the constructor
- * $group = new Psa_Group('new');
+ * $group = new Group('new');
  *
  * // set name of the new grop
  * $group->name = 'my_new_user_group';
@@ -21,12 +21,12 @@
  * </code>
  *
  * <br><b>2)</b>
- * If you want to add more columns to <i>psa_group</i> database table, extend <kbd>Psa_Group</kbd> class:
+ * If you want to add more columns to <i>psa_group</i> database table, extend <kbd>Group</kbd> class:
  * <code>
- * class MyGroup extends Psa_Group{
+ * class MyGroup extends Group{
  *
  *     public function __construct($group_id_or_groupname){
- *         // Call Psa_Group class constructor and pass names of the columns in the
+ *         // Call Group class constructor and pass names of the columns in the
  *         // psa_group database table to work with.
  *         parent::__construct($group_id_or_groupname, array('id', 'name', 'custom_col1', 'custom_col2', 'custom_col3'));
  *     }
@@ -45,7 +45,7 @@
  *
  * @see ActiveRecord
  */
-class Psa_Group extends ActiveRecord{
+class Group extends ActiveRecord{
 
 	/**
 	 * Group ID.
@@ -73,7 +73,7 @@ class Psa_Group extends ActiveRecord{
 	 *
 	 * Must be called with the group ID or group name as argument.
 	 * Pass <kbd>'new'</kbd> as argument if you want to create a new group.
-	 * See examples in {@link Psa_Group} class description.
+	 * See examples in {@link Group} class description.
 	 *
 	 * @param int|string $group_id_or_name Group ID or group name or 'new' if a new group should be created.
 	 * @param array $table_columns Columns in the <i>psa_group</i> database table. If you add more
@@ -83,7 +83,7 @@ class Psa_Group extends ActiveRecord{
 	public function __construct($group_id_or_name, array $table_columns = array('id', 'name')){
 
 		if(!$group_id_or_name)
-			throw new Psa_Group_Exception('Invalid group ID not or group name.', 301);
+			throw new GroupException('Invalid group ID not or group name.', 301);
 
 		// new group
 		if($group_id_or_name === 'new'){
@@ -98,7 +98,7 @@ class Psa_Group extends ActiveRecord{
 			}
 			else{
 				if(!is_string($group_id_or_name))
-					throw new Psa_User_Exception('Invalid group name.', 302);
+					throw new UserException('Invalid group name.', 302);
 
 				$this->name = $group_id_or_name;
 				parent::__construct('psa_group', 'name', $this->name, $table_columns, 'psa_group_id_seq');
@@ -120,19 +120,19 @@ class Psa_Group extends ActiveRecord{
 	 * all columns which names are passed to the constructor are restored.
 	 * @return array Restored data from database.
 	 * @see save()
-	 * @throws Psa_Group_Exception
+	 * @throws GroupException
 	 */
 	public function restore(array $only_columns = array()){
 
 		if(!$this->id && !$this->name){
-			throw new Psa_Group_Exception("Group ID or group name are not set. Cannot load data about the group", 303);
+			throw new GroupException("Group ID or group name are not set. Cannot load data about the group", 303);
 		}
 
 		try{
 			return $this->restoreFromDatabase($only_columns);
 		}
-		catch (Psa_Active_Record_Exception $e){
-			throw new Psa_Group_Exception("Group does not exists. Cannot restore data.", 304);
+		catch (ActiveRecordException $e){
+			throw new GroupException("Group does not exists. Cannot restore data.", 304);
 		}
 	}
 
@@ -141,12 +141,12 @@ class Psa_Group extends ActiveRecord{
 	 * Saves values from the member variables to the database.
 	 *
 	 * It also sets {@link $id} member variable if a new group is created.
-	 * See examples in {@link Psa_Group} class description. This method will throw
-	 * {@link Psa_Group_Exception} on error.
+	 * See examples in {@link Group} class description. This method will throw
+	 * {@link GroupException} on error.
 	 *
 	 * @param array $only_columns
 	 * @return int ID of the saved group for success.
-	 * @throws Psa_Group_Exception
+	 * @throws GroupException
 	 */
 	public function save(array $only_columns = array()){
 
@@ -174,24 +174,24 @@ class Psa_Group extends ActiveRecord{
 	 * Group membership changes are immediately stored in the database, and you don't have to
 	 * call {@link save()} method after.
 	 * If you are creating a new group, this method must be called after {@link save()} method.
-	 * Throws {@link Psa_Group_Exception} on error.
+	 * Throws {@link GroupException} on error.
 	 *
 	 * Example:
 	 * <code>
 	 * // group object
-	 * $group = new Psa_Group('my_user_group');
+	 * $group = new Group('my_user_group');
 	 * // put users with IDs 1,3 and 6 into the group
-	 * $group->add_user(array(1,3,6));
+	 * $group->addUser(array(1,3,6));
 	 * </code>
 	 *
 	 * @param int|array $user_id ID of the user. Or array with user IDs.
 	 * @return int 1 for success, -1 user was already in the group (or more groups)
 	 * or user doesn't exist
-	 * @see remove_user()
-	 * @throws Psa_Group_Exception
+	 * @see removeUser()
+	 * @throws GroupException
 	 */
-	public function add_user($user_id){
-		return $this->add_remove_user($user_id, 1);
+	public function addUser($user_id){
+		return $this->addRemoveUser($user_id, 1);
 	}
 
 
@@ -201,48 +201,48 @@ class Psa_Group extends ActiveRecord{
 	 * Group membership changes are immediately stored in the database and you don't have to
 	 * call {@link save()} method after.
 	 * If you are creating a new group, this method must be called after {@link save()} method.
-	 * Throws {@link Psa_Group_Exception} on error.
+	 * Throws {@link GroupException} on error.
 	 *
 	 * Example:
 	 * <code>
 	 * // group object
-	 * $group = new Psa_Group('my_user_group');
+	 * $group = new Group('my_user_group');
 	 * // remove user with ID 6 from the group
-	 * $group->remove_user(6);
+	 * $group->removeUser(6);
 	 * </code>
 	 *
 	 * @param int|array $user_id ID of the user. Or array with user IDs.
 	 * @return int 1 for success, -1 user was not a member of the group (or more groups)
 	 * or user doesn't exist
-	 * @see remove_user()
-	 * @throws Psa_Group_Exception
+	 * @see removeUser()
+	 * @throws GroupException
 	 */
-	public function remove_user($user_id){
-		return $this->add_remove_user($user_id, 0);
+	public function removeUser($user_id){
+		return $this->addRemoveUser($user_id, 0);
 	}
 
 
 	/**
 	 * Puts user in the group or removes user from group (or more users if $user_id argument is array).
 	 *
-	 * This method is called from add_user() and remove_user() methods.
+	 * This method is called from addUser() and removeUser() methods.
 	 *
 	 * @param int|array|string $user_id id of the user or array with user ids.
 	 * @param int $action 1 add, 0 remove
 	 * @return int 1 for success, -1
-	 * @see add_user()
-	 * @see remove_user()
-	 * @throws Psa_Group_Exception
+	 * @see addUser()
+	 * @see removeUser()
+	 * @throws GroupException
 	 * @ignore
 	 */
-	protected function add_remove_user($user_id, $action){
+	protected function addRemoveUser($user_id, $action){
 
 		if(!$this->id)
-			throw new Psa_Group_Exception("Group ID not set.", 305);
+			throw new GroupException("Group ID not set.", 305);
 
 
 		if(!$user_id)
-			throw new Psa_Group_Exception('Invalid $user_id method parameter.', 306);
+			throw new GroupException('Invalid $user_id method parameter.', 306);
 
 
 		// if $user_id is not array make it array for foreach loop
@@ -281,7 +281,7 @@ class Psa_Group extends ActiveRecord{
 				// run query against the database
 				Db()->execute($q_params, $sql);
 			}
-			catch(Psa_Db_Exception $e){
+			catch(DbException $e){
 				$failed = 1;
 			}
 

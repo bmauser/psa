@@ -75,7 +75,6 @@ $PSA_CFG['@asFunction_file'] = PSA_BASE_DIR . '/wri/asfunctions.php';
  * on file registration. You can add more locations by adding elements
  * to this array. Paths in this array must be relative to PSA_BASE_DIR folder.
  */
-$PSA_CFG['folders']['autoload'][] = '..';  // psa/../
 $PSA_CFG['folders']['autoload'][] = 'lib'; // psa/lib/
 $PSA_CFG['folders']['autoload'][] = 'lib/exceptions'; // psa/exceptions/
 
@@ -105,7 +104,7 @@ $PSA_CFG['folders']['@asFunction']['template_dir'] = 'lib/tpl';
  * execution time and are candidates for optimization.
  * Logging must be enabled for this to work (see ['logging']['max_log_level'] option below).
  *
- * NOTE: Only methods invoked through Psa_Router::dispatch() method will be listed in
+ * NOTE: Only methods invoked through Router::dispatch() method will be listed in
  *       profile logs.
  *
  * NOTE: If property $psa_no_profile_log is set in object (class), profile log will be disabled for
@@ -116,7 +115,7 @@ $PSA_CFG['profile_log'] = 0;
 
 /**
  * Logging. If enabled (see max_log_level value below) some PSA activity will be logged.
- * This values are used by Psa_Logger class which you can extend for your customized logging.
+ * This values are used by Logger class which you can extend for your customized logging.
  * You can add more storages to $PSA_CFG['logging']['storage'] array for your custom logs.
  */
 
@@ -172,7 +171,7 @@ $PSA_CFG['database']['table']['user_in_group'] = 'psa_user_in_group';
 
 /**
  * Default controller and action names.
- * These values are used by Psa_Router::get_dispatch_data() method.
+ * These values are used by Router::getDispatchData() method.
  */
 $PSA_CFG['mvc']['default_controller_name'] = 'Default';
 $PSA_CFG['mvc']['default_action_name'] = 'default';

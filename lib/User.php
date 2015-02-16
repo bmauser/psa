@@ -12,7 +12,7 @@
  * <br><b>1)</b> Create a new user:
  * <code>
  * // user object
- * $user = new Psa_User('new');
+ * $user = new User('new');
  *
  * // set username and password
  * $user->username = 'my_user';
@@ -24,16 +24,16 @@
  *
  * <br><b>2)</b> Authorize user by username and password:
  * <code>
- * $user = new Psa_User('my_user');
+ * $user = new User('my_user');
  * $user->authorize('user_password');
  * </code>
  *
- * <br><b>3)</b> Extend <kbd>Psa_User</kbd> class. You'll probably want to extend <kbd>Psa_User</kbd> class
+ * <br><b>3)</b> Extend <kbd>User</kbd> class. You'll probably want to extend <kbd>User</kbd> class
  * and to add more columns to <i>psa_user</i> database table. In this example <kbd>user_level</kbd>,
  * <kbd>photo</kbd> and <kbd>email</kbd> columns are added to <i>psa_user</i> table.
  *
  * <code>
- * class MyUser extends Psa_User{
+ * class MyUser extends User{
  *
  *     public function __construct($user_id_or_username){
  *         parent::__construct($user_id_or_username, array('id', 'username', 'user_level', 'photo', 'email'));
@@ -54,14 +54,14 @@
  * <br><b>4)</b> Change user's group membership:
  * <code>
  * // user object
- * $user = new MyUser(10); // MyUser extends Psa_User
+ * $user = new MyUser(10); // MyUser extends User
  *
  * // remove the user from all groups and put it in groups with ID 3,5 and 7
  * $user->remove_group('all');
  * $user->add_group(array(3,5,7));
  * </code>
  */
-class Psa_User extends ActiveRecord{
+class User extends ActiveRecord{
 
 
 	/**
@@ -120,7 +120,7 @@ class Psa_User extends ActiveRecord{
 	public function __construct($user_id_or_username, array $table_columns = array('id', 'username')){
 
 		if(!$user_id_or_username)
-			throw new Psa_User_Exception('Invalid user ID or username.', 201);
+			throw new UserException('Invalid user ID or username.', 201);
 
 		// new user
 		if($user_id_or_username === 'new'){
@@ -137,7 +137,7 @@ class Psa_User extends ActiveRecord{
 			else{
 
 				if(!is_string($user_id_or_username))
-					throw new Psa_User_Exception('Invalid username.', 202);
+					throw new UserException('Invalid username.', 202);
 
 				$this->username = $user_id_or_username;
 				parent::__construct('psa_user', 'username', $this->username, $table_columns, 'psa_user_id_seq');
@@ -150,7 +150,7 @@ class Psa_User extends ActiveRecord{
 	 * Does the same as {@link restore()} method, but also writes a log message and calls
 	 * {@link session_save()} method.
 	 *
-	 * See examples in {@link Psa_User} class description.
+	 * See examples in {@link User} class description.
 	 *
 	 * This function calls {@link restore()} method with <kbd>'username_password'</kbd> as the first argument
 	 * and writes a log message that user is authorized.
@@ -161,7 +161,7 @@ class Psa_User extends ActiveRecord{
 	 * the session if session is started before.
 	 * @return array User data restored from the database.
 	 * @see restore()
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function authorize($password = null, $write_success_login_logs = true, $save_to_session = true){
 
@@ -195,14 +195,14 @@ class Psa_User extends ActiveRecord{
 	 *
 	 * @return array Restored user data.
 	 * @see authorize()
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function restore($restore_by = null, $try_from_session = false){
 
 		try{
 			if($restore_by == 'username_password'){
 				if(!$this->username or !$this->password)
-					throw new Psa_User_Exception("Username and password not set.", 203);
+					throw new UserException("Username and password not set.", 203);
 
 				$sql = 'SELECT <COLUMNS> FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE username=? AND password=?';
 				$q_params = array($this->username, $this->password);
@@ -214,7 +214,7 @@ class Psa_User extends ActiveRecord{
 					try{
 						return $this->restore_from_session();
 					}
-					catch (Psa_Active_Record_Exception $e){
+					catch (ActiveRecordException $e){
 						return $this->restoreFromDatabase();
 					}
 				}
@@ -222,10 +222,10 @@ class Psa_User extends ActiveRecord{
 					return $this->restoreFromDatabase();
 			}
 			else
-				throw new Psa_User_Exception('Cannot restore user data. User id or username not set', 204);
+				throw new UserException('Cannot restore user data. User id or username not set', 204);
 		}
-		catch (Psa_Active_Record_Exception $e){
-			throw new Psa_User_Exception('Cannot restore user data. ' . $e->getMessage(), 205);
+		catch (ActiveRecordException $e){
+			throw new UserException('Cannot restore user data. ' . $e->getMessage(), 205);
 		}
 	}
 
@@ -238,24 +238,24 @@ class Psa_User extends ActiveRecord{
 	 * argument to this method.
 	 * All saved values will be restored when the {@link authorize()} or {@link restore()}
 	 * methods are called.
-	 * See examples in {@link Psa_User} class description.
+	 * See examples in {@link User} class description.
 	 *
 	 * @see authorize()
 	 * @param array $only_columns Array with column names in <i>psa_user</i> database table to work with.
 	 * If not set, column names set by the constructor are used.
 	 * @return int User ID.
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function save(array $only_columns = array()){
 
 		if($this->psa_new_record && !($this->username && $this->password))
-			throw new Psa_User_Exception("Error creating a new user. Username & password not set.", 206);
+			throw new UserException("Error creating a new user. Username & password not set.", 206);
 
 
 		if($this->psa_new_record){
 
 			if(!isset($this->password) or !$this->password)
-				throw new Psa_User_Exception("Password for new user not set.", 214);
+				throw new UserException("Password for new user not set.", 214);
 
 			// hash new password
 			$this->password = $this->password_hash($this->password);
@@ -282,11 +282,11 @@ class Psa_User extends ActiveRecord{
 	 * {@link $id} member variable must be set before calling this method. If you pass username
 	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
 	 * user ID from the database.
-	 * Throws {@link Psa_User_Exception} on error.
+	 * Throws {@link UserException} on error.
 	 *
 	 * Example:
 	 * <code>
-	 * $user = new Psa_User(123);
+	 * $user = new User(123);
 	 * $user->add_group(5);
 	 * </code>
 	 *
@@ -294,7 +294,7 @@ class Psa_User extends ActiveRecord{
 	 * @return int 1 for success, -1 user already was in the group (or more groups)
 	 * or group does not exist.
 	 * @see remove_group()
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function add_group($group_id){
 		return $this->add_remove_group($group_id,1);
@@ -309,11 +309,11 @@ class Psa_User extends ActiveRecord{
 	 * {@link $id} member variable must be set before calling this method. If you pass username
 	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
 	 * user ID from the database.
-	 * Throws {@link Psa_User_Exception} on error.
+	 * Throws {@link UserException} on error.
 	 *
 	 * Example:
 	 * <code>
-	 * $user = new Psa_User('some_username');
+	 * $user = new User('some_username');
 	 * $user->restore();
 	 * $user->remove_group(4);
 	 * </code>
@@ -323,7 +323,7 @@ class Psa_User extends ActiveRecord{
 	 * @return int 1 for success, -1 user was not in the group (or more groups).
 	 * or group does not exist.
 	 * @see add_group()
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function remove_group($group_id){
 		return $this->add_remove_group($group_id,0);
@@ -340,16 +340,16 @@ class Psa_User extends ActiveRecord{
 	 * @return int 1 for success, -1
 	 * @see add_group()
 	 * @see remove_group()
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 * @ignore
 	 */
 	protected function add_remove_group($group_id, $action){
 
 		if(!$this->id)
-			throw new Psa_User_Exception('Error changing user group. User ID not set.', 207);
+			throw new UserException('Error changing user group. User ID not set.', 207);
 
 		if(!$group_id)
-			throw new Psa_User_Exception('Error changing user group. Invalid group ID.', 208);
+			throw new UserException('Error changing user group. Invalid group ID.', 208);
 
 
 		// if $group_id is not array make it array for foreach loop
@@ -411,17 +411,17 @@ class Psa_User extends ActiveRecord{
 	 *
 	 * New password will be hashed with {@link password_hash()} method and stored in the database.
 	 * You need to call this method only when you want to change the password for the existing user.
-	 * Throws {@link Psa_User_Exception} on error.
+	 * Throws {@link UserException} on error.
 	 *
 	 * @param string $new_password New password.
 	 * @return int 1 for success.
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 * @see password_hash()
 	 */
 	public function password_change($new_password){
 
 		if((string)$new_password !== $new_password)
-			throw new Psa_User_Exception('Error changing password. Invalid password.', 209);
+			throw new UserException('Error changing password. Invalid password.', 209);
 
 		if($new_password){
 
@@ -447,8 +447,8 @@ class Psa_User extends ActiveRecord{
 
 				return 1;
 			}
-			catch (Psa_Db_Exception $e){
-				throw new Psa_User_Exception('Error changing password', 210);
+			catch (DbException $e){
+				throw new UserException('Error changing password', 210);
 			}
 		}
 	}
@@ -464,12 +464,12 @@ class Psa_User extends ActiveRecord{
 	 * @return int 1 given password is valid, 0 given password is invalid
 	 * @see password_hash()
 	 * @see password_change()
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function password_verify($password){
 
 		if(!$password)
-			throw new Psa_User_Exception('Error verifying password.', 211);
+			throw new UserException('Error verifying password.', 211);
 
 
 		// serialize object
@@ -561,7 +561,7 @@ class Psa_User extends ActiveRecord{
 	public function get_groups(){
 
 		if(!$this->id)
-			throw new Psa_User_Exception('Error with setting user groups. User ID not set.', 212);
+			throw new UserException('Error with setting user groups. User ID not set.', 212);
 
 
 		// get data from all groups user is in
@@ -586,10 +586,10 @@ class Psa_User extends ActiveRecord{
 	 *
 	 * You can call this method when you want to set the last login time for the user. It
 	 * will also set value of the {@link $last_login} member variable.
-	 * Throws {@link Psa_User_Exception} on error.
+	 * Throws {@link UserException} on error.
 	 *
 	 * @return int 1 for success.
-	 * @throws Psa_User_Exception
+	 * @throws UserException
 	 */
 	public function save_last_login_time(){
 
@@ -606,17 +606,17 @@ class Psa_User extends ActiveRecord{
 	 *
 	 * It will store an array named <kbd>psa_current_user_data</kbd> with user ID and username into the session.
 	 * All log messages will contain user ID and username from this session
-	 * variable if not explicitly set otherwise. See {@link Psa_Logger::log()} method for details.
+	 * variable if not explicitly set otherwise. See {@link Logger::log()} method for details.
 	 *
-	 * @param bool $throw_exception If true, Psa_User_Exception will be thrown if PHP session is not started.
-	 * @throws Psa_User_Exception
+	 * @param bool $throw_exception If true, UserException will be thrown if PHP session is not started.
+	 * @throws UserException
 	 */
 	protected function session_save($throw_exception = true){
 
 		// check if session is started
 		if(!session_id()){
 			if($throw_exception)
-				throw new Psa_User_Exception('Session is not started. Cannot store user data into the session.', 213);
+				throw new UserException('Session is not started. Cannot store user data into the session.', 213);
 			else
 				return false;
 		}

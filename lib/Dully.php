@@ -42,15 +42,15 @@
  * <code>
  * <?php
  *
- * // make a new Psa_Dully object
- * $Psa_Dully = new Psa_Dully('path/to/dir/with/templates');
+ * // make a new Dully object
+ * $dully = new Dully('path/to/dir/with/templates');
  *
  * // assign some data for template
- * $Psa_Dully->assign('my_car_color', 'Black');
- * $Psa_Dully->assign('some_name', 'bla bla bla');
+ * $dully->assign('my_car_color', 'Black');
+ * $dully->assign('some_name', 'bla bla bla');
  *
  * // display fetched template
- * $Psa_Dully->display('template.tpl');
+ * $dully->display('template.tpl');
  *
  * ?>
  * </code>
@@ -84,18 +84,18 @@
  * <code>
  * <?php
  *
- * // make a new Psa_Dully object
- * $Psa_Dully = new Psa_Dully('path/to/dir/with/templates');
+ * // make a new Dully object
+ * $dully = new Dully('path/to/dir/with/templates');
  *
  * // put the content of fetched template template2.tpl in the variable $var1
- * $var1 = $Psa_Dully->fetch('template2.tpl');
+ * $var1 = $dully->fetch('template2.tpl');
  *
  * // assign values for var1 and var2
- * $Psa_Dully->assign('var1', $var1);
- * $Psa_Dully->assign('var2', 'bla bla bla');
+ * $dully->assign('var1', $var1);
+ * $dully->assign('var2', 'bla bla bla');
  *
  * // display template template1.tpl
- * $Psa_Dully->display('template1.tpl');
+ * $dully->display('template1.tpl');
  *
  * ?>
  * </code>
@@ -124,11 +124,10 @@
  * </code>
  *
  *
- * @see Psa_Dully_View
- * @see Psa_Smarty
- * @asFunction Dully Psa_Dully getInstance
+ * @see \psa\Smarty
+ * @asFunction Dully Dully getInstance
  */
-class Psa_Dully{
+class Dully{
 
 	/**
 	 * Array that holds template values.
@@ -161,7 +160,7 @@ class Psa_Dully{
 
 	/**
 	 * Assigns values to the templates.
-	 * See examples in {@link Psa_Dully} class description.
+	 * See examples in {@link Dully} class description.
 	 *
 	 * @param string $name The name of the variable being assigned.
 	 * @param mixed $value The value being assigned.
@@ -175,7 +174,7 @@ class Psa_Dully{
 
 	/**
 	 * Returns the fetched template as a string.
-	 * See examples in {@link Psa_Dully} class description.
+	 * See examples in {@link Dully} class description.
 	 *
 	 * @param string $template_file Template file name or relative path from the path passed to the constructor.
 	 * @return string Fetched (rendered) template.
