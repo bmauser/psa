@@ -134,9 +134,9 @@ class Router {
 			$url_arr = $this->explodeUrl($request_uri);
 
 		// controller name
-		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : Reg()->PSA_CFG['mvc']['default_controller_name']) . Reg()->PSA_CFG['mvc']['default_controller_suffix'];
+		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : Cfg('mvc.default_controller_name')) . Cfg('mvc.default_controller_suffix');
 		// action name
-		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : Reg()->PSA_CFG['mvc']['default_action_name']) . Reg()->PSA_CFG['mvc']['default_action_suffix'];
+		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : Cfg('mvc.default_action_name')) . Cfg('mvc.default_action_suffix');
 		// action arguments
 		$return['arguments'] = isset($url_arr[2]) ? array_slice($url_arr, 2) : array();
 

@@ -237,11 +237,7 @@ class ActiveRecord{
 	 */
 	protected function autoSetColumnNames(){
 
-		if(!isset(Reg()->PSA_CFG['pdo']['database'])){
-			throw new ActiveRecordException('Please set the database name to $PSA_CFG[\'pdo\'][\'database\'] configuration value or better pass the column names to constructor.', 703);
-		}
-
-		$sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = \'' . $this->psa_table_name . '\' AND table_schema = \'' . Reg()->PSA_CFG['pdo']['database'] . '\'';
+		$sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = \'' . $this->psa_table_name . '\' AND table_schema = \'' . Cfg('pdo.database') . '\'';
 		$this->psa_column_names = $this->psa_database->fetchColumn(0, $sql);
 	}
 

@@ -371,7 +371,7 @@ class Validator{
 	 * @return int|array
 	 * @see
 	 */
-	public function get_errors(){
+	public function getErrors(){
 		if(sizeof($this->errors))
 			return $this->errors;
 		else return 0;
@@ -381,7 +381,7 @@ class Validator{
 	/**
 	 * Resets all errors (messages).
 	 */
-	public function clean_errors(){
+	public function cleanErrors(){
 		$this->errors = Array();
 	}
 
@@ -413,7 +413,7 @@ class Validator{
 	 *
 	 * @ignore
 	 */
-	protected function fail_local($message, $value, $type, $code){
+	protected function failLocal($message, $value, $type, $code){
 
 		$err_index = count($this->errors);
 
@@ -433,7 +433,7 @@ class Validator{
 	 *
 	 * @ignore
 	 */
-	protected function is_empty($value){
+	protected function isEmpty($value){
 
 		if($value === '' or $value === null or (is_array($value) && empty($value)))
 			return true;
@@ -470,13 +470,13 @@ class Validator{
 		}
 
 		// check if value can be empty
-		if($this->is_empty($value_to_validate)){
+		if($this->isEmpty($value_to_validate)){
 			if(!$reqired)
 				return true;
 
-			$message = $this->get_required_message($validation_type, $params);
+			$message = $this->getRequiredMessage($validation_type, $params);
 
-			return $this->fail_local($message, $value_to_validate, $validation_type, 601);
+			return $this->failLocal($message, $value_to_validate, $validation_type, 601);
 		}
 
 		// if validation has to be run on array of elements
@@ -493,30 +493,30 @@ class Validator{
 					$arr_params[0] = $data_value; // replace array with value to validate
 
 					// check if value can be empty
-					if($this->is_empty($data_value)){
+					if($this->isEmpty($data_value)){
 						// if $data can be empty (optional)
 						if(!$reqired)
 							continue;
 						// data is required
 						else{
-							$message = $this->get_required_message($validation_type, $params);
-							return $this->fail_local($message, $data_value, $validation_type, 602);
+							$message = $this->getRequiredMessage($validation_type, $params);
+							return $this->failLocal($message, $data_value, $validation_type, 602);
 						}
 					}
 
-					if(!$this->invoke_validation_method($validation_type, $arr_params))
+					if(!$this->invokeValidationMethod($validation_type, $arr_params))
 						$return = false;
 				}
 
 				return $return;
 			}
 			else{
-				return $this->fail_local("'{$value_to_validate}' is not an array thus cannot validate each element", $value_to_validate, $validation_type, 603);
+				return $this->failLocal("'{$value_to_validate}' is not an array thus cannot validate each element", $value_to_validate, $validation_type, 603);
 			}
 		}
 		// single value
 		else{
-			return $this->invoke_validation_method($validation_type, $params);
+			return $this->invokeValidationMethod($validation_type, $params);
 		}
 	}
 
@@ -526,7 +526,7 @@ class Validator{
 	 *
 	 * @ignore
 	 */
-	protected function invoke_validation_method($validation_type, $params){
+	protected function invokeValidationMethod($validation_type, $params){
 
 		// name of the method to invoke
 		$validation_method_name = 'check_' . $validation_type;
@@ -543,15 +543,15 @@ class Validator{
 			// if invalid
 			if(!$validation_result){
 
-				$message = $this->get_validation_message($validation_type, $params, $invoke_method);
+				$message = $this->getValidationMessage($validation_type, $params, $invoke_method);
 
-				return $this->fail_local($message, $params[0], $validation_type, 604);
+				return $this->failLocal($message, $params[0], $validation_type, 604);
 			}
 
 			return true;
 		}
 		else
-			return $this->fail_local("Undefined validation method check_{$validation_type}()", $params[0], $validation_type, 605);
+			return $this->failLocal("Undefined validation method check_{$validation_type}()", $params[0], $validation_type, 605);
 	}
 
 
@@ -560,7 +560,7 @@ class Validator{
 	 *
 	 * @ignore
 	 */
-	protected function get_validation_message($validation_type, $method_params, ReflectionMethod $reflection_method = null, $only_parameter_message = null){
+	protected function getValidationMessage($validation_type, $method_params, ReflectionMethod $reflection_method = null, $only_parameter_message = null){
 
 		// default validation message
 		$message_var_name = 'msg_check_' . $validation_type;
@@ -614,10 +614,10 @@ class Validator{
 	 *
 	 * @ignore
 	 */
-	protected function get_required_message($validation_type, $method_params){
+	protected function getRequiredMessage($validation_type, $method_params){
 
 		$message = str_replace('%t', $validation_type, $this->msg_required);
-		$message .= $this->get_validation_message($validation_type, $method_params, null, true);
+		$message .= $this->getValidationMessage($validation_type, $method_params, null, true);
 
 		return trim($message);
 	}

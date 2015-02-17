@@ -48,7 +48,7 @@ include PSA_BASE_DIR . '/lib/Registry.php';
 
 
 // put $PSA_CFG config array to the registry
-Reg()->PSA_CFG = $PSA_CFG;
+//Reg()->PSA_CFG = $PSA_CFG;
 
 
 // register files on every request

@@ -45,7 +45,7 @@ include PSA_BASE_DIR . '/wri/asfunctions.php';
 $PSA_CFG['logging']['max_log_level'] = 0; // disable logging
 
 // put PSA config array to registry
-Reg()->PSA_CFG = $PSA_CFG;
+//Reg()->PSA_CFG = $PSA_CFG;
 
 // register files
 $files_data = Files()->register();

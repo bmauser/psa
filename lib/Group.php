@@ -259,7 +259,7 @@ class Group extends ActiveRecord{
 
 			// add to group
 			if($action == 1){
-				$sql = 'INSERT INTO ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' (group_id, user_id) VALUES (?, ?)';
+				$sql = 'INSERT INTO ' . Cfg('database.table.user_in_group') . ' (group_id, user_id) VALUES (?, ?)';
 				$q_params = array($this->id, $user_id_value);
 			}
 			// remove from group
@@ -267,12 +267,12 @@ class Group extends ActiveRecord{
 
 				// remove all users from the group
 				if($user_id_value == 'all'){
-					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE group_id=?';
+					$sql = 'DELETE FROM ' . Cfg('database.table.user_in_group') . ' WHERE group_id=?';
 					$q_params = array($this->id);
 				}
 				// remove specific user from the group
 				else{
-					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE group_id=? AND user_id =?';
+					$sql = 'DELETE FROM ' . Cfg('database.table.user_in_group') . ' WHERE group_id=? AND user_id =?';
 					$q_params = array($this->id, $user_id_value);
 				}
 			}
@@ -295,7 +295,7 @@ class Group extends ActiveRecord{
 		if($success){
 
 			// write log
-			if(Reg()->PSA_CFG['logging']['max_log_level'] >= 2)
+			if(Cfg('logging.max_log_level') >= 2)
 				$this->log("Members of group changed: " . implode(',', $user_id) . " action=" . ($action ? 'add' : 'remove'), __METHOD__, 2);
 
 			if(!$failed)
@@ -318,7 +318,7 @@ class Group extends ActiveRecord{
 	protected function log($message, $method = '', $level = 1, $type = ''){
 
 		// if logging is enabled
-		if(Reg()->PSA_CFG['logging']['max_log_level'] >= $level){
+		if(Cfg('logging.max_log_level') >= $level){
 
 			$log_data['group_id'] = $this->id;
 			$log_data['groupname'] = $this->name;

@@ -57,8 +57,8 @@
  * $user = new MyUser(10); // MyUser extends User
  *
  * // remove the user from all groups and put it in groups with ID 3,5 and 7
- * $user->remove_group('all');
- * $user->add_group(array(3,5,7));
+ * $user->removeGroup('all');
+ * $user->addGroup(array(3,5,7));
  * </code>
  */
 class User extends ActiveRecord{
@@ -96,7 +96,7 @@ class User extends ActiveRecord{
 	 * UNIX timestamp of last login.
 	 *
 	 * @var int
-	 * @see save_last_login_time()
+	 * @see saveLastLoginTime()
 	 */
 	protected $last_login = null;
 
@@ -148,7 +148,7 @@ class User extends ActiveRecord{
 
 	/**
 	 * Does the same as {@link restore()} method, but also writes a log message and calls
-	 * {@link session_save()} method.
+	 * {@link sessionSave()} method.
 	 *
 	 * See examples in {@link User} class description.
 	 *
@@ -157,7 +157,7 @@ class User extends ActiveRecord{
 	 *
 	 * @param string $password User password.
 	 * @param bool $write_success_login_logs If false, log message about successful authorization will not be written.
-	 * @param bool $save_to_session If true, {@link session_save()} will be called to write user ID and username to
+	 * @param bool $save_to_session If true, {@link sessionSave()} will be called to write user ID and username to
 	 * the session if session is started before.
 	 * @return array User data restored from the database.
 	 * @see restore()
@@ -166,7 +166,7 @@ class User extends ActiveRecord{
 	public function authorize($password = null, $write_success_login_logs = true, $save_to_session = true){
 
 		if($password){
-			$this->password = $this->password_hash($password);
+			$this->password = $this->passwordHash($password);
 			$return = $this->restore('username_password');
 		}
 		else{
@@ -178,7 +178,7 @@ class User extends ActiveRecord{
 			$this->log('User authorized', __METHOD__, 2);
 
 		if($save_to_session)
-			$this->session_save(false);
+			$this->sessionSave(false);
 
 		return $return;
 	}
@@ -204,7 +204,7 @@ class User extends ActiveRecord{
 				if(!$this->username or !$this->password)
 					throw new UserException("Username and password not set.", 203);
 
-				$sql = 'SELECT <COLUMNS> FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE username=? AND password=?';
+				$sql = 'SELECT <COLUMNS> FROM ' . Cfg('database.table.user') . ' WHERE username=? AND password=?';
 				$q_params = array($this->username, $this->password);
 				return $this->restoreFromDatabase(array(), $sql, $q_params);
 			}
@@ -258,7 +258,7 @@ class User extends ActiveRecord{
 				throw new UserException("Password for new user not set.", 214);
 
 			// hash new password
-			$this->password = $this->password_hash($this->password);
+			$this->password = $this->passwordHash($this->password);
 
 			parent::saveToDatabase($only_columns, array('password'));
 
@@ -287,17 +287,17 @@ class User extends ActiveRecord{
 	 * Example:
 	 * <code>
 	 * $user = new User(123);
-	 * $user->add_group(5);
+	 * $user->addGroup(5);
 	 * </code>
 	 *
 	 * @param int|array $group_id ID or array with groups IDs.
 	 * @return int 1 for success, -1 user already was in the group (or more groups)
 	 * or group does not exist.
-	 * @see remove_group()
+	 * @see removeGroup()
 	 * @throws UserException
 	 */
-	public function add_group($group_id){
-		return $this->add_remove_group($group_id,1);
+	public function addGroup($group_id){
+		return $this->addRemoveGroup($group_id,1);
 	}
 
 
@@ -315,35 +315,35 @@ class User extends ActiveRecord{
 	 * <code>
 	 * $user = new User('some_username');
 	 * $user->restore();
-	 * $user->remove_group(4);
+	 * $user->removeGroup(4);
 	 * </code>
 	 *
 	 * @param int|array|string $group_id ID or array with group IDs. '<kbd>all</kbd>'
 	 * to remove user from all groups.
 	 * @return int 1 for success, -1 user was not in the group (or more groups).
 	 * or group does not exist.
-	 * @see add_group()
+	 * @see addGroup()
 	 * @throws UserException
 	 */
-	public function remove_group($group_id){
-		return $this->add_remove_group($group_id,0);
+	public function removeGroup($group_id){
+		return $this->addRemoveGroup($group_id,0);
 	}
 
 
 	/**
 	 * Puts user in the group or removes user from group (or more groups if $group_id argument is array).
 	 *
-	 * This method is called from add_group() and remove_group() methods.
+	 * This method is called from addGroup() and removeGroup() methods.
 	 *
 	 * @param int|array|string $group_id id of the group or array with group ids.
 	 * @param int $action 1 add, 0 remove
 	 * @return int 1 for success, -1
-	 * @see add_group()
-	 * @see remove_group()
+	 * @see addGroup()
+	 * @see removeGroup()
 	 * @throws UserException
 	 * @ignore
 	 */
-	protected function add_remove_group($group_id, $action){
+	protected function addRemoveGroup($group_id, $action){
 
 		if(!$this->id)
 			throw new UserException('Error changing user group. User ID not set.', 207);
@@ -364,7 +364,7 @@ class User extends ActiveRecord{
 
 			// add to group
 			if($action == 1){
-				$sql = 'INSERT INTO ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' (user_id, group_id) VALUES (?, ?)';
+				$sql = 'INSERT INTO ' . Cfg('database.table.user_in_group') . ' (user_id, group_id) VALUES (?, ?)';
 				$q_params = array($this->id, $group_id_value);
 			}
 			// remove from group
@@ -372,12 +372,12 @@ class User extends ActiveRecord{
 
 				// remove all groups
 				if($group_id_value == 'all'){
-					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE user_id=?';
+					$sql = 'DELETE FROM ' . Cfg('database.table.user_in_group') . ' WHERE user_id=?';
 					$q_params = array($this->id);
 				}
 				// remove specific group
 				else{
-					$sql = 'DELETE FROM ' . Reg()->PSA_CFG['database']['table']['user_in_group'] . ' WHERE user_id=? AND group_id=?';
+					$sql = 'DELETE FROM ' . Cfg('database.table.user_in_group') . ' WHERE user_id=? AND group_id=?';
 					$q_params = array($this->id, $group_id_value);
 				}
 			}
@@ -395,7 +395,7 @@ class User extends ActiveRecord{
 		if($success){
 
 			// write log
-			if(Reg()->PSA_CFG['logging']['max_log_level'] >= 2)
+			if(Cfg('logging.max_log_level') >= 2)
 				$this->log("Group membership changed: " . implode(',',$group_id) . " action=" . ($action ? 'add' : 'remove'),__METHOD__,2);
 
 			if(!$failed)
@@ -409,16 +409,16 @@ class User extends ActiveRecord{
 	/**
 	 * Changes user password.
 	 *
-	 * New password will be hashed with {@link password_hash()} method and stored in the database.
+	 * New password will be hashed with {@link passwordHash()} method and stored in the database.
 	 * You need to call this method only when you want to change the password for the existing user.
 	 * Throws {@link UserException} on error.
 	 *
 	 * @param string $new_password New password.
 	 * @return int 1 for success.
 	 * @throws UserException
-	 * @see password_hash()
+	 * @see passwordHash()
 	 */
-	public function password_change($new_password){
+	public function passwordChange($new_password){
 
 		if((string)$new_password !== $new_password)
 			throw new UserException('Error changing password. Invalid password.', 209);
@@ -426,15 +426,15 @@ class User extends ActiveRecord{
 		if($new_password){
 
 			// encrypt new password
-			$new_password = $this->password_hash($new_password);
+			$new_password = $this->passwordHash($new_password);
 
 			// update user in the database
 			if($this->id){
-				$sql = 'UPDATE ' . Reg()->PSA_CFG['database']['table']['user'] . ' SET password = ? WHERE id = ?';
+				$sql = 'UPDATE ' . Cfg('database.table.user') . ' SET password = ? WHERE id = ?';
 				$q_params = array($new_password, $this->id);
 			}
 			else{
-				$sql = 'UPDATE ' . Reg()->PSA_CFG['database']['table']['user'] . ' SET password = ? WHERE username = ?';
+				$sql = 'UPDATE ' . Cfg('database.table.user') . ' SET password = ? WHERE username = ?';
 				$q_params = array($new_password, $this->username);
 			}
 
@@ -462,26 +462,26 @@ class User extends ActiveRecord{
 	 *
 	 * @param string $password Password to check.
 	 * @return int 1 given password is valid, 0 given password is invalid
-	 * @see password_hash()
-	 * @see password_change()
+	 * @see passwordHash()
+	 * @see passwordChange()
 	 * @throws UserException
 	 */
-	public function password_verify($password){
+	public function passwordVerify($password){
 
 		if(!$password)
 			throw new UserException('Error verifying password.', 211);
 
 
 		// serialize object
-		$database_password = $this->password_hash($password);
+		$database_password = $this->passwordHash($password);
 
 		// update user in the database
 		if($this->id){
-			$sql = 'SELECT id FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE password = ? AND id = ?';
+			$sql = 'SELECT id FROM ' . Cfg('database.table.user') . ' WHERE password = ? AND id = ?';
 			$q_params = array($database_password, $this->id);
 		}
 		else{
-			$sql = 'SELECT id FROM ' . Reg()->PSA_CFG['database']['table']['user'] . ' WHERE password = ? AND username = ?';
+			$sql = 'SELECT id FROM ' . Cfg('database.table.user') . ' WHERE password = ? AND username = ?';
 			$q_params = array($database_password, $this->username);
 		}
 
@@ -504,13 +504,13 @@ class User extends ActiveRecord{
 	 *
 	 * @param string $password String to be hashed.
 	 * @see config.php
-	 * @see password_change()
+	 * @see passwordChange()
 	 * @return string hashed password
 	 */
-	public function password_hash($password){
+	public function passwordHash($password){
 
 		// return hash
-		return hash(Reg()->PSA_CFG['password_hash'], $password);
+		return hash(Cfg('password_hash'), $password);
 	}
 
 
@@ -526,7 +526,7 @@ class User extends ActiveRecord{
 	protected function log($message, $method = '', $level = 1, $type = ''){
 
 		// if logging is enabled
-		if(Reg()->PSA_CFG['logging']['max_log_level'] >= $level){
+		if(Cfg('logging.max_log_level') >= $level){
 
 			$log_data['user_id']  = $this->id;
 			$log_data['username'] = $this->username;
@@ -558,7 +558,7 @@ class User extends ActiveRecord{
 	 *
 	 * @return array
 	 */
-	public function get_groups(){
+	public function getGroups(){
 
 		if(!$this->id)
 			throw new UserException('Error with setting user groups. User ID not set.', 212);
@@ -591,7 +591,7 @@ class User extends ActiveRecord{
 	 * @return int 1 for success.
 	 * @throws UserException
 	 */
-	public function save_last_login_time(){
+	public function saveLastLoginTime(){
 
 		$this->last_login = time();
 
@@ -611,7 +611,7 @@ class User extends ActiveRecord{
 	 * @param bool $throw_exception If true, UserException will be thrown if PHP session is not started.
 	 * @throws UserException
 	 */
-	protected function session_save($throw_exception = true){
+	protected function sessionSave($throw_exception = true){
 
 		// check if session is started
 		if(!session_id()){
