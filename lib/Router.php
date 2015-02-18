@@ -180,19 +180,11 @@ class Router {
 		// check if method exists
 		if(method_exists($object, $method_name)){
 
-			// I couldn't use call_user_func_array() here because it is suitable only for static methods.
-			// (it looks that as from 5.3 call_user_func_array() can also be used)
-			// So I use PHP reflection api to invoke method with array of arguments.
-			// Also here can eval() be used.
-			// Simplest and the fastest solution would be: $object->$method_name($method_arguments);
-			// but then invoking method must be written to accept one parameter which is array with values
-			// that normally would be separate method parameters.
-
 			// create an instance of the Reflection_Method class
 			$invoke_method = new ReflectionMethod($object, $method_name);
 
 			// if profile log is enabled
-			if(isset(Reg()->PSA_CFG['profile_log']) && Reg()->PSA_CFG['profile_log'] && !isset($object->psa_no_profile_log))
+			if(Cfgn('profile_log') && !isset($object->psa_no_profile_log))
 				$profile_log = 1;
 			else
 				$profile_log = 0;

@@ -142,7 +142,7 @@ class ActiveRecord{
 
 		// reference to database object
 		if(!$database_connection)
-			$this->psa_database = Reg()->psa_database;
+			$this->psa_database = Db();
 		else
 			$this->psa_database = $database_connection;
 

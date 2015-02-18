@@ -23,6 +23,7 @@ class Psa{
 	
 	/**
 	 * @asFunction Cfg Psa::getConfig() propSelector
+	 * @asFunction Cfgn Psa::getConfig() propSelector exception=no
 	 *
 	 * @return Array
 	 */

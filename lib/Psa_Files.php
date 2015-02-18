@@ -193,7 +193,7 @@ class Psa_Files {
 			
 							
 						/*
-						 @asFunction PSA_CFG psa_get_config() propSelector
+						 @asFunction PSA_CFG psa_get_config() propSelector exceptionClass 
 						 @return asdasdasd
 						 @asFunction Message MessageCoo getInstance ret:\asdasd\UserObject 
 						 @asFunction Logger from>\aass\asasa\Class  getInstance ret:\asdasd\UserObject
@@ -258,8 +258,9 @@ class Psa_Files {
 				
 			if(isset($asFunction_comments[2])){
 				foreach ($asFunction_comments[2] as $doc_tag) {
-						
-					$params = explode(' ', trim(preg_replace('/\s+/', ' ', $doc_tag)));
+
+					$asFunction_line = trim(preg_replace('/\s+/', ' ', $doc_tag));
+					$params = explode(' ', $asFunction_line, 4);
 					
 					// invalid asFunction comment
 					if(count($params) < 3){
@@ -283,14 +284,33 @@ class Psa_Files {
 
 					//if(isset($files['@asFunction'][$function_name]))
 					//	trigger_error("Replaceing @asFunction $function_name from {$files['@asFunction'][$function_name]['tag_file']}", E_USER_NOTICE);
+					
+					$template_params = array();
+					
+					// get template params
+					if(isset($params[3])){
 						
+						$tparams_csv_arr = str_getcsv(trim($params[3]), ' ');
+						
+						foreach ($tparams_csv_arr as $param_value) {
+							
+							$key_val = explode('=', $param_value, 2);
+							
+							if(isset($key_val[1]))
+								$template_params[$key_val[0]] = $key_val[1];
+							else
+								$template_params[] = $param_value;
+						}
+					}
+					
+					// data for temlplate
 					$files['@asFunction'][$function_name] = array(
 							'function' => $function_name,
 							'target' => $target,
 							'target_type' => $target_type,
 							'template' => trim($params[2]),
 							'tag_file' => $filepath,
-							'params' => array_slice($params, 3),
+							'params' => $template_params,
 					);
 				}
 			}

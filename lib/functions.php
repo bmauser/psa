@@ -243,7 +243,7 @@ function isUserInGroup($user, $group){
 
 		$sql = "SELECT * FROM " . Cfg('database.table.user_in_group') . " WHERE user_id = '$user' AND group_id = '$group'";
 
-		$row = Reg()->psa_database->fetchRow($sql);
+		$row = Db()->fetchRow($sql);
 
 		if(isset($row['user_id']) && $row['user_id'])
 			return 1;
@@ -333,12 +333,9 @@ function getInstance($class_name, $instance_name = null, array $constructor_args
  * @param unknown_type $selector
  * @return NULL
  */
-function &getPropertyBySelector(&$object, $selector, $exception_class_name = null, $exception_message = null, $use_cache = true){
+function &getPropertyBySelector(&$object, $selector, $exception_class_name = 'PsaException', $exception_message = null, $use_cache = true){
 
 	static $cache;
-	
-	if(!$exception_class_name)
-		$exception_class_name = 'PsaException';
 	
 	if(!$exception_message)
 		$exception_message = 'Value ' . $selector . ' not set';
@@ -346,8 +343,6 @@ function &getPropertyBySelector(&$object, $selector, $exception_class_name = nul
 	if($use_cache && isset($cache[$selector])){
 		return $cache[$selector];
 	}
-	
-	// @todo check if is array or object
 	
 	$parts1 = explode('->', $selector);
 	$ref = &$object;

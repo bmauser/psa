@@ -126,31 +126,6 @@ class Db{
 	public $result;
 
 
-	// Database connection parameters. If are set, will be used by connect() function.
-
-	/**
-	 * PDO data source name.
-	 * @var string
-	 */
-	public $dsn = null;
-	/**
-	 * Database username.
-	 * @var string
-	 */
-	public $username = null;
-	/**
-	 * Database password.
-	 * @var string
-	 */
-	public $password = null;
-	/**
-	 * PDO driver options
-	 * @var array
-	 */
-	public $driver_options = array();
-
-
-
 	/**
 	 * Performs a query against the database.
 	 *
@@ -215,9 +190,7 @@ class Db{
 	/**
 	 * Connects to the database.
 	 *
-	 * If called without arguments, it first uses connection parameters from object properties ({@link $dsn},
-	 * {@link $username}, {@link $password}, {@link $driver_options}) and if
-	 * {@link $dsn} value is not set, it takes connection parameters from <var>$PSA_CFG</var> config array
+	 * If called without arguments, it takes connection parameters from <var>$PSA_CFG</var> config array
 	 * (set in {@link config.php} or config_override.php).
 	 * Throws a {@link DbException} if the attempt to connect to the requested database fails.
 	 *
@@ -235,36 +208,25 @@ class Db{
 		// if connected to the database
 		if(!$this->pdo){
 
-			// if connection parameters are passed as method arguments
-			if($dsn){
-				$this->dsn = $dsn;
-				$this->username = $username;
-				$this->password = $password;
-				$this->driver_options = $driver_options;
-			}
-
-			// if connection parameters are not set as object properties use default
-			else if(!$this->dsn){
-				$this->dsn = Cfg('pdo.dsn');
-				$this->username = Cfg('pdo.username');
-				$this->password = Cfg('pdo.password');
-				if(isset(Cfg()['pdo']['driver_options']))
-					$this->driver_options = Cfg()['pdo']['driver_options'];
-			}
-
 			// Connect to database server
 			try{
-				$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->driver_options);
+				if($dsn)
+					$this->pdo = new PDO($dsn, $username, $password, $driver_options);
+				else
+					$this->pdo = new PDO(Cfg('pdo.dsn'), Cfg('pdo.username'), Cfg('pdo.password'), Cfgn('pdo.driver_options'));
 			}
 			catch(PDOException $e){
 
 				if($throw_PDOException)
 					throw $e;
 
+				if(!$dsn)
+					$dsn = Cfg('pdo.dsn');
+				
 				// check if PDO extension is enabled
-				if(substr($this->dsn,0,6) == 'mysql:' && !extension_loaded('pdo_mysql'))
+				if(substr($dsn, 0, 6) == 'mysql:' && !extension_loaded('pdo_mysql'))
 					$msg1 = "pdo_mysql extension not enabled.";
-				else if(substr($this->dsn,0,6) == 'pgsql:' && !extension_loaded('pdo_pgsql'))
+				else if(substr($dsn, 0, 6) == 'pgsql:' && !extension_loaded('pdo_pgsql'))
 					$msg1 = "pdo_pgsql extension not enabled.";
 				else
 					$msg1 = '';
@@ -393,10 +355,7 @@ class Db{
 
 		// execute prepared query
 		try{
-			if(is_array($params))
-				$statement->execute($params);
-			else
-				$statement->execute();
+			return $statement->execute($params);
 		}
 		catch(PDOException $e){
 
@@ -412,8 +371,5 @@ class Db{
 
 			throw new DbException('SQL error: ' . $e->getMessage() . '. In query: ' . $statement->queryString . $query_params_str, $e->getCode());
 		}
-
-		// if success
-		return true;
 	}
 }
