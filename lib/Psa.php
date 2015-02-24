@@ -12,7 +12,7 @@
  */
 class Psa{
 
-	public $instances;
+	protected $asFunction_instances;
 	
 	
 	

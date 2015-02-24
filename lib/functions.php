@@ -159,7 +159,7 @@ function deleteGroup($group){
  * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array
  * with all classes and their paths. There is a command line helper script <kbd>register_files.php</kbd> for that.
  *
- * @see Psa_Files::register()
+ * @see PreInit::register()
  */
 function autoloader($class_name){
 
@@ -283,26 +283,31 @@ function getInstance($class_name, $instance_name = null, array $constructor_args
 	static $first_instance = array();
 	static $instances = array();	
 
-	
-	// select instance
-	if($instance_name === null or $only_first_instance){ // first instance
-		if(!isset($first_instance[$class_name])){
-			$first_instance[$class_name] = null;
-			$instance = &$first_instance[$class_name];
-		}
-		else
-			$instance = $first_instance[$class_name];
+	// just return a new instance
+	if($instance_name === '_new'){
+		$instance = null;
 	}
-	else{ // named instance
-		if(!isset($instances[$class_name][$instance_name])){
-			$instances[$class_name][$instance_name] = null;
-			$instance = &$instances[$class_name][$instance_name];
+	// select an instance
+	else{
+		if($instance_name === null or $only_first_instance){ // first instance
+			if(!isset($first_instance[$class_name])){
+				$first_instance[$class_name] = null;
+				$instance = &$first_instance[$class_name];
+			}
+			else
+				$instance = $first_instance[$class_name];
 		}
-		else
-			$instance = $instances[$class_name][$instance_name];
+		else{ // named instance
+			if(!isset($instances[$class_name][$instance_name])){
+				$instances[$class_name][$instance_name] = null;
+				$instance = &$instances[$class_name][$instance_name];
+			}
+			else
+				$instance = $instances[$class_name][$instance_name];
+		}
 	}
 	
-	// make new instance
+	// make a new instance
 	if($instance === null){
 		
 		// if function name is passed

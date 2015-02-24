@@ -25,7 +25,7 @@
  * <br><b>2)</b> Authorize user by username and password:
  * <code>
  * $user = new User('my_user');
- * $user->authorize('user_password');
+ * $user->logIn('user_password');
  * </code>
  *
  * <br><b>3)</b> Extend <kbd>User</kbd> class. You'll probably want to extend <kbd>User</kbd> class
@@ -57,8 +57,8 @@
  * $user = new MyUser(10); // MyUser extends User
  *
  * // remove the user from all groups and put it in groups with ID 3,5 and 7
- * $user->removeGroup('all');
- * $user->addGroup(array(3,5,7));
+ * $user->leaveGroup('all');
+ * $user->joinGroup(array(3,5,7));
  * </code>
  */
 class User extends ActiveRecord{
@@ -153,7 +153,7 @@ class User extends ActiveRecord{
 	 * See examples in {@link User} class description.
 	 *
 	 * This function calls {@link restore()} method with <kbd>'username_password'</kbd> as the first argument
-	 * and writes a log message that user is authorized.
+	 * and writes a log message that user is logged in.
 	 *
 	 * @param string $password User password.
 	 * @param bool $write_success_login_logs If false, log message about successful authorization will not be written.
@@ -163,10 +163,10 @@ class User extends ActiveRecord{
 	 * @see restore()
 	 * @throws UserException
 	 */
-	public function authorize($password = null, $write_success_login_logs = true, $save_to_session = true){
+	public function logIn($password = null, $write_success_login_logs = true, $save_to_session = true){
 
 		if($password){
-			$this->password = $this->passwordHash($password);
+			$this->password = $this->hashPassword($password);
 			$return = $this->restore('username_password');
 		}
 		else{
@@ -175,7 +175,7 @@ class User extends ActiveRecord{
 
 		// write log
 		if($write_success_login_logs)
-			$this->log('User authorized', __METHOD__, 2);
+			$this->log('User logged in', __METHOD__, 2);
 
 		if($save_to_session)
 			$this->sessionSave(false);
@@ -236,11 +236,11 @@ class User extends ActiveRecord{
 	 * There must be a column in the database named the same as the member variable. It works only for
 	 * variables mentioned in <var>$table_columns</var> argument to the constructor or by <var>$only_columns</var>
 	 * argument to this method.
-	 * All saved values will be restored when the {@link authorize()} or {@link restore()}
+	 * All saved values will be restored when the {@link logIn()} or {@link restore()}
 	 * methods are called.
 	 * See examples in {@link User} class description.
 	 *
-	 * @see authorize()
+	 * @see logIn()
 	 * @param array $only_columns Array with column names in <i>psa_user</i> database table to work with.
 	 * If not set, column names set by the constructor are used.
 	 * @return int User ID.
@@ -258,7 +258,7 @@ class User extends ActiveRecord{
 				throw new UserException("Password for new user not set.", 214);
 
 			// hash new password
-			$this->password = $this->passwordHash($this->password);
+			$this->password = $this->hashPassword($this->password);
 
 			parent::saveToDatabase($only_columns, array('password'));
 
@@ -280,24 +280,24 @@ class User extends ActiveRecord{
 	 * call {@link save()} method after.
 	 * If you are creating a new user, this method must be called after {@link save()} method.
 	 * {@link $id} member variable must be set before calling this method. If you pass username
-	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
+	 * to the constructor, call {@link restore()} or {@link logIn()} method before to get the
 	 * user ID from the database.
 	 * Throws {@link UserException} on error.
 	 *
 	 * Example:
 	 * <code>
 	 * $user = new User(123);
-	 * $user->addGroup(5);
+	 * $user->joinGroup(5);
 	 * </code>
 	 *
 	 * @param int|array $group_id ID or array with groups IDs.
 	 * @return int 1 for success, -1 user already was in the group (or more groups)
 	 * or group does not exist.
-	 * @see removeGroup()
+	 * @see leaveGroup()
 	 * @throws UserException
 	 */
-	public function addGroup($group_id){
-		return $this->addRemoveGroup($group_id,1);
+	public function joinGroup($group_id){
+		return $this->addRemoveGroup($group_id, 1);
 	}
 
 
@@ -307,7 +307,7 @@ class User extends ActiveRecord{
 	 * Group membership changes are immediately stored in the database and you don't have to
 	 * call {@link save()} method after.
 	 * {@link $id} member variable must be set before calling this method. If you pass username
-	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
+	 * to the constructor, call {@link restore()} or {@link logIn()} method before to get the
 	 * user ID from the database.
 	 * Throws {@link UserException} on error.
 	 *
@@ -315,17 +315,17 @@ class User extends ActiveRecord{
 	 * <code>
 	 * $user = new User('some_username');
 	 * $user->restore();
-	 * $user->removeGroup(4);
+	 * $user->leaveGroup(4);
 	 * </code>
 	 *
 	 * @param int|array|string $group_id ID or array with group IDs. '<kbd>all</kbd>'
 	 * to remove user from all groups.
 	 * @return int 1 for success, -1 user was not in the group (or more groups).
 	 * or group does not exist.
-	 * @see addGroup()
+	 * @see joinGroup()
 	 * @throws UserException
 	 */
-	public function removeGroup($group_id){
+	public function leaveGroup($group_id){
 		return $this->addRemoveGroup($group_id,0);
 	}
 
@@ -333,13 +333,13 @@ class User extends ActiveRecord{
 	/**
 	 * Puts user in the group or removes user from group (or more groups if $group_id argument is array).
 	 *
-	 * This method is called from addGroup() and removeGroup() methods.
+	 * This method is called from joinGroup() and leaveGroup() methods.
 	 *
 	 * @param int|array|string $group_id id of the group or array with group ids.
 	 * @param int $action 1 add, 0 remove
 	 * @return int 1 for success, -1
-	 * @see addGroup()
-	 * @see removeGroup()
+	 * @see joinGroup()
+	 * @see leaveGroup()
 	 * @throws UserException
 	 * @ignore
 	 */
@@ -409,16 +409,16 @@ class User extends ActiveRecord{
 	/**
 	 * Changes user password.
 	 *
-	 * New password will be hashed with {@link passwordHash()} method and stored in the database.
+	 * New password will be hashed with {@link hashPassword()} method and stored in the database.
 	 * You need to call this method only when you want to change the password for the existing user.
 	 * Throws {@link UserException} on error.
 	 *
 	 * @param string $new_password New password.
 	 * @return int 1 for success.
 	 * @throws UserException
-	 * @see passwordHash()
+	 * @see hashPassword()
 	 */
-	public function passwordChange($new_password){
+	public function changePassword($new_password){
 
 		if((string)$new_password !== $new_password)
 			throw new UserException('Error changing password. Invalid password.', 209);
@@ -426,7 +426,7 @@ class User extends ActiveRecord{
 		if($new_password){
 
 			// encrypt new password
-			$new_password = $this->passwordHash($new_password);
+			$new_password = $this->hashPassword($new_password);
 
 			// update user in the database
 			if($this->id){
@@ -462,18 +462,18 @@ class User extends ActiveRecord{
 	 *
 	 * @param string $password Password to check.
 	 * @return int 1 given password is valid, 0 given password is invalid
-	 * @see passwordHash()
-	 * @see passwordChange()
+	 * @see hashPassword()
+	 * @see changePassword()
 	 * @throws UserException
 	 */
-	public function passwordVerify($password){
+	public function verifyPassword($password){
 
 		if(!$password)
 			throw new UserException('Error verifying password.', 211);
 
 
 		// serialize object
-		$database_password = $this->passwordHash($password);
+		$database_password = $this->hashPassword($password);
 
 		// update user in the database
 		if($this->id){
@@ -504,12 +504,12 @@ class User extends ActiveRecord{
 	 *
 	 * @param string $password String to be hashed.
 	 * @see config.php
-	 * @see passwordChange()
+	 * @see changePassword()
 	 * @return string hashed password
 	 */
-	public function passwordHash($password){
+	public function hashPassword($password){
 
-		// return hash
+		// return hashed password
 		return hash(Cfg('password_hash'), $password);
 	}
 
@@ -553,7 +553,7 @@ class User extends ActiveRecord{
 	 * </pre>
 	 *
 	 * {@link $id} member variable must be set before calling this method. If you pass username
-	 * to the constructor, call {@link restore()} or {@link authorize()} method before to get the
+	 * to the constructor, call {@link restore()} or {@link logIn()} method before to get the
 	 * user ID from the database.
 	 *
 	 * @return array

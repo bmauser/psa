@@ -2,8 +2,8 @@
 /**
  * Files registration script.
  * 
- * This script does file registration, it actually calls {@link Psa_Files::register()} 
- * and {@link Psa_Files::save()} methods.
+ * This script does file registration, it actually calls {@link PreInit::register()} 
+ * and {@link PreInit::save()} methods.
  * See their documentation for details about the file registration process.
  * When you add some new classes to your project that you want to autoload
  * you must register files to recreate autoload_data.php file.
@@ -30,13 +30,13 @@ if(php_sapi_name() !== 'cli'){
 
 
 // PSA main dir
-define('PSA_BASE_DIR', dirname(__FILE__));
+define('PSA_BASE_DIR', __DIR__);
 
 
 // include required files
 include PSA_BASE_DIR . '/lib/Psa.php';
 include PSA_BASE_DIR . '/config.php';
-include PSA_BASE_DIR . '/lib/Psa_Files.php';
+include PSA_BASE_DIR . '/lib/PreInit.php';
 include PSA_BASE_DIR . '/lib/Registry.php';
 include PSA_BASE_DIR . '/lib/functions.php';
 include PSA_BASE_DIR . '/wri/asfunctions.php';

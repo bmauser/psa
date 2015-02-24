@@ -10,7 +10,7 @@
  * Define PSA_BASE_DIR constant if not defined.
  */
 if(!defined('PSA_BASE_DIR'))
-	define('PSA_BASE_DIR', dirname(__FILE__)); // PSA main directory
+	define('PSA_BASE_DIR', __DIR__); // PSA main directory
 
 
 /**

@@ -8,7 +8,7 @@ include_once 'PsaException.php';
 
 
 /**
- * This exception will be raised by some methods from the {@link Psa_Files} class.
+ * This exception will be raised by some methods from the {@link PreInit} class.
  */
 class FileException extends PsaException{
 

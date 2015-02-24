@@ -530,20 +530,23 @@ class Validator{
 
 		// name of the method to invoke
 		$validation_method_name = 'check_' . $validation_type;
-
+		
+		$reflection = $this->getReflection($validation_method_name);
+		
 		// if method exists
-		if(method_exists($this, $validation_method_name)){
+		if($reflection){
 
-			// method reflection
-			$invoke_method = new ReflectionMethod($this, $validation_method_name);
-
-			// call validating method
-			$validation_result = $invoke_method->invokeArgs($this, $params);
+			// closure
+			if(isset($this->$validation_method_name))
+				$validation_result = $reflection->invokeArgs($params);
+			// method
+			else
+				$validation_result = $reflection->invokeArgs($this, $params);	
 
 			// if invalid
 			if(!$validation_result){
 
-				$message = $this->getValidationMessage($validation_type, $params, $invoke_method);
+				$message = $this->getValidationMessage($validation_type, $params, $reflection);
 
 				return $this->failLocal($message, $params[0], $validation_type, 604);
 			}
@@ -555,22 +558,37 @@ class Validator{
 	}
 
 
+	
+	/**
+	 * Returns reflection object for method or closure.
+	 *
+	 * @ignore
+	 */
+	protected function getReflection($validation_method_name){
+		
+		// is closure
+		if(isset($this->$validation_method_name) && $this->$validation_method_name instanceof Closure)
+			return new ReflectionFunction($this->$validation_method_name);
+		// is method
+		else if(method_exists($this, $validation_method_name))
+			return new ReflectionMethod($this, $validation_method_name);
+		else
+			return null;	
+	}
+	
+	
 	/**
 	 * Returns validation error message.
 	 *
 	 * @ignore
 	 */
-	protected function getValidationMessage($validation_type, $method_params, ReflectionMethod $reflection_method = null, $only_parameter_message = null){
+	protected function getValidationMessage($validation_type, $method_params, $reflection_method = null, $only_parameter_message = null){
 
 		// default validation message
 		$message_var_name = 'msg_check_' . $validation_type;
 
 		if(!$reflection_method){
-
-			// name of the validation method
-			$validation_method_name = 'check_' . $validation_type;
-
-			$reflection_method = new ReflectionMethod($this, $validation_method_name);
+			$reflection_method = $this->getReflection('check_' . $validation_type);
 		}
 
 		// how many arguments has validation_method

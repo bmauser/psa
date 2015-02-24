@@ -23,15 +23,15 @@
  *
  * This class implements {@link http://en.wikipedia.org/wiki/Singleton_pattern
  * singleton pattern}
- * so you can get reference to Psa_Files object from any scope with
- * {@link get_instance()} method. You cannot make instance of Psa_Files object
+ * so you can get reference to PreInit object from any scope with
+ * {@link get_instance()} method. You cannot make instance of PreInit object
  * with the
  * <var>new</var> operator.
  *
  * @see register_files.php
- * @asFunction Files Psa_Files getInstance
+ * @asFunction Files PreInit getInstance
  */
-class Psa_Files {
+class PreInit {
 
 
 	/**
