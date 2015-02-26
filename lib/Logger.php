@@ -19,15 +19,12 @@
  * 
  * @asFunction Logger Logger getInstance
  */
-class Logger{
+class Logger extends Psr\Log\AbstractLogger{
 
 	/**
-	 * Prepared query.
-	 *
-	 * @var PDOStatement
 	 * @ignore
 	 */
-	protected $prepared_query = null;
+	protected $log_function = null;
 
 
 	/**
@@ -37,7 +34,104 @@ class Logger{
 	 * @ignore
 	 */
 	protected $db = null;
+	
+	
+	
+	
+	public function __construct($log_function){
+		
+		
+		$this->log_function = $log_function;
+		
+		
+		if(!is_callable($log_function))
+			$this->log_function = $log_function;
+		
+		if(!($this->db instanceof Db)){
+		
+			// should new database connection be opened
+			if(isset(Cfg()['logging']['new_database_connection'])){
+		
+				if(!(@Reg()->psa_log_database_connection instanceof Db)){
+					Reg()->psa_log_database_connection = Db();
+				}
+				$this->db = Reg()->psa_log_database_connection;
+			}
+			else{
+				// existing database connection
+				$this->db = Reg()->psa_database;
+			}
+		}
+		
+	}
+	
+	
 
+
+	
+	protected function log($level, $message, $log_data){
+
+		// validate levels
+		
+		/*
+					id
+					log_time
+			message
+			client_ip
+					user_id
+					username
+					group_id
+					groupname
+					function
+					type
+			request_uri
+			user_agent
+			referer
+		*/
+		
+		$log_data = array(
+			'client_ip' => null,
+			'request_uri' => null,
+			'user_agent' => null,
+			'referer' => null,
+			'type' => null,
+			'username' => null,
+			'user_id' => null,
+			'function' => null,
+			'group_id' => null,
+			'groupname' => null,
+		);
+		
+		// if not set user data, use data from $_SESSION['psa_current_user_data']
+		if((!isset($log_data['user_id']) or !$log_data['user_id']) && isset(Session()['psa_current_user_data']['id']))
+			$log_data['user_id'] = Session()['psa_current_user_data']['id'];
+
+		if((!isset($log_data['username']) or !$log_data['username']) && isset(Session()['psa_current_user_data']['username']))
+			$log_data['username'] = Session()['psa_current_user_data']['username'];
+		
+		if(!isset($log_data['username']) && isset($_SERVER["REMOTE_ADDR"]))
+			$log_data['request_uri'] = $_SERVER["REMOTE_ADDR"];
+		
+		if(!isset($log_data['username']) && isset($_SERVER["REQUEST_URI"]))
+			$log_data['request_uri'] = $_SERVER["REQUEST_URI"];
+		
+		if(!isset($log_data['user_agent']) && isset($_SERVER["HTTP_USER_AGENT"]))
+			$log_data['user_agent'] = $_SERVER["HTTP_USER_AGENT"];
+		
+		if(!isset($log_data['referer']) && isset($_SERVER["HTTP_REFERER"]))
+			$log_data['referer'] = $_SERVER["HTTP_REFERER"];
+		
+		$log_data['message'] = (string) $message;
+		$log_data['level'] = (string) $level;
+		
+		if($this->log_function)
+			$this->log_function($log_data);
+		else
+			$this->writeLog($log_data);
+		
+	}
+	
+	
 
 	/**
 	 * Writes logs.
@@ -90,6 +184,60 @@ class Logger{
 	 * @see format_database_log()
 	 * @see config.php
 	 */
+	protected function writeLog($log_data){
+		
+		static $prepared_query = null;
+		
+		// prepare database query if not already prepared
+		if(!$prepared_query){
+			$sql = "INSERT INTO " . Cfg('database.table.log') . " (client_ip, log_time, request_uri, user_agent, referer, type, username, user_id, message, function, group_id, groupname) VALUES (?,NOW(),?,?,?,?,?,?,?,?,?,?)";
+			$prepared_query = $this->db->prepare($sql);
+		}
+		
+		$defaults = array(
+			'client_ip' => null,
+			'request_uri' => null,
+			'user_agent' => null,
+			'referer' => null,
+			'type' => null,
+			'username' => null,
+			'user_id' => null,
+			'message' => null,
+			'function' => null,
+			'group_id' => null,
+			'groupname' => null,
+		);
+		
+		$params = array_merge($defaults, $log_data);
+		
+		// run query against the database
+		try{
+			$this->db->execute($params, $this->prepared_query, 1);
+		}
+		catch(PDOException $e){
+		
+			$message = 'Unable to write log message to database table ' . Cfg()['logging']['storage'][$log_storage]['target'] . ' ' . $e->getMessage();
+		
+			// log message cannot be written into the database if there is problem with database connection
+			if(Cfg()['logging']['storage']['psa_default']['type'] == 'database'){
+				trigger_error($message);
+				throw new LoggerException($message, $e->getCode(), false);
+			}
+			else
+				throw new LoggerException($message, $e->getCode());
+		}
+		
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+
 	public function log($log_data, $log_storage = 'psa_default'){
 
 		// if $log_data is not array
