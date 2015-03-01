@@ -5,6 +5,7 @@
 
 
 // @asFunction Session $_SESSION propSelector
+// @asFunction Sessionn $_SESSION propSelector exception=null
 /**
  * 
  * @todo
@@ -23,7 +24,7 @@ class Psa{
 	
 	/**
 	 * @asFunction Cfg Psa::getConfig() propSelector
-	 * @asFunction Cfgn Psa::getConfig() propSelector exception=no
+	 * @asFunction Cfgn Psa::getConfig() propSelector exception=null
 	 *
 	 * @return Array
 	 */

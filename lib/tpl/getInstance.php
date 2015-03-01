@@ -10,10 +10,12 @@ function <?php echo $gf['function'] ?>($instance_name = null){
 	
 	// no arguments for constructor
 	if(func_num_args() <= 1)
-		return getInstance('<?php echo $gf['target'] ?>', $instance_name, null, <?php echo ($gf['target_type'] == 'function') ? 1 : 0; ?>, null);
-	
+		$args = array();
 	// with constructor arguments
-	$args = func_get_args();
-	array_shift($args);
-	return call_user_func_array('getInstance', array('<?php echo $gf['target'] ?>', $instance_name, $args, <?php echo ($gf['target_type'] == 'function') ? 1 : 0; ?>, null));
+	else{
+		$args = func_get_args();
+		array_shift($args);
+	}
+	
+	return getInstance('<?php echo $gf['target'] ?>', $instance_name, $args, <?php echo ($gf['target_type'] == 'function') ? 1 : 0; ?>, null);
 }

@@ -530,11 +530,10 @@ class User extends ActiveRecord{
 
 			$log_data['user_id']  = $this->id;
 			$log_data['username'] = $this->username;
-			$log_data['message']  = $message;
 			$log_data['function'] = $method;
 			$log_data['level']    = $level;
 			$log_data['type']     = $type;
-			Logger()->log($log_data);
+			Logger()->info($message, $log_data);
 		}
 	}
 

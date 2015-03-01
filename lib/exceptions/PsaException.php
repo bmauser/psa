@@ -59,22 +59,18 @@ class PsaException extends Exception{
 		// if logging is enabled
 		if(Cfg('logging.max_log_level') >= 1){
 			
-			if(is_array($log_message)){
+			if(is_array($log_message))
 				$log_data = &$log_message;
-			}
 			else
 				$log_data['message'] = $log_message;
 
 			if(!@$log_data['function'])
 				$log_data['function'] = $this->getTraceAsString();
 
-			if(!@$log_data['level'])
-				$log_data['level'] = 1;
-
 			if(!@$log_data['type'])
 				$log_data['type'] = get_class($this);
 
-			Logger()->log($log_data);
+			Logger()->info($log_data['message'], $log_data);
 		}
 	}
 }

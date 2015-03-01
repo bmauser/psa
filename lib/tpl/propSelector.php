@@ -19,7 +19,7 @@ function &<?php echo $gf['function'] ?>($selector = null){
 		return $obj;
 	
 	<?php if(isset($gf['params']['exception'])){
-		if($gf['params']['exception'] == 'no')
+		if($gf['params']['exception'] == 'null')
 			$gf['params']['exception'] = '';
 	?>		
 	return getPropertyBySelector($obj, $selector, '<?php echo @$gf['params']['exception'] ?>', '<?php echo @$gf['params']['message'] ?>');

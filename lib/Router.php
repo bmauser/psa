@@ -50,13 +50,6 @@
  */
 class Router {
 
-	/**
-	 * Array that holds Profile log data
-	 *
-	 * @var array
-	 */
-	protected $profile_log_data;
-
 
 	/**
 	 * Returns an array of URL elements after application base directory exploded by '/'.
@@ -75,29 +68,33 @@ class Router {
 	 * </pre>
 	 *
 	 * @param string $request_uri <kbd>$_SERVER["REQUEST_URI"]</kbd> by default
+	 * @param string $basedir_web 
 	 * @return array
 	 */
-	public function explodeUrl($request_uri = null){
-
+	public function explodeRequestUri($request_uri = null, $basedir_web = null){
+		
 		if($request_uri === null){
 			if(isset($_SERVER["REQUEST_URI"]) && $_SERVER["REQUEST_URI"])
 				$request_uri = $_SERVER["REQUEST_URI"];
 			else
-				throw new RouterException("Unknown REQUEST_URI.", 103);
+				return array();
 		}
+		
+		if(!$basedir_web && isset(Reg()->basedir_web))
+			$basedir_web = Reg()->basedir_web;
 
 		// remove query string from url
-		$request_uri_arr = explode('?', $request_uri);
+		$request_uri = explode('?', $request_uri)[0];
 
-		// If application root folder is in subfolder from server root like: www.example.com/my/application/
-		// remove unnecessary part of the path. In case of url above that would be '/my/application'.
-		if(Reg()->basedir_web)
-			$request_uri_arr[0] = implode('', explode(Reg()->basedir_web, $request_uri_arr[0], 2));
+		// remove $basedir_web from $request_uri
+		if($basedir_web)
+			$request_uri = implode('', explode(Reg()->basedir_web, $request_uri, 2));
 
-		$request_uri_arr[0] = trim($request_uri_arr[0], "/ \t\n\r\0\x0B");
+		// clean route string
+		$request_uri = trim($request_uri, "/ \t\n\r\0\x0B");
 
-		if($request_uri_arr[0])
-			return explode('/', $request_uri_arr[0]);
+		if($request_uri)
+			return explode('/', $request_uri);
 
 		return array();
 	}
@@ -123,22 +120,20 @@ class Router {
 	 * )
 	 * </pre>
 	 *
-	 * @param string|array $request_uri <kbd>$_SERVER["REQUEST_URI"]</kbd> by default
+	 * @param string|array $uri_arr
 	 * @return array
 	 */
-	public function getDispatchData($request_uri = null){
+	public function getDispatchData(array $uri_arr = null){
 
-		if(is_array($request_uri))
-			$url_arr = $request_uri;
-		else
-			$url_arr = $this->explodeUrl($request_uri);
+		if(!$uri_arr)
+			$uri_arr = $this->explodeRequestUri();
 
 		// controller name
-		$return['controller'] = (isset($url_arr[0]) ? ucfirst($url_arr[0]) : Cfg('mvc.default_controller_name')) . Cfg('mvc.default_controller_suffix');
+		$return['controller'] = (isset($uri_arr[0]) ? ucfirst($uri_arr[0]) : Cfg('mvc.default_controller_name')) . Cfg('mvc.default_controller_suffix');
 		// action name
-		$return['action'] = (isset($url_arr[1]) ? $url_arr[1] : Cfg('mvc.default_action_name')) . Cfg('mvc.default_action_suffix');
+		$return['action'] = (isset($uri_arr[1]) ? $uri_arr[1] : Cfg('mvc.default_action_name')) . Cfg('mvc.default_action_suffix');
 		// action arguments
-		$return['arguments'] = isset($url_arr[2]) ? array_slice($url_arr, 2) : array();
+		$return['arguments'] = isset($uri_arr[2]) ? array_slice($uri_arr, 2) : array();
 
 		return $return;
 	}
@@ -168,77 +163,19 @@ class Router {
 			$method_arguments = $dispatch_data['arguments'];
 		}
 
-		// make new object
-		if(class_exists($class_name))
-			$object = new $class_name;
-		else{
+		if(!class_exists($class_name))
 			throw new RouterException("Trying to make a new instance of unexisting class: $class_name", 101);
-		}
-
-		$return = null;
+		
+		// make new object
+		$object = new $class_name;
 
 		// check if method exists
-		if(method_exists($object, $method_name)){
-
-			// create an instance of the Reflection_Method class
-			$invoke_method = new ReflectionMethod($object, $method_name);
-
-			// if profile log is enabled
-			if(Cfgn('profile_log') && !isset($object->psa_no_profile_log))
-				$profile_log = 1;
-			else
-				$profile_log = 0;
-
-			// data for profile log
-			if($profile_log){
-
-				static $request_id = null; // unique ID for request
-
-				if(!$request_id)
-					$this->profile_log_data['request_id'] = uniqid('', true);
-
-				$this->profile_log_data['time_start'] = microtime(true);
-				$this->profile_log_data['method'] = $class_name . '->' . $method_name;
-				if($method_arguments)
-					$this->profile_log_data['method_arguments'] = print_r($method_arguments,true);
-				else
-					$this->profile_log_data['method_arguments'] = null;
-			}
-
-			// call method with arguments
-			$return = $invoke_method->invokeArgs($object, $method_arguments);
-
-			// write profile log
-			if($profile_log){
-				$this->writeProfileLog();
-			}
-		}
-		else{
+		if(!method_exists($object, $method_name))
 			throw new RouterException("Trying to call unexisting method: $class_name::$method_name", 102);
-		}
 
-		return $return;
-	}
-
-
-	/**
-	 * Writes profile log.
-	 *
-	 * @return bool
-	 */
-	function writeProfileLog(){
-
-		if(isset($this->profile_log_data['time_start']) && $this->profile_log_data['time_start']){
-
-			// calculate time diff
-			$this->profile_log_data['total_time'] = microtime(true) - $this->profile_log_data['time_start'];
-
-			// write log
-			ProfileLogger()->log($this->profile_log_data);
-
-			return true;
-		}
-
-		return false;
+		$invoke_method = new ReflectionMethod($object, $method_name);
+			
+		// call method with arguments
+		return $invoke_method->invokeArgs($object, $method_arguments);
 	}
 }

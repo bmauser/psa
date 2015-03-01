@@ -7,10 +7,4 @@
 include_once 'PsaException.php';
 
 
-/**
- * This exception will be raised by some methods from the {@link Logger} class.
- */
-class LoggerException extends PsaException{
-
-}
-
+class LoggerException extends PsaException{}

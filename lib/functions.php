@@ -59,10 +59,10 @@ function deleteUserGroup($id, $user_or_group){
 			// if no rows affected
 			if(Db()->affectedRows() <= 0){
 				$failed = 1;
-				$log_data['message']  = 'Unable to delete ' . (($user_or_group == 1) ? 'user' : 'group') . ". Maybe does not exists.";
+				$log_message  = 'Unable to delete ' . (($user_or_group == 1) ? 'user' : 'group') . ". Maybe does not exists.";
 			}
 			else{
-				$log_data['message']  = (($user_or_group == 1) ? 'User' : 'Group') . ' deleted';
+				$log_message  = (($user_or_group == 1) ? 'User' : 'Group') . ' deleted';
 			}
 
 			// logging
@@ -84,7 +84,7 @@ function deleteUserGroup($id, $user_or_group){
 						$log_data['groupname'] = $id_value;
 				}
 
-				Logger()->log($log_data);
+				Logger()->info($log_message, $log_data);
 			}
 		}
 
@@ -277,7 +277,7 @@ function isInt($value){
  * @throws PsaException
  * @return Ambigous <unknown, NULL>
  */
-function getInstance($class_name, $instance_name = null, array $constructor_args = null, $is_function = false, $only_first_instance = false){
+function getInstance($class_name, $instance_name = null, array $constructor_args = array(), $is_function = false, $only_first_instance = false){
 
 	// instance store
 	static $first_instance = array();
@@ -312,10 +312,7 @@ function getInstance($class_name, $instance_name = null, array $constructor_args
 		
 		// if function name is passed
 		if($is_function){
-			if($constructor_args)
-				$instance = call_user_func_array($class_name, $constructor_args);
-			else
-				$instance = $class_name();
+			$instance = call_user_func_array($class_name, $constructor_args);
 		}
 		
 		else if($constructor_args){

@@ -64,7 +64,7 @@ $PSA_CFG['@asFunction_file'] = PSA_BASE_DIR . '/wri/asfunctions.php';
  * Web path to the folder where index.php is if application is not in web server root directory.
  * Set to empty ('') if your application is in the web server root folder.
  * Example: '/webroot/myapp'
- * Leave this value commented if you want to auto discover application root folder (in front_controller.php).
+ * Leave this value commented if you want to auto discover application root folder (in init.php).
  */
 //$PSA_CFG['folders']['basedir_web'] = '';
 
@@ -167,6 +167,7 @@ $PSA_CFG['password_hash'] = 'sha256';
 $PSA_CFG['database']['table']['user'] = 'psa_user';
 $PSA_CFG['database']['table']['group'] = 'psa_group';
 $PSA_CFG['database']['table']['user_in_group'] = 'psa_user_in_group';
+$PSA_CFG['database']['table']['log'] = 'psa_log';
 
 
 /**
