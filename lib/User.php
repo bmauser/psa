@@ -395,7 +395,7 @@ class User extends ActiveRecord{
 		if($success){
 
 			// write log
-			if(Cfg('logging.max_log_level') >= 2)
+			if(Cfgn('logging.enabled'))
 				$this->log("Group membership changed: " . implode(',',$group_id) . " action=" . ($action ? 'add' : 'remove'),__METHOD__,2);
 
 			if(!$failed)
@@ -526,7 +526,7 @@ class User extends ActiveRecord{
 	protected function log($message, $method = '', $level = 1, $type = ''){
 
 		// if logging is enabled
-		if(Cfg('logging.max_log_level') >= $level){
+		if(Cfgn('logging.enabled')){
 
 			$log_data['user_id']  = $this->id;
 			$log_data['username'] = $this->username;

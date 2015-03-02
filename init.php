@@ -10,15 +10,13 @@
  */
 
 
-
-
-
+require __DIR__ . '/../../../vendor/autoload.php';
 
 // PSA main directory
 define('PSA_BASE_DIR', __DIR__);
 
-
-
+// include required files
+include PSA_BASE_DIR . '/wri/asfunctions.php';
 
 
 
@@ -52,13 +50,13 @@ include PSA_BASE_DIR . '/lib/Registry.php';
 
 
 // register files on every request
-if($PSA_CFG['develop_mode'] && $PSA_CFG['develop_mode_register_files']){
-	Files()->save();
+if($PSA_CFG['develop_mode'] && $PSA_CFG['asFunction']['develop_mode_check']){
+	AsFunctionGenerator()->write();
 }
 
 
 // register autoloader() function as __autoload() implementation
-spl_autoload_register('autoloader');
+// spl_autoload_register('autoloader');
 
 
 

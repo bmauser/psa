@@ -30,11 +30,11 @@ class Smarty extends Smarty{
 		parent::__construct();
 
 		// Smarty folder configuration
-		$this->cache_dir    = PSA_BASE_DIR . '/' . Cfg('folders.smarty.cache_dir');
-		$this->config_dir   = PSA_BASE_DIR . '/' . Cfg('folders.smarty.config_dir');
-		$this->compile_dir  = PSA_BASE_DIR . '/' . Cfg('folders.smarty.compile_dir');
+		$this->cache_dir    = PSA_BASE_DIR . '/' . Cfg('smarty.cache_dir');
+		$this->config_dir   = PSA_BASE_DIR . '/' . Cfg('smarty.config_dir');
+		$this->compile_dir  = PSA_BASE_DIR . '/' . Cfg('smarty.compile_dir');
 		if(!$template_dir)
-			$template_dir = Cfg('folders.template_dir');
+			$template_dir = Cfg('smarty.template_dir');
 		$this->template_dir = PSA_BASE_DIR . '/' . $template_dir;
 
 		$this->use_sub_dirs = true;

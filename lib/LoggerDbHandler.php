@@ -89,8 +89,7 @@ class LoggerDbHandler extends Monolog\Handler\AbstractProcessingHandler{
 	 * @param array|string $monolog_record Array with data to be logged or log message only.
 	 * @param int|string $log_storage Storage for the log. This is the index of <var>$PSA_CFG['logging']['storage']</var>
 	 * array in {@link config.php}. Default is 'psa_default'.
-	 * @return int 0 for failure, 1 for success, -1 logging is disabled or the log level for the message is set too low
-	 * (bigger number than <var>$PSA_CFG['logging']['max_log_level'] </var>).
+	 * @return int 0 for failure, 1 for success, -1 logging is disabled or the log level for the message is set too low.
 	 * @see get_instance()
 	 * @see formatFileLog()
 	 * @see format_database_log()

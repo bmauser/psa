@@ -57,7 +57,7 @@ class PsaException extends Exception{
 	protected function log($log_message){
 
 		// if logging is enabled
-		if(Cfg('logging.max_log_level') >= 1){
+		if(Cfgn('logging.enabled')){
 			
 			if(is_array($log_message))
 				$log_data = &$log_message;

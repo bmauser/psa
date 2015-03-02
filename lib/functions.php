@@ -66,7 +66,7 @@ function deleteUserGroup($id, $user_or_group){
 			}
 
 			// logging
-			if(Cfg('logging.max_log_level') >= 2){
+			if(Cfgn('logging.enabled')){
 				// parameters for Logger
 				$log_data['function'] = __FUNCTION__;
 				$log_data['level']    = 2;
@@ -145,37 +145,6 @@ function deleteUser($user){
  */
 function deleteGroup($group){
 	return deleteUserGroup($group, 2);
-}
-
-
-/**
- * This function is registered with the PHP <kbd>spl_autoload_register()</kbd> function as <kbd>__autoload()</kbd> implementation
- * used to auto include .php files.
- *
- * Thus, if you want to extend some class you don't have to include its file, it will be included automatically.
- *
- * <b>Note:</b> Class autoloading will be working only in folders specified with
- * <var>$PSA_CFG['folders']['autoload'][]</var>  configuration
- * options. Also, file registration must be invoked to generate <kbd>autoload_data.php</kbd> file that contains array
- * with all classes and their paths. There is a command line helper script <kbd>register_files.php</kbd> for that.
- *
- * @see PreInit::register()
- */
-function autoloader($class_name){
-
-	static $psa_files = null;
-
-	// read data from generated autoload_data.php file
-	if(!$psa_files){
-		$psa_files = Files();
-		$psa_files->set_data();
-	}
-
-	// try to include registered class
-	if($psa_files->files_data && array_key_exists($class_name, $psa_files->files_data['class_paths'])){
-		include_once $psa_files->files_data['class_paths'][$class_name];
-		return;
-	}
 }
 
 
@@ -371,8 +340,9 @@ function &getPropertyBySelector(&$object, $selector, $exception_class_name = 'Ps
 
 	// if not set
 	if(isset($not_isset)){
-		if($exception_class_name)
+		if($exception_class_name){
 			throw new $exception_class_name($exception_message);
+		}
 		else{
 			$return = null; 
 			return $return;

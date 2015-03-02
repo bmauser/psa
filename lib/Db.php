@@ -213,7 +213,7 @@ class Db{
 				if($dsn)
 					$this->pdo = new PDO($dsn, $username, $password, $driver_options);
 				else
-					$this->pdo = new PDO(Cfg('pdo.dsn'), Cfg('pdo.username'), Cfg('pdo.password'), Cfgn('pdo.driver_options'));
+					$this->pdo = new PDO(Cfg('db.dsn'), Cfg('db.username'), Cfg('db.password'), Cfgn('db.driver_options'));
 			}
 			catch(PDOException $e){
 
@@ -221,7 +221,7 @@ class Db{
 					throw $e;
 
 				if(!$dsn)
-					$dsn = Cfg('pdo.dsn');
+					$dsn = Cfg('db.dsn');
 				
 				// check if PDO extension is enabled
 				if(substr($dsn, 0, 6) == 'mysql:' && !extension_loaded('pdo_mysql'))
