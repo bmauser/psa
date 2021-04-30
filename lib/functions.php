@@ -370,7 +370,7 @@ function prs($value, $return_only = false){
 		$return = '<pre>' . htmlspecialchars (print_r($value, TRUE)) . '</pre>';
 	// cli mode
 	else
-		$return = print_r($value, TRUE);
+		$return = print_r($value, TRUE) . PHP_EOL;
 
 
 	if($return_only)
