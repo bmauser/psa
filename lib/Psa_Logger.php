@@ -236,6 +236,9 @@ class Psa_Logger extends Psa_Singleton{
 						$psa_registry = Psa_Registry::get_instance();
 						if(!(@$psa_registry->psa_log_database_connection instanceof Psa_PDO)){
 							$psa_registry->psa_log_database_connection = new Psa_PDO();
+							if(isset($PSA_CFG['logging']['pdo'])) {
+                                $psa_registry->psa_log_database_connection->connect($PSA_CFG['logging']['pdo']['dsn'], $PSA_CFG['logging']['pdo']['username'], $PSA_CFG['logging']['pdo']['password'], $PSA_CFG['logging']['pdo']['driver_options']);
+                            }
 						}
 						$this->database = $psa_registry->psa_log_database_connection;
 					}

@@ -200,6 +200,12 @@ $PSA_CFG['logging']['time_format'] = 'd.m.Y H:i:s';
 //       on every request 3 database connections will be opened.
 $PSA_CFG['logging']['new_database_connection'] = 0;
 
+// Database connection settings for log database (if different from the main database connection).
+//$PSA_CFG['logging']['pdo']['username'] = 'logDatabaseUser';
+//$PSA_CFG['logging']['pdo']['password'] = 'logDatabasePass';
+//$PSA_CFG['logging']['pdo']['dsn']      = 'mysql:host=localhost;port=3306;dbname=logDatabaseName';
+//$PSA_CFG['logging']['pdo']['driver_options'] = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8", PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
+
 
 /**
  * User passwords hashing method. This value must be valid argument for hash() PHP function.
